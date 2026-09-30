@@ -3,7 +3,6 @@
 python -m bassnet.eval_cached --build [--models GLOB]     # compute posteriors (GPU)
 python -m bassnet.eval_cached --variant NAME              # evaluate a named variant
 """
-import paths
 import argparse
 import glob
 import json
@@ -13,6 +12,7 @@ import sys
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import paths  # noqa: E402
 from bassnet.eval_e2e import test_metas, event_f1  # noqa: E402
 from bassnet.decode import decode_notes, decode_beats, note_metrics  # noqa: E402
 from bassnet.quantize import quantize, beat_time, TPB  # noqa: E402

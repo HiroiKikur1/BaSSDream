@@ -2,7 +2,6 @@
 
 Output: cache/bassnet/stems/<md5>.flac (mono 22050 Hz) + cache/bassnet/index.json
 """
-import paths
 import glob
 import hashlib
 import json
@@ -13,6 +12,7 @@ import time
 import zipfile
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import paths  # noqa: E402
 from bassnet.gpif_parser import parse_gp  # noqa: E402
 
 TABS = paths.TABS

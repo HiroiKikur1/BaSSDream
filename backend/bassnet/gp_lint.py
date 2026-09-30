@@ -8,7 +8,10 @@ The profile is learned from the library originals:
   * values    - leaf text for enumerated tags (few distinct values in real files) must be a known value
 Usage: python -m bassnet.gp_lint file.gp [...]      (profile cached in cache/bassnet/gp_profile.json)
 """
-import paths
+import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import paths  # noqa: E402
 import glob
 import json
 import os

@@ -163,7 +163,7 @@ cd backend && python -c "from tab_scanner import scan_all_tabs; scan_all_tabs(fo
 | `gpif_parser.py` | GP6/7/8 解析：选贝斯轨，展开反复和交替结尾，处理倚音、连音线、闷音；`score_anchors` 是纯谱面速度时钟。**SyncPoint 语义（已实测验证）**：同步段内音频以 ModifiedTempo 匀速运行；audio_time = FrameOffset/44100 − FramePadding/44100（`PAD_SIGN=-1`）。 |
 | `build_stems.py` | 用 BS-Roformer-SW（overlap 2，autocast）分离全库贝斯，输出 `cache/bassnet/stems/<md5>.flac`（22050Hz 单声道）；索引写在 `index.json`。 |
 | `dataset.py` | CQT 特征（A0 起，3 bin/半音，264 bin，hop 256 ≈ 86fps）、混音 log-mel（128 维）、首轮标签对齐（CQT 互相关，已被 `align_labels` 取代）、拍点/强拍标签。同一音频对应多份谱时的选择规则：**5 弦 > 非简化版 > 音符最多**。 |
-| `align_labels.py` | **当前标签对齐方法**：短窗 STFT 起音包络 × 音高能量，依次做全局偏移、5 秒窗局部精修（中值平滑）、逐音 ±25ms 吸附；原始时间保存在 `time_gp/end_gp`。 |
+| `lab/align_labels.py` | **当前标签对齐方法**：短窗 STFT 起音包络 × 音高能量，依次做全局偏移、5 秒窗局部精修（中值平滑）、逐音 ±25ms 吸附；原始时间保存在 `time_gp/end_gp`。 |
 | `model.py` | BassNet：谐波堆叠 CQT（½f…6f）→ 卷积 → 双向 GRU(256)，混音 mel 分支，`stem_branch`（v2 起新增：分离音轨宽频加差分分支）。输出 49 类帧音高（0 表示休止，MIDI 23–70）、起音、闷音、拍、强拍。`load_checkpoint()` 会按检查点里的 `arch` 构建对应结构。 |
 | `train.py` | 10 秒随机切片；增广有 ±3 半音移调、±10% 时间伸缩、增益、频谱倾斜、噪声；AMP；OneCycle。**固定划分**：测试集按歌名分组，基于完整索引（`test_split.json`）；验证集从训练歌里另外划出（种子 11）。 |
 | `decode.py` | `decode_notes`（默认参数：起音阈值 0.5、最小间隔 4 帧、音高判定窗口为起音后 2–10 帧；可选网格约束，默认关闭）；`decode_beats`（Ellis 式 DP，局部速度连续、允许速度突变、全局周期先验；强拍取激活峰并按拍号补齐）；`note_metrics`。 |
@@ -175,12 +175,12 @@ cd backend && python -c "from tab_scanner import scan_all_tabs; scan_all_tabs(fo
 | `eval_e2e.py` | 在测试集上跑完整链路（含节拍/强拍 F1）。 |
 | `eval_cached.py` | 把测试集后验缓存到 `eval/post_cache*`，之后离线快速评测各种变体；`--combine` 可以平均多个缓存做集成。 |
 | `tune_decode.py` | 在验证集上扫解码参数。 |
-| `realign.py` | EM 标签精修（用模型输出微调训练标签；测试集不动）。**注意**：它会让验证 F1 虚高；而 `align_labels` 会从 `time_gp` 重新计算，覆盖掉 EM 的结果。 |
+| `lab/realign.py` | EM 标签精修（用模型输出微调训练标签；测试集不动）。**注意**：它会让验证 F1 虚高；而 `align_labels` 会从 `time_gp` 重新计算，覆盖掉 EM 的结果。 |
 | `consensus.py` / `lm.py` | 重复一致性、音程语言模型：受控测试有效，真实数据无效，默认不启用。 |
 | `score_align.py` | 录音 ↔ 乐谱对齐（用于伴奏补齐，见 §4.3）。 |
-| `bench_legacy.py` | 旧引擎基线，`--test` 只跑测试集。 |
-| `run_p1.py` | 通宵编排脚本（已执行完毕）。 |
-| `test_roundtrip.py` | 量化和写出的保真度测试。 |
+| `lab/bench_legacy.py` | 旧引擎基线，`--test` 只跑测试集。 |
+| `lab/run_p1.py` | 通宵编排脚本（已执行完毕）。 |
+| `lab/test_roundtrip.py` | 量化和写出的保真度测试。 |
 
 ### 5.2 缓存 `cache/bassnet/`
 - `index.json`：320 份谱 → 296 段唯一音频（按 md5）。
@@ -255,7 +255,7 @@ cd backend && python -c "from tab_scanner import scan_all_tabs; scan_all_tabs(fo
    - `pipeline.posteriors` 能正常加载混合结构的模型；
    - 生成的 GP 能在 Guitar Pro 8 里打开，伴奏同步；
    - 进度行和 JSON 结果能被 WPF 正确解析。
-3. 考虑在 v3 上再做一轮 EM 精修（`realign.py`），然后微调；评测时注意验证集会虚高，只看测试集。
+3. 考虑在 v3 上再做一轮 EM 精修（`lab/realign.py`），然后微调；评测时注意验证集会虚高，只看测试集。
 
 ### P1 — 扒谱精度（架构方向）
 - **起音**：同音重复是最大短板。可以尝试：
@@ -324,7 +324,7 @@ cd backend && python -c "from tab_scanner import scan_all_tabs; scan_all_tabs(fo
 ## 10. 2026-09-26 续（本节为最新进展，与前文冲突时以本节为准）
 
 ### 10.1 端到端实测（P0.2 完成）
-- 新脚本 `bassnet/e2e_real.py`：从测试集 GP 抽出原混音 → 以子进程跑 `ai_transcriber.py`（与 WPF 相同路径）→ 解析写出的 GP（按其自身同步点换算音频时间）→ 与原谱比较。结果在 `cache/bassnet/e2e/`。
+- 新脚本 `bassnet/lab/e2e_real.py`：从测试集 GP 抽出原混音 → 以子进程跑 `ai_transcriber.py`（与 WPF 相同路径）→ 解析写出的 GP（按其自身同步点换算音频时间）→ 与原谱比较。结果在 `cache/bassnet/e2e/`。
 - ALIVE（Morfonica）：音高 48.6%，与离线评测 48.3% 一致；写出 GP 的全局同步误差 +6ms；5 条进度行、JSON 结果均正常。**离线指标可代表真实流程。**
 - 修复：
   - `ai_transcriber` 写 GP 前调用 `gp_guard.is_protected()`，冲突时改写 `[BASS TAB] xxx [AI].gp`；`gp_writer` 写出的 meta.json 带 `bassstationDerived: true`（AI 谱可被重新扒谱覆盖，原谱不会）。
@@ -345,7 +345,7 @@ cd backend && python -c "from tab_scanner import scan_all_tabs; scan_all_tabs(fo
 - 音符结束阈值 `end_thr` 0.4–0.8：时值准确率变化 < 0.3%。
 - 同音重复弱起音合并 `rep_thr`：0.6 时误报 −3.5% 但召回 −1.5%，全对 +0.2%，基本中性；更高阈值明显变差。v3 起音峰值无法区分真假重复。
 - 节拍周期选择 `strong_frac`：验证集最优 0.8（现值），测试集 0.9 略好 —— 不改。
-- EM 精修（`realign.py`）：v3 起音与标签中位偏差已仅 11.6ms，且 realign 以 `time_gp` 为基准会丢掉 STFT 对齐，跳过。
+- EM 精修（`lab/realign.py`）：v3 起音与标签中位偏差已仅 11.6ms，且 realign 以 `time_gp` 为基准会丢掉 STFT 对齐，跳过。
 
 ### 10.4 误差结构（v3 ep16，验证集）
 - 时值误差主要来自起音错误而非结束判定：同音假重复把一个音切成两个（6.8%）、休止/结尾（6.7%）、漏掉下一个起音（3%）。
@@ -483,10 +483,10 @@ cd backend && python -c "from tab_scanner import scan_all_tabs; scan_all_tabs(fo
 ### 11.9 v5：技法头 + 效果器增广（进行中）与 beat_this 评估
 - **技法标签**：`gpif_parser` 现在解析 Slide 标志位（1 换把 / 2 连音 / 4 向下滑出 / 8 向上滑出 / 16、32 滑入）、HopoOrigin/Destination、Beat 级 Slapped/Popped；已补进全部 296 个特征 json（`cache/add_tech_labels.py`，逐音校验 0 不匹配）。曲库频率：滑音 20%（264 首）、击勾弦 2.6%、闷音 2.1%、Slap/Pop 2.0%/1.3%（36 首）。
 - **模型**：`BassNet(tech=7)` 新增技法头（`model.TECH_NAMES`：slide_arr, slide_out_down, slide_out_up, slide_in, hopo_arr, slap, pop），标签在音符起音帧；旧检查点照常加载（5 路输出）。
-- **效果器增广**：`bassnet/build_fx.py`（tanh/硬削波/非对称/fuzz，驱动 1.5–25×，可选中频提升，音箱低通 1.5–5 kHz，干湿 0.3–1），每首 2 个变体 → `cache/bassnet/feats_fx/`（592 个，按真实录音高频能量分布校准：曲库中位 0.036、90% 0.13、最高 0.30）。训练 `--fx-p 0.3`。训练缓存 CQT 改为 float16。
-- **推理端**：`pipeline.posteriors(with_tech=True)`、`attach_techniques`（阈值 `cache/bassnet/tech_thr.json`，由 `python -m bassnet.eval_tech --split val --cache ... --tune` 生成）；写出器支持 Slapped/Popped（滑音/击勾弦已有），GP8 实测滑音线、H、S、P 均正常显示。
+- **效果器增广**：`bassnet/lab/build_fx.py`（tanh/硬削波/非对称/fuzz，驱动 1.5–25×，可选中频提升，音箱低通 1.5–5 kHz，干湿 0.3–1），每首 2 个变体 → `cache/bassnet/feats_fx/`（592 个，按真实录音高频能量分布校准：曲库中位 0.036、90% 0.13、最高 0.30）。训练 `--fx-p 0.3`。训练缓存 CQT 改为 float16。
+- **推理端**：`pipeline.posteriors(with_tech=True)`、`attach_techniques`（阈值 `cache/bassnet/tech_thr.json`，由 `python -m bassnet.lab.eval_tech --split val --cache ... --tune` 生成）；写出器支持 Slapped/Popped（滑音/击勾弦已有），GP8 实测滑音线、H、S、P 均正常显示。
 - v5 命令：`python -m bassnet.train --epochs 40 --seed 2 --tech --fx-p 0.3 --out cache\bassnet\staging\bassnet_v5.pt`，日志 `cache/p1_train_v5.log`。
-- **beat_this（CPJKU，MIT，权重 final0 81 MB 已下载到 ~/.cache/torch/hub/checkpoints，`pip install beat-this --no-deps`，torch 未变）**：在本库上**比我们自己的节拍头差**（验证集拍 F1 0.86 vs 0.93，小节完全一致 17% vs 27%）：系统性早 18 ms，55 首里 7 首选了半速（我们的节拍头学的是这些谱的速度记法习惯）。**不采用**，代码 `bassnet/beat_external.py`、`eval_cached` 变体 bt/bt_hmm 保留。
+- **beat_this（CPJKU，MIT，权重 final0 81 MB 已下载到 ~/.cache/torch/hub/checkpoints，`pip install beat-this --no-deps`，torch 未变）**：在本库上**比我们自己的节拍头差**（验证集拍 F1 0.86 vs 0.93，小节完全一致 17% vs 27%）：系统性早 18 ms，55 首里 7 首选了半速（我们的节拍头学的是这些谱的速度记法习惯）。**不采用**，代码 `bassnet/lab/beat_external.py`、`eval_cached` 变体 bt/bt_hmm 保留。
 - **八度错误分析**：出错时模型很确定（正确八度的后验只有所选的 2–10%），且相邻音也大多在错误八度（仅 8–17% 支持正确八度）→ 整段八度偏移，解码层面无法修复；需要模型/数据层面（可能是录音与谱的八度记法不一致、或某些音色整体误判）。
 
 ## 12. 2026-09-26：演奏评测重写（`backend/performance_evaluator.py`）
@@ -523,7 +523,7 @@ cd backend && python -c "from tab_scanner import scan_all_tabs; scan_all_tabs(fo
 
 ### 11.11 对照实验：通用大模型 vs 自训专用模型（2026-09-26 晚）
 - **标签上限**：同一录音的两份人工谱，4 弦改编版 vs 5 弦版音高一致率只有 27–94%（整段八度改编）；忠实重复版之间 95–100%；Easy/短版 61–87%。测试集里没有按名字可识别的改编版（选谱时优先 5 弦/非简化），训练+验证里有 9 首 + 31 首 Live 版。
-- **YourMT3+**（YPTF.MoE+Multi noPS，GPL-3.0，检查点 561 MB 在 `tools/ymt/`，独立环境 `tools/ymt_env`（继承系统包，另装 lightning/transformers 4.45.1/torchvision 0.21 cu124——系统里的 torchvision 0.29 与 torch 2.6 不匹配，系统环境未改）；脚本 `tools/ymt/bench_bass.py`、对比 `bassnet/bench_compare.py`）：
+- **YourMT3+**（YPTF.MoE+Multi noPS，GPL-3.0，检查点 561 MB 在 `tools/ymt/`，独立环境 `tools/ymt_env`（继承系统包，另装 lightning/transformers 4.45.1/torchvision 0.21 cu124——系统里的 torchvision 0.29 与 torch 2.6 不匹配，系统环境未改）；脚本 `tools/ymt/bench_bass.py`、对比 `bassnet/lab/bench_compare.py`）：
 
 | 测试集 35 首（音频层面） | 音高 | 忽略八度 | 起音召回 |
 |---|---|---|---|
@@ -532,7 +532,7 @@ cd backend && python -c "from tab_scanner import scan_all_tabs; scan_all_tabs(fo
 | YourMT3+ 同一贝斯分轨 | 18.2% | 21.8% | 28.2% |
 
   时间对得上（中位偏早 22–37 ms），但严重漏音（只出约 40–60% 的音），只有 5% 的音被分到贝斯乐器。结论：**通用大模型整体替换/精调路线不可取**。
-- **MERT 特征探针**：MERT-v1-330M（CC BY-NC 4.0，1.26 GB 在 `cache/models/MERT-v1-330M/`），取第 6/12/18 层 → PCA 384（解释方差 85.7%，`cache/bassnet/mert_pca.npz`），特征 `cache/bassnet/feats_mert/`（3.2 GB，`python -m bassnet.build_mert`，用 ymt_env 运行）。模型 `BassNet(mert=384)` 新分支；训练时移调样本置零 MERT（MERT 无法随 CQT 移调），另 10% 随机丢弃。训练 v6m：`--epochs 40 --seed 3 --tech --mert 384`，日志 `cache/p1_train_v6m.log`。
+- **MERT 特征探针**：MERT-v1-330M（CC BY-NC 4.0，1.26 GB 在 `cache/models/MERT-v1-330M/`），取第 6/12/18 层 → PCA 384（解释方差 85.7%，`cache/bassnet/mert_pca.npz`），特征 `cache/bassnet/feats_mert/`（3.2 GB，`python -m bassnet.lab.build_mert`，用 ymt_env 运行）。模型 `BassNet(mert=384)` 新分支；训练时移调样本置零 MERT（MERT 无法随 CQT 移调），另 10% 随机丢弃。训练 v6m：`--epochs 40 --seed 3 --tech --mert 384`，日志 `cache/p1_train_v6m.log`。
 - **数据扩充**：清单与渠道见 `docs/训练数据扩充清单.md`（Songsterr Plus 官方可下 GP；mySongBook 不可导出；雪鹽子/ぷりんと楽譜/Piascore 只有 PDF）。
 - **MERT 探针结果（v6m，最佳第 35 轮，验证 F1 0.783）**：同配方单模型对比 v3，验证集音高 82.6→82.8%、记谱音符 58.9→59.5%、小节完全一致 24.5→24.7%；测试集音高 80.1→80.2%、记谱音符 55.0→54.4%、小节完全一致 22.9→23.6%——**均在 ±2% 噪声内，无实质提升**。加入集成（v3+v4+v6m）验证集略降、测试集略升，按规则不采用。未部署（部署还需在正式流程里跑 MERT，另需 transformers 环境）。
 - **总结论**：v3/v4/v5/v6m 无论改损失、加技法头、加效果器增广、加预训练特征，验证集都收敛到 note F1≈0.78、音高≈82%、小节完全一致≈25–27%；通用大模型（YourMT3+）远差于我们。→ 瓶颈是**数据量与标签（记谱）本身**，不是模型容量或特征。路线定为：**自训专用模型 + 扩充数据（见 docs/训练数据扩充清单.md）+ 记谱层建模（节拍网格）+ 核对版修正回流**。
@@ -548,7 +548,7 @@ cd backend && python -c "from tab_scanner import scan_all_tabs; scan_all_tabs(fo
 - `bassnet/audio_verify.py`：纯信号的逐音证据。`d_down(L)` = 在 L-12、L+7、L+16（低八度音的奇次谐波）处的峰值度，表示"实际比谱低一个八度"。
 - 结果：模型判为"低一个八度"的 848 个音里，**95% 录音里确有低八度证据**（中位 +2.1，正确音 −0.07）；判为"高一个八度"的则没有（模型真错）。→ 低八度"错误"多数是谱面写高八度（4 弦改编 / 音区选择），模型是对的。全部训练标签里约 3% 的音有强证据（>1.5），集中在 16 首（4 弦版、部分 Project SEKAI 合成贝斯叠低八度）。
 - 注意：物理上"只弹低八度"与"贝斯原八度 + 合成器叠低八度"频谱无法区分 → 八度部分是记谱选择，不直接改标签；可考虑对这些音用八度宽容的损失，最终八度由弦数/把位规则决定。
-- `bassnet/tab_quality.py`：一份谱与录音的客观一致度——agree（模型同时同音高）、agree_pc（忽略八度）、coverage（模型听到的音被谱包含的比例）+ 数据集的音频命中率 rate_final。基准（55 首未训练的购买谱）10% 分位：agree 0.653、agree_pc 0.72、coverage 0.828、rate 0.956；中位 0.83/0.86/0.92/0.99。
+- `bassnet/lab/tab_quality.py`：一份谱与录音的客观一致度——agree（模型同时同音高）、agree_pc（忽略八度）、coverage（模型听到的音被谱包含的比例）+ 数据集的音频命中率 rate_final。基准（55 首未训练的购买谱）10% 分位：agree 0.653、agree_pc 0.72、coverage 0.828、rate 0.956；中位 0.83/0.86/0.92/0.99。
 - 验证：4 弦改编版 agree 大降而 agree_pc 不变（能识别"只是八度改编"）；版本不符（栞 短版增編）全 0；Easy 版识别不出。人为损坏：错 30% 的音 100% 被拦，删 20% 的音 100% 被拦；错 10% 的音几乎拦不住（35% vs 完好谱 24% 的误拦率）——受限于模型本身约 80% 的准确率。
 - 若启用社区谱：导入 → 分离/特征 → 模型后验 → tab_quality 门控（达到购买谱 10% 分位）→ 训练时降权、永不进验证/测试集。尚未接入，等用户决定。
 
@@ -592,12 +592,12 @@ cd backend && python -c "from tab_scanner import scan_all_tabs; scan_all_tabs(fo
 - 旧评测用 `label_time_map`（缓存里的 `time_gp` + 对齐曲线）放置原谱小节，但 `time_gp` 来自旧版 GP 时间映射，与当前解析器相差中位 40–80 ms（Touring 0.85 s）→ 小节匹配（容差 80 ms）大量失败，谱面指标被系统性低估。
 - 现在默认 `fixed_q_map`：用**固定**的 v3+v4 后验跑 `score_align.align_posteriors`（节拍级 DP），结果缓存 `cache/bassnet/eval/gt_align/<md5>.json`，保证不同模型 A/B 用同一条小节时间线。`eval_cached`、`e2e_real`、`notation_oracle` 都走 `gt_score_bars()`。
 - `score_align.align()` 拆出 `align_posteriors(info, fr, on, be, do)`；伴奏对齐基准不变（中位 11.6 ms，97.4% ≤50 ms）。
-- 新增：`compare_bars` 输出 `note_pos_pitch`、`note_pos`；`error_breakdown()` 逐音归因；`notation_oracle.py`（PP/PG/GP/GG 神谕对照）；`notation_sweep.py`（多进程扫解码/量化/HMM 参数，`--beats` 可指定节拍后验来源）。
+- 新增：`compare_bars` 输出 `note_pos_pitch`、`note_pos`；`error_breakdown()` 逐音归因；`lab/notation_oracle.py`（PP/PG/GP/GG 神谕对照）；`lab/notation_sweep.py`（多进程扫解码/量化/HMM 参数，`--beats` 可指定节拍后验来源）。
 - 正式配置（v3+v4）修正后：验证 notation_note_acc 58.9% → **68.8%**，测试 → **67.2%**，小节线 94%/98%。真音符+真节拍喂量化器 ≈ 98%（量化器本身几乎不丢分）。
 - 逐音错误（验证）：音高 7.9%、多余音 7.4%（不计入召回，但使前一音时值变短）、小节错位 5.1%（Henceforth 强拍相位差 2 拍、The Whole Blue World 3/4 判成 4/4、Imprisoned XII 5 拍）、漏音 4.3%、时值 8.5%（其中约 3/4 是"时值=到下一个音"，但下一个音多了或漏了 → 本质是起音问题）。
 - 试过无效：起音阈值扫描（0.5 已最优）、`grid_beats` 弱起音（变差）、强拍 HMM 加"贝斯换根音"证据 `bass_change_evidence`（+0.3–0.6，不稳定，默认关闭 `chg_w=0`）。
 
-### 17.2 标签时间错位与重对齐（`bassnet/relabel.py` → `cache/bassnet/labels_v2/`）
+### 17.2 标签时间错位与重对齐（`bassnet/lab/relabel.py` → `cache/bassnet/labels_v2/`）
 - 旧标签（作者 GP 同步 + 局部 CQT 修正）在 Live 版和快速八分音符段整段偏 60–120 ms（常恰好一个八分）。纯信号频谱通量裁判：分歧音符中支持新对齐 1308 vs 旧标签 526（另 473 两边都有起音）。
 - 做法：两折模型 `staging/fold0.pt`/`fold1.pt`（`train.py --fold 0/1`，各用一半训练歌 20 轮；验证 F1 都约 0.776，与全量模型相当）为另一半歌出后验；val/test 用缓存 v3+v4 后验 → `align_posteriors` → 音符时间 = 对齐网格，±35 ms 吸附到起音峰；拍/强拍也从对齐网格重建；只有频谱通量支持度不下降才采用新标签。
 - 结果：296 首里 293 首采用；通量支持 0.839 → 0.901（仅网格不吸附 0.877）；平均 9.8% 音符移动 >60 ms；7 首原先因 rate<0.85 被排除的歌重新可用（285 首）。
@@ -608,7 +608,7 @@ cd backend && python -c "from tab_scanner import scan_all_tabs; scan_all_tabs(fo
 - `train.py --epochs 40 --seed 1 --rep-w 2.0 --sus-w 1.5 --labels labels_v2`，`staging/bassnet_v8.pt`，最佳 ep31 验证 F1 0.840（同尺子 v4 0.835、v3 0.832）。缓存 `eval/val_v8`、`eval/post_cache_v8`。
 - 单模型：音高 +1–1.5、起音召回 +1.5，但多余音 +1–2、拍 F1 变差；谱面 验证 +0.3 / 测试 −3.4。v3+v4+v8：验证 +0.8 / 测试 −0.8。换阈值、节拍改用 v3+v4 都在 ±1 噪声内。
 
-### 17.4 错误审计（`bassnet/error_audit.py`、`bassnet/audit_list.py`）
+### 17.4 错误审计（`bassnet/lab/error_audit.py`、`bassnet/lab/audit_list.py`）
 - 起音匹配但音高不同的音（验证 8.9%），用分离轨谐波证据 `d_here` 做裁判：支持模型 74%、支持谱 19%、不确定 8%；裁判在模型与谱一致的音上判错率 2–6%。非八度错误（半音/全音/四五度）也有 65–80% 支持模型。八度类因 E1 基频弱，结论要打折。
 - 含义：剩余"错误"相当一部分是谱与录音不一致；现有 GT 已接近测不出进步的程度 → 需要人工核对的金标准小集合。
 - 抽查清单：`docs/音高分歧抽查清单.md`（4 首 × 12 处，含时间/小节/拍/谱/模型/裁判倾向），等用户听后回填，用于校准裁判。
@@ -624,11 +624,11 @@ cd backend && python -c "from tab_scanner import scan_all_tabs; scan_all_tabs(fo
 - 用户问过但已回复、未执行：MuScriptor（CC BY-NC，需用户在 HF 接受许可并登录后才能实测）；租算力（现阶段不需要）；Rocksmith/CDLC（CDLC = 社区谱，暂不用；官方 DLC 解密违反 EULA）；视频 OCR 扒谱（不建议）。
 
 ### 17.7 "乐理 / 编曲 / 贝斯手" 先验（用户提议）—— 四种做法均无效
-- 交叉后验：`bassnet/xfold_post.py` → `cache/bassnet/eval/xfold/`（230 首训练歌，各用没见过它的 fold 模型）。逐音数据集 `bassnet/context_model.py build` → `cache/bassnet/context_ds.pkl`（train 17.3 万音 / val 1.7 万 / test 2.5 万）。
+- 交叉后验：`bassnet/lab/xfold_post.py` → `cache/bassnet/eval/xfold/`（230 首训练歌，各用没见过它的 fold 模型）。逐音数据集 `bassnet/lab/context_model.py build` → `cache/bassnet/context_ds.pkl`（train 17.3 万音 / val 1.7 万 / test 2.5 万）。
 - 声学模型出错时通常很自信：错选音高的中位概率 0.75，44% > 0.8；正确答案排第二约占一半。
-- ① 全曲上下文 Transformer（`context_model.py`，残差修正声学 log 概率 + 弦位辅助任务）：val 91.04 → 91.06（噪声）；加时间位置编码、lr 1e-3 → 训练 91.5 但 val 降到 90.0（过拟合）。
-- ② "贝斯手"联合解码（`play_decode.py`：top-3 音高 × 弦位 Viterbi，学到的指法发射/换把代价）：test 90.91 → 86.9（w=1）… 90.7（w=8），始终不超过基线。注意 `fingering.json` 只排除了 test，不排除 val。
-- ③ 八度一致性投票（`octave_vote.py`：同音名 + 前后音程 + 拍内位置分组，概率求和定八度）：val/test/train 全部持平或下降。
+- ① 全曲上下文 Transformer（`lab/context_model.py`，残差修正声学 log 概率 + 弦位辅助任务）：val 91.04 → 91.06（噪声）；加时间位置编码、lr 1e-3 → 训练 91.5 但 val 降到 90.0（过拟合）。
+- ② "贝斯手"联合解码（`lab/play_decode.py`：top-3 音高 × 弦位 Viterbi，学到的指法发射/换把代价）：test 90.91 → 86.9（w=1）… 90.7（w=8），始终不超过基线。注意 `fingering.json` 只排除了 test，不排除 val。
+- ③ 八度一致性投票（`lab/octave_vote.py`：同音名 + 前后音程 + 拍内位置分组，概率求和定八度）：val/test/train 全部持平或下降。
 - 结论：声学模型（BiGRU、数秒上下文、用谱训练）已隐含了从 230 首谱能学到的规律；剩余错误无法用统计先验推翻。
 - "?" 标记覆盖率（逐音音高错误）：当前 conf<0.5 标 3% 的音、抓到 19–26% 的错误（精度 60–65%）；conf<0.8 标 11–12%、抓到 52–56%（精度 40–45%）；conf<0.9 标 18–20%、抓到 68–70%。
 
@@ -641,7 +641,7 @@ cd backend && python -c "from tab_scanner import scan_all_tabs; scan_all_tabs(fo
 - 55 首：相似度 谱 0.586/0.612 vs 模型 0.591/0.617（验证/测试）；2 秒窗 模型更像 20–21%、谱更像 15–17%、其余持平。该指标偏向模型（模型本就跟着分离轨），且不适合跨分离模型比较（偏好"干"的分离轨）。
 - 对听文件：`cache/resynth_listen/<曲名>/`（分离轨 / 谱渲染 / 模型渲染 / 左右声道对照）。
 
-### 18.2 分离压力测试（`bassnet/sep_stress.py`、`bassnet/sep_compare.py`）
+### 18.2 分离压力测试（`bassnet/lab/sep_stress.py`、`bassnet/sep_compare.py`）
 - 渲染 8 种音色（指弹、拨片、slap、过载、fuzz、合成贝斯、八度、合唱）混入真实伴奏（原混音 − 分离贝斯），可选贝斯压低 dB，比较多个分离模型；结果 `cache/sep_stress/results.json`，样例音色 `cache/sep_stress/demo/`。
 - 正常音量 BS-Roformer-SW：多数音色 F1 损失 ≤1–2 点；fuzz −2~−6。
 - **贝斯压低 9 dB（被鼓/吉他埋住）**：指弹 F1 0.96→0.88、拨片 0.90、fuzz 0.78（音高 91%）；htdemucs_ft 明显更差（0.58–0.67）。现有开源模型里 BS-Roformer-SW 最好 → 需精调（重点 fuzz/过载 + 被埋）。
@@ -663,7 +663,7 @@ cd backend && python -c "from tab_scanner import scan_all_tabs; scan_all_tabs(fo
 
 ### 18.5 规整 + 多结尾 + 解析器修复（已接入正式流程）
 - `bassnet/regularize.py`：同拍号、(起音位置, 音高) Jaccard ≥ 0.7 的小节按中心点聚成"乐句家族"；每种写法放到每个成员位置上用声学后验打分（帧音高/休止对数概率 + 起音证据 + 未认领起音惩罚），全组总分最高者为标准写法；成员仅在自身位置得分损失 ≤ τ 时改写（真实加花保留）；跨小节连音的小节不动。正式流程 `pipeline.TIDY=True, TIDY_TAU=0.05`，在 quantize 之后、指法之前。
-- 评估 `bassnet/regularize_eval.py`（τ=0.05）：验证 改动 4.7% 音符，不同写法小节 72.4→66.5%，重合成 0.6018→0.6011，对参考谱 68.8→68.7%；测试 改动 5.7%，75.1→68.4%，重合成 −0.0008，对参考谱 −0.3。
+- 评估 `bassnet/lab/regularize_eval.py`（τ=0.05）：验证 改动 4.7% 音符，不同写法小节 72.4→66.5%，重合成 0.6018→0.6011，对参考谱 68.8→68.7%；测试 改动 5.7%，75.1→68.4%，重合成 −0.0008，对参考谱 −0.3。
 - `find_repeats` 增加多结尾（`|: 共同部分 |1. :|2. |`，两遍，结尾 ≤ 块长一半）与 `min_saved=2`（至少省 2 小节才用反复，避免一串单小节 |: :|）。块元组现为 `(起始, L, k, m)`，`_saved()` 算节省小节数。
 - `gpif_parser._playback_order` 修复：第二结尾在反复终止小节之后时原逻辑会跳过它；现在用 `cur_pass/block_end` 跟踪当前遍数。库内只有 1 份（Walking with you）展开结果变化（+1 小节），其余 9 份带反复的谱不变。
 - 回读验证：20 首验证歌 反复+多结尾版与展开版逐音一致；GP8 截图正常。`gp_lint` 自由值加入 AlternateEndings、同步字段。
@@ -687,12 +687,12 @@ cd backend && python -c "from tab_scanner import scan_all_tabs; scan_all_tabs(fo
 - `find_repeats` 默认风格：`REPEAT_LENGTHS = (2, 4, 8, 16)`，块起点须相对段落起点按块长对齐，`REPEAT_MIN_SAVED = 4`，`REPEAT_ALT = False`。20 首验证歌里只剩 3 首用到反复。
 - GP8 核对：Henceforth ♩=158 单一速度、7 个同步点、总时长 3:57 = 音频。
 - 仍存在（下一步）：强拍 HMM 会插入孤立 2/4 小节"跳相"（Henceforth 第 11 小节），导致后续段落错 2 拍；段落在前奏过碎。
-- 强拍实验（2026-09-28，均未部署，正式参数不变）：跳相/换拍号代价 p_jump 20 + p_meter 12 → 小节错位 验证 5.1→4.8%、测试 2.6→2.2%；贝斯"再进入"证据 `bass_entry_evidence`（`entry_w`）无效果；全曲相位模型 `bassnet/phase_model.py`（HMM 多数相位已 98–100% 正确，模型不更好）；全曲相位锁定 `decode_beats(phase_lock=...)` 验证最好 5.1→3.2% 但测试 2.7→3.2% 变差。结论：Henceforth 式"整段跑偏半小节"是局部修补解决不了的结构问题 → 见 docs/扒谱架构v2.md。
+- 强拍实验（2026-09-28，均未部署，正式参数不变）：跳相/换拍号代价 p_jump 20 + p_meter 12 → 小节错位 验证 5.1→4.8%、测试 2.6→2.2%；贝斯"再进入"证据 `bass_entry_evidence`（`entry_w`）无效果；全曲相位模型 `bassnet/lab/phase_model.py`（HMM 多数相位已 98–100% 正确，模型不更好）；全曲相位锁定 `decode_beats(phase_lock=...)` 验证最好 5.1→3.2% 但测试 2.7→3.2% 变差。结论：Henceforth 式"整段跑偏半小节"是局部修补解决不了的结构问题 → 见 docs/扒谱架构v2.md。
 
 ## 19. 2026-09-28：架构 v2 定稿与第 0 阶段启动（压缩对话前的状态）
 - 方案文档：`docs/扒谱架构v2.md`（第 9 节为执行版，含 DadaGP 的用途与质量把关）。用户决定：不要易弹版；GPU 任务在工作日空闲时跑；DadaGP 用户认为可信、已获授权（用作符号先验、指法、写谱风格、和弦进行，不当真实录音标签）。
 - 数据统一放 `D:\BassData\`（不计入 BassStation 200 GB 额度）：
-  - `stems6\<md5>\{bass,drums,guitar,piano,vocals,other}.flac`：`python -m bassnet.build_stems6`（BS-Roformer-SW，overlap 4，44.1 kHz 立体声，约 25–40 s/首，297 首，可续跑），日志 `D:\BassData\stems6.log`。
+  - `stems6\<md5>\{bass,drums,guitar,piano,vocals,other}.flac`：`python -m bassnet.lab.build_stems6`（BS-Roformer-SW，overlap 4，44.1 kHz 立体声，约 25–40 s/首，297 首，可续跑），日志 `D:\BassData\stems6.log`。
   - `musdb18hq.zip`：后台 curl 下载中（Zenodo 3338373 公开可下，22.66 GB，约 1.7 MB/s，可 `curl -C -` 续传），日志 `musdb18hq.log`；之后自动下载 `IDMT-SMT-BASS.zip`（Zenodo 7188892，1.58 GB）。
   - `IDMT-SMT-BASS-SINGLE-TRACKS\`：已解压（源 `D:\IDMT-SMT-BASS-SINGLE-TRACKS.zip`）。
   - `D:\moisesdb.zip`：用户浏览器仍在下载（21:40 时 19 GB 且在增长），完成后解压到 `D:\BassData\moisesdb\` 并按 moises-db README 的校验值核对。
@@ -700,22 +700,22 @@ cd backend && python -c "from tab_scanner import scan_all_tabs; scan_all_tabs(fo
 - 下一步（第 0 阶段剩余）：五维评测套件、歌曲档案 JSON 格式、DadaGP 解析；然后第 1 阶段（WSL2 部署 allin1、S-KEY、lv-chordia 零样本评测，调号/升降写法接入写谱）。
 
 ## 20. 2026-09-28 夜：第 0 阶段完成、第 1 阶段（调号、和弦、allin1）
-- **五维评测套件** `bassnet/song_eval.py`（`--run NAME [--key tab|none|方法]`，`--compare A B`）：val+test 55 首走正式写谱路径（缓存 v3+v4 后验 → `pipeline.build_gp`）后解析回来打分：①忠于录音（对 labels_v2 的音符 F1、对谱逐小节记谱准确率）②结构（小节线 F1、首小节、拍号、速度个数、调号、段落边界 F1）③可读（调外音/100 音、离格音、同步点、反复）④可弹（品位跳动、换把比例、小节内跨度）⑤写出的 GP 留在 `cache/bassnet/song_eval/<run>/` 供试听。基线 `base_tabkey`：音符 F1 0.829、记谱 0.676、小节线 F1 0.942、首小节 0.891、拍号 0.980、段落 F1 0.575、同步点 7.0（谱 2.5）。`pipeline.build_gp` 返回值加了 `bar0_time`。
+- **五维评测套件** `bassnet/lab/song_eval.py`（`--run NAME [--key tab|none|方法]`，`--compare A B`）：val+test 55 首走正式写谱路径（缓存 v3+v4 后验 → `pipeline.build_gp`）后解析回来打分：①忠于录音（对 labels_v2 的音符 F1、对谱逐小节记谱准确率）②结构（小节线 F1、首小节、拍号、速度个数、调号、段落边界 F1）③可读（调外音/100 音、离格音、同步点、反复）④可弹（品位跳动、换把比例、小节内跨度）⑤写出的 GP 留在 `cache/bassnet/song_eval/<run>/` 供试听。基线 `base_tabkey`：音符 F1 0.829、记谱 0.676、小节线 F1 0.942、首小节 0.891、拍号 0.980、段落 F1 0.575、同步点 7.0（谱 2.5）。`pipeline.build_gp` 返回值加了 `bar0_time`。
 - **升降写法** `bassnet/spelling.py`：按调号拼写（调内音用调的字母，调外音随调号方向），与购买谱 24.4 万个音一致 99.85%（旧写法全用升号：82.3%）；小调导音升号规则反而更差（谱里 D 小调写 Db），已去掉。`gp_writer` 已接入。
 - **调号识别** `bassnet/key_eval.py`（评测）+ `bassnet/key_detect.py`（正式）：全曲色度 + lv-chordia 和弦（原曲上跑，约 3 秒/首），两路证据按签名打分、权重在 297 首上学（`cache/bassnet/key_w.json`）。与谱调号一致 80.5%（10 折），旧检测器（前 90 秒 Krumhansl）63.6%；96% 在一个五度以内。错误多为 ±1 个五度（调式歧义）和 46 首谱内转调的歌。`ai_transcriber.build_complete_tab_project_bassnet` 已改用它（失败回退旧检测器）。lv-chordia 以 `--no-deps` 装入正式 ML Python（另加 pretty-midi、h5py、importlib_resources），numpy/torch 版本未变。
 - **反复记号频率**：在谱自身内容上统计，最少省 4 小节会让 27% 的谱出反复（雪鹽子实际 3%），8 → 11.5% 且仍覆盖他 10 份反复谱中的 8 份；`REPEAT_MIN_SAVED = 8`。55 首评测：有反复的歌 10 → 3（谱 2）。
 - **歌曲档案** `bassnet/song_doc.py`：`SongDoc`（节拍、小节时刻、拍数、复合拍、首小节、速度段、调号、段落[功能/能量/段内调]、和弦、每小节和弦、乐句家族、来源）+ `from_pipeline` + `validate`；和弦标签解析 `parse_chord` / `chord_pcs`。
 - **allin1**：WSL 未装（需管理员+重启），改为 Windows 原生：隔离 venv `cache/venv_allin1`（`--system-site-packages`，madmom 用 MSVC 从 git 编译，allin1 `--no-deps`），NATTEN 用纯 PyTorch 替身（venv 的 `site-packages/natten/functional.py`，按 NATTEN 0.14/0.15 的边界与相对位置偏置规则）。`bassnet/allin1_run.py`（我们的 6 轨 → allin1 的 4 轨：other = guitar+piano+other）→ `cache/bassnet/allin1/`。
   - 零样本（39 首）：24 首跟成半速；强拍 F1 0.656（我们的 HMM 0.837），强拍精确率 0.83 vs 0.85，段落边界 F1 0.55（我们的段落模型 0.575）。激活值 0.3 融合进我们的 HMM 仅 +0.4 点。结论：原样不如现行，需要精调。
-  - 精调 `bassnet/allin1_finetune.py`：`targets`（谱的拍、小节线、段落 → `cache/bassnet/l1_targets/`，训练 223 / val 20 / test 35 首）、`train`（从 harmonix-fold0 起，60 秒随机片段，AdamW 2e-4，mask 只算谱覆盖的区间，按 val 强拍 F1 存 `staging/allin1_ft_fold0.pt`）、`infer`。`layer1_eval.py` 用环境变量 `ALLIN1_DIR` 切换零样本/精调结果。
-- **和弦** `bassnet/chords_run.py`（venv）：lv-chordia 在 6 轨混合 / 和声轨（`_mix` / `_harm`）与原曲（`--orig`）上 → `cache/bassnet/chords/`。
-- **DadaGP**：数据需作者邮件授权后的链接（Zenodo 公开部分只有 PDF，GitHub 只有编解码工具，已克隆到 `D:\BassData\dadagp_tools`）。token 格式不含拍号、调号、段落标记，所以解析直接读 GP 文件：`bassnet/dadagp.py`（PyGuitarPro；贝斯轨音符、同曲吉他/键盘的半小节和弦、底鼓/军鼓、每小节拍号/调号/标记/反复；质量门槛：1 条贝斯轨、≥50 音、B0–G4、≥16 小节）；`parse <根目录>`、`stats`。示例文件测试通过。
+  - 精调 `bassnet/lab/allin1_finetune.py`：`targets`（谱的拍、小节线、段落 → `cache/bassnet/l1_targets/`，训练 223 / val 20 / test 35 首）、`train`（从 harmonix-fold0 起，60 秒随机片段，AdamW 2e-4，mask 只算谱覆盖的区间，按 val 强拍 F1 存 `staging/allin1_ft_fold0.pt`）、`infer`。`lab/layer1_eval.py` 用环境变量 `ALLIN1_DIR` 切换零样本/精调结果。
+- **和弦** `bassnet/lab/chords_run.py`（venv）：lv-chordia 在 6 轨混合 / 和声轨（`_mix` / `_harm`）与原曲（`--orig`）上 → `cache/bassnet/chords/`。
+- **DadaGP**：数据需作者邮件授权后的链接（Zenodo 公开部分只有 PDF，GitHub 只有编解码工具，已克隆到 `D:\BassData\dadagp_tools`）。token 格式不含拍号、调号、段落标记，所以解析直接读 GP 文件：`bassnet/lab/dadagp.py`（PyGuitarPro；贝斯轨音符、同曲吉他/键盘的半小节和弦、底鼓/军鼓、每小节拍号/调号/标记/反复；质量门槛：1 条贝斯轨、≥50 音、B0–G4、≥16 小节）；`parse <根目录>`、`stats`。示例文件测试通过。
 - **后台任务**：6 轨分离续跑（22:18 因文件名含奇怪扩展名崩溃，已修，同样的修复也加到了 key_eval / chords_run）；`cache/layer1_loop.sh` 每 15 分钟把新分出的歌跑 allin1、和弦、分轨色度；`cache/overnight.sh` 在分离完成后自动：key_eval 全量 → allin1 零样本评测 → 精调 fold0 40 轮 → 推理 → 精调后评测（日志 `cache/key_eval_full.log`、`layer1_zeroshot.log`、`allin1_ft_fold0.log`、`layer1_ft.log`）。下载改为 `D:\BassData\dl.sh`（任何 curl 错误都续传重试，日志 `dl.log`）。
 - **MoisesDB**：`D:\moisesdb.zip` 停在 23.7 GB（22:18 后不再增长，zip 目录缺失 = 未下完），需要用户在浏览器里恢复下载。
 - **段落按乐句长度解码**（正式）：`section_model.decode_boundaries_dp`：边界证据 + 训练谱的段落长度先验（`staging/section_len.json`，8 和 16 小节各占约 22%）的半马尔可夫动态规划，取代逐峰值挑边界。55 首：段落边界 F1 0.575 → 0.609，段落长度为 4 的倍数 41% → 55%（谱 59%）。参数 `SECTION_DECODE`，可用环境变量 `BASSNET_SEC_DEC` 覆盖做扫描。
 - **和弦契合度**（新指标，`song_eval`）：小节首音落在和弦根音 / 和弦音上的比例，我们 0.850 / 0.897，谱 0.845 / 0.896 —— 声学扒出来的低音已经和和声一样契合，贝斯语言模型的收益不会在小节首音上，而在经过音与含糊处。
 - **和弦先验能否纠音高（第 3 阶段可行性预检）**：55 首 val/test，模型音符与 labels_v2 起音匹配 39357 个，音级不同 2242 个、八度不同 1308 个。音级分歧里"谱是和弦音而模型不是" 602 个，"模型是和弦音而谱不是" 848 个 —— 按和弦偏向选音会让与谱的一致率变差（谱里大量经过音、非和弦音）。结论：贝斯语言模型不能用"贴和弦"来改音，只能在声学真正含糊（低置信）的音上、用学到的乐句写法（DadaGP + 雪鹽子谱）做裁决；八度问题要靠演奏习惯（指法/把位、slap 八度型），不是和声。
-- **真实 DI 贝斯评测** `bassnet/idmt_eval.py`（IDMT-SMT-Bass-Single-Tracks，17 条带弦/品标注的真实贝斯线，只作评测）：音符 F1 0.845，匹配音的音高 96.8%，我们的指法与演奏者选同一根弦 72.4%（同弦同品 72.0%）。个别曲目 F1 偏低：017（0.56）56 个音里 32 个是泛音（HA），009（0.65）全是闷音拨弦（MU）加揉弦——技法专项的具体靶子。指法 72% 是第 5 阶段指法模型的基线。
+- **真实 DI 贝斯评测** `bassnet/lab/idmt_eval.py`（IDMT-SMT-Bass-Single-Tracks，17 条带弦/品标注的真实贝斯线，只作评测）：音符 F1 0.845，匹配音的音高 96.8%，我们的指法与演奏者选同一根弦 72.4%（同弦同品 72.0%）。个别曲目 F1 偏低：017（0.56）56 个音里 32 个是泛音（HA），009（0.65）全是闷音拨弦（MU）加揉弦——技法专项的具体靶子。指法 72% 是第 5 阶段指法模型的基线。
 - **歌曲档案落地**：`pipeline.build_gp` 每次写谱时把 `SongDoc` 存到 `cache/bassnet/song_docs/<gp 名>.json`（`ai_transcriber` 把 key_detect 得到的和弦一并传入）。
 - **真实多轨分离评测** `bassnet/sep_real_eval.py`（MUSDB18-HQ test：SI-SDR + "分离后扒的音符 vs 真干净贝斯扒的音符"F1），`sep_compare.run_separator` 新增 `xlance_bass` / `xlance_dn_bass`（X-LANCE MSR 2025 冠军的贝斯修复模型，权重在 `D:\BassData\restoration\checkpoints`，代码 `D:\BassData\restoration\xlance-msr`）。`cache/overnight2.sh`、`overnight3.sh` 依次排队：压力测试（-9 dB、0 dB）→ MUSDB 解压 → 真实多轨评测。
 - **allin1 结论（第 1/2 阶段）**：全库 278 首零样本：强拍 F1 0.736（我们的 HMM 0.874），135 首跟成半速；激活值 0.3 融合 0.888。精调 fold0（6 轮后 val 不再涨，`staging/allin1_ft_fold0.pt`）在 55 首 val/test：强拍 F1 0.858（HMM 0.948），强拍精确率 0.966（最高）但首小节只有 0.69；融合 0.3：强拍 0.954（+0.6）但首小节 0.891 → 0.855；用它的强拍给整首歌投票定相位（`layer1_eval.phase_vote`）无变化；段落边界 0.583（我们的 DP 0.609）。**不采用**：我们在本领域数据上训练的节拍模型已强于通用模型，剩下的错误是局部的（个别段落的相位、乐句起点），不是整首的相位。allin1 的环境、脚本、精调结果保留，可在以后数据更多时再试。
@@ -738,16 +738,16 @@ cd backend && python -c "from tab_scanner import scan_all_tabs; scan_all_tabs(fo
   - 第二轮（凌晨 01:50 起，`restore_train_r2.log`）：训练曲 336 首（MUSDB 100 + MoisesDB 236）+ **40% 的片段用自家曲库训练曲的"去掉贝斯的乐队"做伴奏**（6 轨分离的鼓/吉他/钢琴/人声/其他，`lib_<md5>_rest.npy` 240 首，val/test 歌曲排除），15000 步，只有自家曲库 F1 超过 0.8228 才存 `staging/sw_bassft_r2.ckpt`。
   - **第二轮结果（05:01 结束）：无提升，未保存检查点。** 15000 步里自家曲库音符 F1 在 0.8197–0.8216 之间（原版 0.8228），MUSDB 0.824–0.834。结论：拿"干净分轨"为目标去精调 BS-Roformer-SW 的贝斯输出，对我们的扒谱没有帮助（曲库上 ±0.3 点属噪声范围，且一直略低）。分离路线到此为止，不再用这种方式继续投入 GPU。
   - 真正的 17% 差距（MUSDB：分离后扒 vs 干净贝斯扒）若要缩小，可能的方向是让**扒谱模型**直接学会从分离音频里还原"干净贝斯能听出的音"：用 MUSDB/MoisesDB 的 336 首真实多轨，以"干净贝斯上扒出的音符"为教师标签、以分离后的贝斯为输入训练 BassNet。但这等于用模型输出当训练标签，违反"不用 AI 输出训练"的原则，需用户决定。
-  - IDMT-SMT-Bass 单音技法库已解压到 `D:\BassData\IDMT-SMT-BASS\`（5306 个 wav；文件名 `BS_<琴>_EQ_<eq>_[PS_]<拨弦>_[ES_]<表情>_<弦1-4>_<品0-12>`）。**技法评测** `bassnet/idmt_tech_eval.py`（每类抽 40–60 个）：
+  - IDMT-SMT-Bass 单音技法库已解压到 `D:\BassData\IDMT-SMT-BASS\`（5306 个 wav；文件名 `BS_<琴>_EQ_<eq>_[PS_]<拨弦>_[ES_]<表情>_<弦1-4>_<品0-12>`）。**技法评测** `bassnet/lab/idmt_tech_eval.py`（每类抽 40–60 个）：
     - 音高：指弹/拨片/闷音/slap 拇指/slap 勾弦/揉弦/滑音/推弦 0.92–1.00（快推弦 BEQ 0.68）；泛音 0.00（预期内）。
     - 闷音（DN）只检出 7%，几乎全漏。
     - 技法标记在所有类别上都是 0：`tech_thr.json` 里除 slap（0.15）外阈值全是 1.01（等于关闭），而 slap 拇指单音上 slap 后验最大只有 0.03。**技法识别目前实际上是关着的/不工作**，这是第 5 阶段"技法专项"的起点（IDMT 许可只能评测，训练标签需另找：谱里的技法标记 + 用户核对版）。
-  - **技法专项分类器试验** `bassnet/tech_note.py`（只看每个音的起音：以音高为 0 号格重排的 CQT 8 帧 + 频带亮度/突变，4 类 plain/slap/pop/dead，谱标签训练曲 686 slap / 379 pop / 1775 dead）：val 谱 slap P 0.35 R 0.58、pop P 0.49 R 0.78、dead P 0.23 R 0.63；IDMT 真实单音上 slap 拇指只认出 5%、勾弦 1%，指弹误判闷音 31%。**不采用**。技法样本太少（slap/pop 只有 37 首歌），且分离后的贝斯与 DI 单音差异大；要做好需要更多带技法的真实标签（用户核对版回流、DadaGP 里带 slap/pop 标记的贝斯谱可做合成）。
+  - **技法专项分类器试验** `bassnet/lab/tech_note.py`（只看每个音的起音：以音高为 0 号格重排的 CQT 8 帧 + 频带亮度/突变，4 类 plain/slap/pop/dead，谱标签训练曲 686 slap / 379 pop / 1775 dead）：val 谱 slap P 0.35 R 0.58、pop P 0.49 R 0.78、dead P 0.23 R 0.63；IDMT 真实单音上 slap 拇指只认出 5%、勾弦 1%，指弹误判闷音 31%。**不采用**。技法样本太少（slap/pop 只有 37 首歌），且分离后的贝斯与 DI 单音差异大；要做好需要更多带技法的真实标签（用户核对版回流、DadaGP 里带 slap/pop 标记的贝斯谱可做合成）。
   - **自有谱格式已接入**：`pipeline.build_gp` 写完主 GP 后调用 `score_format.write_score`（另一个会话写的 `backend/score_format.py`），生成 `<GP名>.score.json`（核对版/4 弦版不写）；每音带 `time/end`（录音秒，80 ms 内匹配原始解码音）、`conf`（min(conf, on_peak)）、`cand`（起音处后验前三 [midi, p]），顶层 `model`（models.json 哈希、各角色权重、`audio_md5`（`transcribe_stem` 里算，混音字节 md5 前 16 位）、代码日期）。失败只打 `[score_format] skipped`。对方已在 WPF 编辑器里读写验证通过；编辑记录 `edits.jsonl` 支持 add/set/delete/set_rhythm/review（bars 左闭右开 + 录音秒 t）/undo，只有 review 过的区间才算真值。
   - **演示谱**（全部新改动，含伴奏，可直接用 GP8 打开）：`cache/bassnet/demo_0930/<Henceforth|My Dearest|Velonica|転生林檎>/[BASS TAB] *.gp`（及核对版）。四首调号都与谱一致（3♯ / 0 / 4♯ / 1♭），都只有一个速度（Henceforth 158）；Henceforth 在第 103 小节（尾奏）检测到转到 5♯，谱里没写转调——可能是最后副歌升调，也可能误判，请用户听判。
   - 与"项目功能审查与优化"会话（负责 WPF/评测）对齐了自有谱格式：它新建 `backend/score_format.py` 和 WPF 谱面视图，不碰 pipeline/gp_writer/quantize/song_doc；我在 `build_gp` 里加一行调用并提供每音的录音时间/置信度/模型版本/音频 md5；回流标签需要"已审核"标记（没改的音不等于确认过）以及小节线/速度/段落修改记录。
   - MoisesDB 下完（88.8 GB），md5 与 README 一致（13cf74eda129c38b914a51ea79fb1778），自动解压中。`cache/night_restore.sh`：第一轮结束后（有更好的检查点才）做压力测试 A/B（`sw_raw` vs `sw_bassft`，−9 dB），MoisesDB 解压后重建缓存、第二轮 15000 步（`staging/sw_bassft_r2.ckpt`，日志 `restore_train_r2.log`、汇总 `night_restore.log`）。
-- **指法序列模型**（`bassnet/fingering_nn.py`，双向 GRU 对每个音的可弹弦打分）：test 谱同弦率 0.8630 vs 现行 Viterbi 0.8631，IDMT 0.727 vs 0.715 —— 持平，不采用。87% 左右可能就是谱本身的一致性上限；等 DadaGP 再试。
+- **指法序列模型**（`bassnet/lab/fingering_nn.py`，双向 GRU 对每个音的可弹弦打分）：test 谱同弦率 0.8630 vs 现行 Viterbi 0.8631，IDMT 0.727 vs 0.715 —— 持平，不采用。87% 左右可能就是谱本身的一致性上限；等 DadaGP 再试。
 
 ## 22. 2026-09-30：练习闭环（段落 / 慢速录制、录制历史）+ 评测器修复 + 代码审查
 - **评测器 bug（已修，`performance_evaluator.py`）**：起音强度是对数 mel 通量，与音量无关；音高检查也是相对值 → 底噪会被判成弹奏。纯底噪带 `--lag-hint` 得 65 分；"停了手但录音没停"的后半段全判 PERFECT。修复：① 电平门限 `lvl`（贝斯音区 CQT 线性峰值）：第一遍 ≥ 录音 95 分位的 5%，第二遍 ≥ 已匹配拨弦中位数的 10%（闷音减半），多余音检测同样过门限；② `_pitch_ok` 加 `TONAL_MIN=1.35`（目标音高显著度 / 音区中位数；底噪约 1.0，真实音符 1% 分位 ≥ 1.6）。回归 `cache/eval_test/baseline_20260930.txt` vs `after_20260930.txt`：只有 s_errors 一个错音 GOOD→BAD、missing 多一个 MISS（均更准），纯底噪现在报"不匹配"。
@@ -780,7 +780,7 @@ cd backend && python -c "from tab_scanner import scan_all_tabs; scan_all_tabs(fo
 - 演示谱已按新代码重生成（`cache/bassnet/demo_0930/`）：Henceforth 152 条小节线全部对上，全曲 4/4、速度 158。
 - **规则变更（用户 09-30）**：模型输出可以当训练标签，前提是数据可信、不会造成虚假准确；评测必须用独立标签。
 - **老师—学生**：`bassnet/ext_build.py` 把 MUSDB（train 100 + test 50）与 MoisesDB 236 首做成 feats 格式（`cache/bassnet/feats_ext/`）：输入 = 正式分离模型（SW，overlap 8）分出的贝斯 CQT + 混音 mel；标签 = 现有 v3+v4 在**干净贝斯**上扒出的音符和节拍；MUSDB test 标 `ext_split: val` 不参与训练。`train.py` 新增 `--init`（从已有权重微调）、`--extra DIR`、`--extra-p`。计划：v4 微调 12 轮，对照组只用曲库、实验组加 30% 外部歌，均用 labels_v2，在曲库 val/test 上比较。
-- **滑音**：`bassnet/slide_note.py`，在贝斯分轨细分辨率 CQT（每半音 3 格，和声求和 + 抛物线插值）上跟踪每个音开头/主体/结尾/结尾后的音高、到下一个音的滑行、下一个音起音强度，每类滑音（连音滑、音尾下滑、音尾上滑、从下滑入）一个梯度提升分类器，用谱里的滑音标记训练。谱中频率：音尾下滑 1.17%、连音滑 0.79%、音尾上滑 0.78%、从下滑入 0.35%。
+- **滑音**：`bassnet/lab/slide_note.py`，在贝斯分轨细分辨率 CQT（每半音 3 格，和声求和 + 抛物线插值）上跟踪每个音开头/主体/结尾/结尾后的音高、到下一个音的滑行、下一个音起音强度，每类滑音（连音滑、音尾下滑、音尾上滑、从下滑入）一个梯度提升分类器，用谱里的滑音标记训练。谱中频率：音尾下滑 1.17%、连音滑 0.79%、音尾上滑 0.78%、从下滑入 0.35%。
 
 ## 23. 2026-09-30 晚：找回被算法吃掉的部分
 - **损耗审计** `bassnet/loss_audit.py`（55 首 val/test，参照 labels_v2，音符 F1）：解码 0.834 → 量化 0.832 → 规整 0.8315 → 写出 GP 0.829。解码之后几乎不掉分，损耗集中在解码本身：漏掉 2224 个音（约 1700 个模型其实听到了音高：起音峰 0.25–0.5，或同音重复拨弦根本没有峰）、音高错 3520 个（八度 1298、正确音是第二候选 866）、多出 3011 个。
@@ -788,7 +788,7 @@ cd backend && python -c "from tab_scanner import scan_all_tabs; scan_all_tabs(fo
 - **上线：变拍号探测** `pipeline.song_beats`：先用宽松设置解一遍，若出现连续 ≥8 个 3 拍小节（真有 3/4 段落），改拍号代价保持 4，否则 12。278 首小节线正确率 97.15% → 97.30%（纯 4/4 98.6%、3/4 段落 93.5%、6/8 等复合拍 87.9%，都不低于改动前）。「1」恢复全对，Henceforth 仍全对。
 - 剩余小节问题主要是**复合拍与少见拍号**（6/8 整首被写成 12/8 或跟成半速、5/4、6/4、9/8），以及个别 3/4 段落（雑踏）——需要支持复合二拍（6/8）与更多拍号的解码，是下一步。
 - **五维评测**（`song_eval prod_1001`，全部新改动）vs 09-29 正式版：音符 F1 0.829 → 0.833、小节线 0.968 → 0.976、强拍 F1 0.946 → 0.953、首小节 0.927 不变、离格音 0.40 → 0.28 /100 音。
-- **滑音**：`slide_note.py` 手工轮廓特征 + 梯度提升，以及音高相对 CQT 片段的小 CNN（`slide_note.py patches|cnn|cnn_eval`），对谱面滑音标记的平均精确率仅 0.1–0.29（音尾下滑最好：阈值 0.9 时 P 0.36 R 0.40）。原因：①谱里约 80% 的"音尾下滑"紧接下一个音，声音上与直接换低音难分；②IDMT 的真实滑音（一个半音的连音滑）被解码成一个音，滑到的新音根本没写出来。**未上线**。可行方向：在细分辨率音高轨迹上检测音符中途的持续音高移动并切分成"连音滑"两音；滑出类标记可在核对版里作为建议给用户确认。
+- **滑音**：`lab/slide_note.py` 手工轮廓特征 + 梯度提升，以及音高相对 CQT 片段的小 CNN（`slide_note.py patches|cnn|cnn_eval`），对谱面滑音标记的平均精确率仅 0.1–0.29（音尾下滑最好：阈值 0.9 时 P 0.36 R 0.40）。原因：①谱里约 80% 的"音尾下滑"紧接下一个音，声音上与直接换低音难分；②IDMT 的真实滑音（一个半音的连音滑）被解码成一个音，滑到的新音根本没写出来。**未上线**。可行方向：在细分辨率音高轨迹上检测音符中途的持续音高移动并切分成"连音滑"两音；滑出类标记可在核对版里作为建议给用户确认。
 - **显卡**：用户的 180 W 驱动上限重启后失效（现在 225 W）；`thermal.py` 默认按 180 W 节流，并新增 `hook_module` 在分离模型每块计算前检查（`ext_build` 已接入）。
 
 ## 24. 2026-09-30 晚：谱面页改为只看只播 + 清理

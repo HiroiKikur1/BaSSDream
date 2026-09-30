@@ -1,5 +1,4 @@
 """Trains BassNet on GP-aligned bass stems. Usage: python -m bassnet.train [--epochs N] [--resume]"""
-import paths
 import argparse
 import glob
 import json
@@ -14,6 +13,7 @@ import torch
 import torch.nn.functional as F
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import paths  # noqa: E402
 from bassnet.model import BassNet, PITCH_LO, PITCH_HI, BINS_PER_SEMI, TECH_NAMES  # noqa: E402
 N_TECH = len(TECH_NAMES)
 from bassnet.decode import decode_notes, note_metrics, decode_beats, FPS  # noqa: E402

@@ -11,7 +11,6 @@ CLI (Python311): eval_session.py <gp_path> [--range START END] [--rate R] | --se
   lead_s    backing-audio time at session time 0, / rate (negative = silence before the audio starts)
   count_in  seconds of count-in before bar 1
 """
-import paths
 import hashlib
 import json
 import os
@@ -22,6 +21,7 @@ import zipfile
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import paths  # noqa: E402
 from bassnet.gpif_parser import parse_gp  # noqa: E402
 from performance_evaluator import FFMPEG_EXE, score_time_map  # noqa: E402
 

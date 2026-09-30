@@ -2,7 +2,6 @@
 
 Usage: python -m bassnet.eval_e2e [--limit N] [--no-consensus] [--tag NAME]
 """
-import paths
 import argparse
 import json
 import os
@@ -12,6 +11,7 @@ import time
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import paths  # noqa: E402
 from bassnet.decode import decode_notes, decode_beats, note_metrics  # noqa: E402
 from bassnet.quantize import quantize  # noqa: E402
 from bassnet.fretboard import assign_frets  # noqa: E402

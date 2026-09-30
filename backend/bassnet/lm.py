@@ -4,7 +4,6 @@ The LM is an interval trigram (transposition invariant) with add-k smoothing, tr
 tab library (excluding the evaluation split). Rescoring picks, for every decoded note, one of
 its top-K acoustic pitch candidates so that acoustic log-prob + lam * LM log-prob is maximal.
 """
-import paths
 import glob
 import json
 import math
@@ -15,6 +14,7 @@ from collections import defaultdict
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import paths  # noqa: E402
 from bassnet.decode import FPS  # noqa: E402
 from bassnet.model import PITCH_LO  # noqa: E402
 

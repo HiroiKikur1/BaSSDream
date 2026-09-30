@@ -20,7 +20,6 @@ CLI (Python311):
   score_format.py audio <song_id> <gp_path>    -> {"success", "backing", "bass"}  (tracks only, for report replay)
 Times of stretched tracks are session seconds: recording time = session time * rate.
 """
-import paths
 import hashlib
 import json
 import os
@@ -33,6 +32,7 @@ from typing import Any, Dict, Optional
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import paths  # noqa: E402
 from bassnet.gpif_parser import parse_gp  # noqa: E402
 
 FORMAT = "bassdream-score"

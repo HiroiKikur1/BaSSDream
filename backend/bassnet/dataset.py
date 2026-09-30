@@ -3,7 +3,6 @@
 For each unique backing track: CQT of the separated bass stem, and GP notes
 re-aligned to the stem (global offset search + piecewise local refinement).
 """
-import paths
 import json
 import os
 import sys
@@ -11,6 +10,7 @@ import sys
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import paths  # noqa: E402
 from bassnet.gpif_parser import parse_gp  # noqa: E402
 
 ROOT = paths.cache(r"bassnet")

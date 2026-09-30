@@ -4,7 +4,6 @@ Stats (saved to cache/bassnet/fingering.json):
   emit[nstr][string][fret]           how often a pitch is played at (string, fret), per 4/5-string
   trans[bucket][dfret][dstring]      hand movement between consecutive notes, by inter-onset gap
 """
-import paths
 import glob
 import json
 import math
@@ -13,6 +12,7 @@ import sys
 from collections import defaultdict
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import paths  # noqa: E402
 from bassnet.gpif_parser import parse_gp  # noqa: E402
 
 ROOT = paths.cache(r"bassnet")

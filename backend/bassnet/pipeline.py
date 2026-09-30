@@ -1,5 +1,4 @@
 """End-to-end: audio -> separated bass -> BassNet (ensemble + TTA) -> beat-grid quantisation -> .gp"""
-import paths
 import glob
 import os
 import sys
@@ -8,6 +7,7 @@ from typing import Callable, Dict, List, Optional
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import paths  # noqa: E402
 from bassnet.dataset import SR, compute_cqt, compute_mel, BINS_PER_SEMI  # noqa: E402
 from bassnet.decode import decode_notes, decode_beats  # noqa: E402
 from bassnet.quantize import quantize  # noqa: E402
@@ -204,7 +204,7 @@ ALLIN1_CKPT = os.path.join(MODEL_DIR, "allin1_ft_fold0.pt")
 
 
 def allin1_downbeat(stems4_dir: str):
-    """allin1 fine-tuned on the purchased tabs (bassnet/allin1_finetune.py), run in its own venv on the 4 stems;
+    """allin1 fine-tuned on the purchased tabs (bassnet/lab/allin1_finetune.py), run in its own venv on the 4 stems;
     -> downbeat activation at 100 fps, or None when the venv / checkpoint / stems are missing or it fails."""
     import subprocess
     import tempfile

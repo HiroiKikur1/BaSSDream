@@ -4,7 +4,6 @@
 2. fine: per-bar search (+-120 ms) maximising bass-pitch energy at the notated pitches
 3. quality: fraction of notes whose pitch is present in the aligned audio
 """
-import paths
 import os
 import re
 import sys
@@ -16,6 +15,7 @@ from typing import Dict, List, Optional
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import paths  # noqa: E402
 from bassnet.gpif_parser import parse_gp, q_to_sec, SAMPLE_RATE  # noqa: E402
 
 SR = 22050
