@@ -21,6 +21,7 @@ namespace BassStation.DebugTools;
 ///   --render-result out.png &lt;report.json&gt; &lt;song title&gt; [--report [scroll]]   (BASSDREAM_REPLAY)
 ///   --render-eval-run out.png &lt;audio&gt; &lt;song title&gt;               (BASSDREAM_SECTION, BASSDREAM_RATE)
 ///   --render-score out.png &lt;song title&gt; [bar beat string [play seconds]]   (BASSDREAM_MIX)
+///   --render-boot out.png &lt;seconds&gt;                           one frame of the boot animation
 ///   --render-calendar | --render-eval | --render-add-song out.png [query]
 /// </summary>
 internal static class RenderHarness
@@ -68,6 +69,13 @@ internal static class RenderHarness
                 Snap(Content(), outPath);
                 return true;
             }
+
+            case "--render-boot":                          // --render-boot out.png <seconds>
+                main.PlayBoot(a.Length > 2 ? double.Parse(a[2], CultureInfo.InvariantCulture) : 0);
+                main.Show();
+                await Task.Delay(2000);
+                Snap(Content(), Out("render_boot.png"));
+                return true;
 
             case "--render-test":
                 main.Show();

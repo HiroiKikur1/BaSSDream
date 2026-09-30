@@ -32,6 +32,7 @@ public partial class App : Application
             return;
         }
         Services.PyHost.Warm();
+        mainWindow.PlayBoot();
         mainWindow.Show();
     }
 }

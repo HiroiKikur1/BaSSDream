@@ -59,6 +59,24 @@ public partial class MainWindow : Window
         Closing += MainWindow_Closing;
     }
 
+    /// <summary>Boot animation over the whole window; ends in the header logo. A fixed time shows one frame (debug).</summary>
+    internal void PlayBoot(double? fixedTime = null)
+    {
+        try
+        {
+            var boot = new Views.BootOverlay { FixedTime = fixedTime };
+            Panel.SetZIndex(boot, 1000);
+            rootGrid.Children.Add(boot);
+            boot.Start(imgLogo);
+        }
+        catch (Exception ex)
+        {
+            // never let the intro keep the app from starting
+            Debug.WriteLine(ex);
+            imgLogo.Opacity = 1;
+        }
+    }
+
     private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
     {
         await LoadDataAsync();

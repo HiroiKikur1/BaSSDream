@@ -21,7 +21,9 @@
     <Content Include="BassStation.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Resource Include="assets\**\*" />
+    <Resource Include="assets\**\*" Exclude="assets\boot\splash.png" />
+    <!-- first frame of the boot animation, shown natively before .NET starts -->
+    <SplashScreen Include="assets\boot\splash.png" />
   </ItemGroup>
 
   <ItemGroup>
