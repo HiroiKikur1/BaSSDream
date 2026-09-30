@@ -88,7 +88,9 @@ roselia_new.png
 # IDE / Agent Config
 # ==========================================
 .agents/
-.claude/
+# project skills are shared; local settings stay private
+.claude/*
+!.claude/skills/
 .vscode/
 .idea/
 .vs/
