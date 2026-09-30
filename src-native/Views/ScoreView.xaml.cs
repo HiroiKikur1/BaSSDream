@@ -24,8 +24,8 @@ namespace BassStation.Views;
 /// </summary>
 public partial class ScoreView : UserControl
 {
-    private const string Py = @"C:\Users\hongw\AppData\Local\Programs\Python\Python311\python.exe";
-    private const string Script = @"E:\BassStation\backend\score_format.py";
+    private static readonly string Py = AppPaths.PythonMl;
+    private static readonly string Script = AppPaths.Script("score_format.py");
     private static readonly double[] Rates = { 1.25, 1.1, 1.0, 0.9, 0.8, 0.7, 0.6, 0.5 };
     private BandEdition _ed = BandEdition.Default;
     private double _baseBpm = 120;
@@ -130,7 +130,7 @@ public partial class ScoreView : UserControl
     {
         var psi = new ProcessStartInfo
         {
-            FileName = File.Exists(Py) ? Py : "python",
+            FileName = Py,
             UseShellExecute = false,
             RedirectStandardOutput = true,
             RedirectStandardError = true,

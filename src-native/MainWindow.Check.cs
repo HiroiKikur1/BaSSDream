@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using BassStation.Models;
 
+using BassStation.Services;
+
 namespace BassStation;
 
 // 核对版: an AI transcription's companion GP whose audio is the song with the separated bass boosted.
@@ -31,7 +33,7 @@ public partial class MainWindow
     // 4弦 / 5弦: one list entry per song version. The other arrangement is either a sibling song (own folder, own
     // level/stats) or a file in the same folder (sibling "…4st/5st…" file, or the AI "[4弦版].gp" of a 5-string transcription).
     private const string FourTag = "[4弦版]";
-    private static readonly string PrefsPath = @"E:\BassStation\cache\ui_prefs.json";
+    private static readonly string PrefsPath = AppPaths.CachePath(@"ui_prefs.json");
     private readonly Dictionary<string, bool> _fivePick = new();   // per song (GroupKey or Id): last chosen arrangement
     private bool _defaultFive = LoadDefaultFive();                 // last arrangement chosen anywhere
 
@@ -168,14 +170,14 @@ public partial class MainWindow
             {
                 var psi = new ProcessStartInfo
                 {
-                    FileName = "python",
+                    FileName = AppPaths.Python,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     UseShellExecute = false,
                     CreateNoWindow = true,
                     StandardOutputEncoding = System.Text.Encoding.UTF8
                 };
-                psi.ArgumentList.Add(@"E:\BassStation\backend\tab_cli.py");
+                psi.ArgumentList.Add(AppPaths.Script("tab_cli.py"));
                 psi.ArgumentList.Add("sync-check");
                 psi.ArgumentList.Add(checkPath);
                 psi.EnvironmentVariables["PYTHONUTF8"] = "1";

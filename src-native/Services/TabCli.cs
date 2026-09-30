@@ -9,7 +9,7 @@ namespace BassStation.Services;
 /// <summary>Runs backend/tab_cli.py actions (backend Python) and reads the JSON result line.</summary>
 public static class TabCli
 {
-    public const string CliPath = @"E:\BassStation\backend\tab_cli.py";
+    public static readonly string CliPath = AppPaths.Script("tab_cli.py");
 
     public record Result(bool Ok, JsonElement Root, string Error);
 
@@ -20,7 +20,7 @@ public static class TabCli
         if (!File.Exists(CliPath)) return new Result(false, default, "tab_cli.py 缺失");
         var psi = new ProcessStartInfo
         {
-            FileName = "python",
+            FileName = AppPaths.Python,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             UseShellExecute = false,

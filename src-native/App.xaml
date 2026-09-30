@@ -39,7 +39,8 @@
         <FontFamily x:Key="UiFont">Microsoft YaHei UI, Segoe UI</FontFamily>
         <FontFamily x:Key="NumFont">Segoe UI Black, Segoe UI</FontFamily>
         <!-- GBP result screen: rounded CJK (Resource Han Rounded, OFL, assets/fonts) + plain Latin digits -->
-        <FontFamily x:Key="RoundFont">file:///E:/BassStation/assets/fonts/#Resource Han Rounded CN, Microsoft YaHei UI</FontFamily>
+        <!-- RoundFont is set in App.OnStartup from the project's assets\fonts -->
+        <FontFamily x:Key="RoundFont">Microsoft YaHei UI</FontFamily>
         <FontFamily x:Key="GbpLatin">Arial, Microsoft YaHei UI</FontFamily>
 
         <!-- Polka-dot stage floor (水玉) -->

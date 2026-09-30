@@ -10,7 +10,7 @@ namespace BassStation.Services;
 
 public class DatabaseService
 {
-    private const string DbPath = @"E:\BassStation\backend\data.db";
+    private static readonly string DbPath = AppPaths.Db;
     private readonly string _connectionString = $"Data Source={DbPath};";
 
     public async Task<List<SongModel>> LoadSongsAsync()
@@ -498,7 +498,7 @@ public class DatabaseService
             }
 
             // Also clean from tabs.db if present
-            string tabsDbPath = @"E:\BassStation\backend\tabs.db";
+            string tabsDbPath = Path.Combine(AppPaths.Backend, "tabs.db");
             if (File.Exists(tabsDbPath))
             {
                 try
@@ -515,7 +515,7 @@ public class DatabaseService
             // Physically delete song folder
             if (!string.IsNullOrEmpty(folderName))
             {
-                string targetDir = Path.Combine(@"E:\BassStation\tabs", folderName);
+                string targetDir = Path.Combine(AppPaths.Tabs, folderName);
                 if (Directory.Exists(targetDir))
                 {
                     Directory.Delete(targetDir, true);

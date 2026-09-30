@@ -19,10 +19,10 @@ namespace BassStation.Views;
 public partial class EvaluationWindow : Window
 {
     // librosa lives in the ML environment, not in the backend's default Python
-    private const string EvalPython = @"C:\Users\hongw\AppData\Local\Programs\Python\Python311\python.exe";
-    private const string EvalScript = @"E:\BassStation\backend\performance_evaluator.py";
-    private const string SessionScript = @"E:\BassStation\backend\eval_session.py";
-    private const string TakesDir = @"E:\BassStation\cache\evaluations\takes";
+    private static readonly string EvalPython = AppPaths.PythonMl;
+    private static readonly string EvalScript = AppPaths.Script("performance_evaluator.py");
+    private static readonly string SessionScript = AppPaths.Script("eval_session.py");
+    private static readonly string TakesDir = AppPaths.CachePath(@"evaluations\takes");
 
     public event Action? RequestClose;
     public event Action<PerformanceScoreDetailModel>? ScoreUpdated;
@@ -546,7 +546,7 @@ public partial class EvaluationWindow : Window
     {
         var psi = new ProcessStartInfo
         {
-            FileName = File.Exists(EvalPython) ? EvalPython : "python",
+            FileName = EvalPython,
             UseShellExecute = false,
             RedirectStandardOutput = true,
             RedirectStandardError = true,

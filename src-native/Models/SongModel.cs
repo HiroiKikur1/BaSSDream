@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 
+using BassStation.Services;
+
 namespace BassStation.Models;
 
 public class SongModel : System.ComponentModel.INotifyPropertyChanged
@@ -90,9 +92,9 @@ public class SongModel : System.ComponentModel.INotifyPropertyChanged
     {
         get
         {
-            var jpg = Path.Combine(@"E:\BassStation\cache\covers", $"{Id}.jpg");
+            var jpg = Path.Combine(AppPaths.Covers, $"{Id}.jpg");
             if (File.Exists(jpg)) return jpg;
-            var png = Path.Combine(@"E:\BassStation\cache\covers", $"{Id}.png");
+            var png = Path.Combine(AppPaths.Covers, $"{Id}.png");
             if (File.Exists(png)) return png;
             return "";
         }

@@ -10,6 +10,7 @@ public static class GuitarProNativeExporter
 {
     public static string GetGuitarProExecutablePath()
     {
+        if (AppPaths.GuitarPro is { } configured && File.Exists(configured)) return configured;
         try
         {
             using var key = Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(@"Guitar Pro 8.AssocFile.gp\shell\open\command");

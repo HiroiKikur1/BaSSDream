@@ -25,7 +25,7 @@ public class ScoreCanvas : FrameworkElement
     private const double TabGap = 15;
     private const double SysGap = 22;
 
-    public static readonly FontFamily Round = new(new Uri("file:///E:/BassStation/assets/fonts/"), "./#Resource Han Rounded CN, Microsoft YaHei UI");
+    public static readonly FontFamily Round = new(new Uri(System.IO.Path.Combine(AppPaths.Assets, "fonts") + System.IO.Path.DirectorySeparatorChar), "./#Resource Han Rounded CN, Microsoft YaHei UI");
     private static readonly Typeface RoundBold = new(Round, FontStyles.Normal, FontWeights.Bold, FontStretches.Normal);
     private static readonly Typeface RoundHeavy = new(Round, FontStyles.Normal, FontWeights.Black, FontStretches.Normal);
     private static readonly Typeface Din = new(new FontFamily("Bahnschrift"), FontStyles.Normal, FontWeights.SemiBold, FontStretches.Normal);

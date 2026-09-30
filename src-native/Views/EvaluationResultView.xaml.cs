@@ -11,6 +11,8 @@ using System.Windows.Shapes;
 using Path = System.Windows.Shapes.Path;
 using BassStation.Models;
 
+using BassStation.Services;
+
 namespace BassStation.Views;
 
 /// <summary>Full-window result screen after a take (GBP live-result layout), with the per-note report view.</summary>
@@ -320,11 +322,11 @@ public partial class EvaluationResultView : UserControl
     {
         var psi = new System.Diagnostics.ProcessStartInfo
         {
-            FileName = @"C:\Users\hongw\AppData\Local\Programs\Python\Python311\python.exe",
+            FileName = AppPaths.PythonMl,
             UseShellExecute = false, RedirectStandardOutput = true, RedirectStandardError = true, CreateNoWindow = true,
             StandardOutputEncoding = System.Text.Encoding.UTF8
         };
-        psi.ArgumentList.Add(@"E:\BassStation\backend\score_format.py");
+        psi.ArgumentList.Add(AppPaths.Script("score_format.py"));
         foreach (var a in args) psi.ArgumentList.Add(a);
         psi.EnvironmentVariables["PYTHONUTF8"] = "1";
         try

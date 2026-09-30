@@ -13,6 +13,7 @@ public partial class App : Application
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+        Resources["RoundFont"] = Views.ScoreCanvas.Round;
 
         // no dashed keyboard-focus rectangles (they appear after pressing Alt)
         EventManager.RegisterClassHandler(typeof(FrameworkElement), FrameworkElement.LoadedEvent,

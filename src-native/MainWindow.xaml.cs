@@ -401,7 +401,7 @@ public partial class MainWindow : Window
             else if (artistLower.Contains("more more jump") || folderLower.Contains("more more jump")) bandKey = "more_more_jump";
             else if (artistLower.Contains("ワンダー") || artistLower.Contains("wonderlands") || folderLower.Contains("wonderlands")) bandKey = "wonderlands";
 
-            string backdropsDir = @"E:\BassStation\assets\backdrops";
+            string backdropsDir = Path.Combine(AppPaths.Assets, @"backdrops");
             string? backdropPath = null;
 
             if (bandKey != null)
@@ -701,36 +701,7 @@ public partial class MainWindow : Window
         }
     }
 
-    private string GetGuitarProExecutablePath()
-    {
-        try
-        {
-            using var key = Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(@"Guitar Pro 8.AssocFile.gp\shell\open\command");
-            if (key != null)
-            {
-                string cmd = key.GetValue("")?.ToString() ?? "";
-                int firstQ = cmd.IndexOf('"');
-                int secondQ = firstQ >= 0 ? cmd.IndexOf('"', firstQ + 1) : -1;
-                if (firstQ >= 0 && secondQ > firstQ)
-                {
-                    string path = cmd.Substring(firstQ + 1, secondQ - firstQ - 1);
-                    if (File.Exists(path)) return path;
-                }
-            }
-        }
-        catch { }
-
-        string[] candidates = {
-            @"C:\Program Files\Arobas Music\Guitar Pro 8\GuitarPro.exe",
-            @"C:\Program Files (x86)\Arobas Music\Guitar Pro 8\GuitarPro.exe",
-            @"C:\Program Files\Arobas Music\Guitar Pro 7\GuitarPro.exe"
-        };
-        foreach (var p in candidates)
-        {
-            if (File.Exists(p)) return p;
-        }
-        return "";
-    }
+    private static string GetGuitarProExecutablePath() => GuitarProNativeExporter.GetGuitarProExecutablePath();
 
     private void BtnStartPractice_Click(object sender, RoutedEventArgs e)
     {

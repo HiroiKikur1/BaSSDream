@@ -12,13 +12,15 @@ using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
 using Path = System.Windows.Shapes.Path;
 
+using BassStation.Services;
+
 namespace BassStation;
 
 // GBP-style tap feedback: a random band logo pops up and coloured stars scatter; dragging leaves a star trail.
 public partial class MainWindow
 {
-    private const string BandLogoDir = @"E:\BassStation\assets\band_logos";   // official large logos
-    private const string BandIconDir = @"E:\BassStation\assets\band_icons_line";   // official small emblems
+    private static readonly string BandLogoDir = System.IO.Path.Combine(AppPaths.Assets, @"band_logos");   // official large logos
+    private static readonly string BandIconDir = System.IO.Path.Combine(AppPaths.Assets, @"band_icons_line");   // official small emblems
     private static readonly string[] LogoKeys = { "popipa", "afterglow", "pasupare", "roselia", "hhw", "morfonica", "ras", "mygo", "avemujica" };
     private static readonly Brush[] StarBrushes = MakeStarBrushes();
     private static Brush[] MakeStarBrushes()

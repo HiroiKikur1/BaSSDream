@@ -15,7 +15,7 @@ namespace BassStation.Services;
 /// </summary>
 public sealed class TakeRecorder : IDisposable
 {
-    private const string DeviceFile = @"E:\BassStation\cache\eval_session\input_device.txt";
+    private static readonly string DeviceFile = AppPaths.CachePath(@"eval_session\input_device.txt");
 
     private WasapiCapture? _capture;
     private WaveFileWriter? _writer;
