@@ -1,0 +1,401 @@
+﻿<Application x:Class="BassStation.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             ShutdownMode="OnMainWindowClose">
+    <Application.Resources>
+        <!-- ===== GBP palette ===== -->
+        <Color x:Key="PinkPrimaryColor">#FF3377</Color>
+        <Color x:Key="PinkLightColor">#FF6B9E</Color>
+        <Color x:Key="PinkGradientEndColor">#F21D68</Color>
+        <Color x:Key="StageBgColor">#FFF7FA</Color>
+
+        <SolidColorBrush x:Key="PinkPrimaryBrush" Color="#FF3377" />
+        <SolidColorBrush x:Key="PinkLightBrush" Color="#FF6B9E" />
+        <SolidColorBrush x:Key="PinkLipBrush" Color="#D1185C" />
+        <SolidColorBrush x:Key="PinkPaleBrush" Color="#FFE8F0" />
+        <SolidColorBrush x:Key="StageBgBrush" Color="#FFF7FA" />
+        <SolidColorBrush x:Key="CardBgBrush" Color="#FFFFFF" />
+        <SolidColorBrush x:Key="BorderLightBrush" Color="#F2DCE5" />
+        <SolidColorBrush x:Key="TextPrimaryBrush" Color="#3D3A4B" />
+        <SolidColorBrush x:Key="TextSecondaryBrush" Color="#7C7688" />
+        <SolidColorBrush x:Key="TextMutedBrush" Color="#B3ACBC" />
+        <SolidColorBrush x:Key="LipGrayBrush" Color="#E3D6DE" />
+
+        <SolidColorBrush x:Key="EasyBrush" Color="#3E8BFF" />
+        <SolidColorBrush x:Key="NormalBrush" Color="#34C274" />
+        <SolidColorBrush x:Key="HardBrush" Color="#FFAE1A" />
+        <SolidColorBrush x:Key="ExpertBrush" Color="#FF4058" />
+        <SolidColorBrush x:Key="SpecialBrush" Color="#E04BD6" />
+
+        <LinearGradientBrush x:Key="PinkVividGradient" StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#FF5A93" Offset="0" />
+            <GradientStop Color="#FF3377" Offset="1" />
+        </LinearGradientBrush>
+
+        <LinearGradientBrush x:Key="GbpFlatFace" StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#FFFFFF" Offset="0" />
+            <GradientStop Color="#EEEDEF" Offset="1" />
+        </LinearGradientBrush>
+        <FontFamily x:Key="UiFont">Microsoft YaHei UI, Segoe UI</FontFamily>
+        <FontFamily x:Key="NumFont">Segoe UI Black, Segoe UI</FontFamily>
+        <!-- GBP result screen: rounded CJK (Resource Han Rounded, OFL, assets/fonts) + plain Latin digits -->
+        <FontFamily x:Key="RoundFont">file:///E:/BassStation/assets/fonts/#Resource Han Rounded CN, Microsoft YaHei UI</FontFamily>
+        <FontFamily x:Key="GbpLatin">Arial, Microsoft YaHei UI</FontFamily>
+
+        <!-- Polka-dot stage floor (水玉) -->
+        <DrawingBrush x:Key="DotPattern" TileMode="Tile" Viewport="0,0,22,22" ViewportUnits="Absolute"
+                      Viewbox="0,0,22,22" ViewboxUnits="Absolute">
+            <DrawingBrush.Drawing>
+                <DrawingGroup>
+                    <GeometryDrawing Brush="Transparent">
+                        <GeometryDrawing.Geometry>
+                            <RectangleGeometry Rect="0,0,22,22" />
+                        </GeometryDrawing.Geometry>
+                    </GeometryDrawing>
+                    <GeometryDrawing Brush="#FFD9E6">
+                        <GeometryDrawing.Geometry>
+                            <EllipseGeometry Center="5.5,5.5" RadiusX="2" RadiusY="2" />
+                        </GeometryDrawing.Geometry>
+                    </GeometryDrawing>
+                    <GeometryDrawing Brush="#FFE7EF">
+                        <GeometryDrawing.Geometry>
+                            <EllipseGeometry Center="16.5,16.5" RadiusX="2" RadiusY="2" />
+                        </GeometryDrawing.Geometry>
+                    </GeometryDrawing>
+                </DrawingGroup>
+            </DrawingBrush.Drawing>
+        </DrawingBrush>
+
+        <!-- Diagonal stripes for header plates -->
+        <DrawingBrush x:Key="StripePattern" TileMode="Tile" Viewport="0,0,10,10" ViewportUnits="Absolute"
+                      Viewbox="0,0,10,10" ViewboxUnits="Absolute">
+            <DrawingBrush.Drawing>
+                <DrawingGroup>
+                    <GeometryDrawing Brush="#FF3377">
+                        <GeometryDrawing.Geometry>
+                            <RectangleGeometry Rect="0,0,10,10" />
+                        </GeometryDrawing.Geometry>
+                    </GeometryDrawing>
+                    <GeometryDrawing Brush="#FF4A87">
+                        <GeometryDrawing.Geometry>
+                            <PathGeometry Figures="M 0,10 L 10,0 L 10,4 L 4,10 Z M 0,4 L 4,0 L 0,0 Z" />
+                        </GeometryDrawing.Geometry>
+                    </GeometryDrawing>
+                </DrawingGroup>
+            </DrawingBrush.Drawing>
+        </DrawingBrush>
+
+        <!-- "!" of the logo: lightning-shaped bar with a round dot (official bar outline) -->
+        <GeometryGroup x:Key="ExclaimBoltGeometry" FillRule="Nonzero">
+            <PathGeometry Figures="m515.31 62.273a12.46 12.778 0 0 0-6.9551 2.8983l6.4021-12.45c2.2242-4.3349 0.82331-7.8002-3.1458-7.7246-3.9691 0.07561-7.508 1.5752-11.194 7.9893l-14.623 28.454c-2.2364 4.3349-0.8233 7.8002 3.1335 7.7246a12.46 12.778 0 0 0 6.9551-2.9109l-6.4021 12.45c-2.2364 4.3349-0.8233 7.8002 3.1458 7.7246s7.8767-1.4744 11.219-7.9767l14.623-28.454c2.2119-4.3349 0.79873-7.7876-3.158-7.7246z" />
+            <EllipseGeometry Center="486.5,118.5" RadiusX="6.8" RadiusY="6.8" />
+        </GeometryGroup>
+        <Geometry x:Key="StarGeometry">M 10,0 L 12.9,6.6 L 20,7.3 L 14.6,12 L 16.2,19 L 10,15.3 L 3.8,19 L 5.4,12 L 0,7.3 L 7.1,6.6 Z</Geometry>
+
+        <!-- Flat 3D arcade button: Background = face, BorderBrush = lip -->
+        <Style x:Key="GbpButton" TargetType="{x:Type Button}">
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Foreground" Value="#FFFFFF" />
+            <Setter Property="Background" Value="#FF3B72" />
+            <Setter Property="BorderBrush" Value="#FF3B72" />
+            <Setter Property="FontFamily" Value="{StaticResource UiFont}" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Padding" Value="16,6" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Grid>
+                            <Border CornerRadius="6" Background="#26000000" Margin="0,2,0,-2" />
+                            <Border x:Name="face" CornerRadius="6" Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" TextElement.Foreground="{TemplateBinding Foreground}" />
+                            </Border>
+                            <Border x:Name="lighten" CornerRadius="6" Background="#FFFFFF" Opacity="0" IsHitTestVisible="False" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="lighten" Property="Opacity" Value="0.25" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="lighten" Property="Opacity" Value="0.55" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="face" Property="Opacity" Value="0.5" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="GbpButtonWhite" TargetType="{x:Type Button}" BasedOn="{StaticResource GbpButton}">
+            <Setter Property="Background" Value="{StaticResource GbpFlatFace}" />
+            <Setter Property="BorderBrush" Value="#D9D6DC" />
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Grid>
+                            <Border CornerRadius="6" Background="#26000000" Margin="0,2,0,-2" />
+                            <Border x:Name="face" CornerRadius="6" Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" TextElement.Foreground="{TemplateBinding Foreground}" />
+                            </Border>
+                            <Border x:Name="lighten" CornerRadius="6" Background="#FFFFFF" Opacity="0" IsHitTestVisible="False" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="lighten" Property="Opacity" Value="0.25" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="lighten" Property="Opacity" Value="0.55" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="face" Property="Opacity" Value="0.5" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ===== GBP flat buttons (pressed = lighter, no travel) ===== -->
+        <Style x:Key="GbpFlat" TargetType="{x:Type Button}">
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Background" Value="{StaticResource GbpFlatFace}" />
+            <Setter Property="BorderBrush" Value="#D9D6DC" />
+            <Setter Property="Foreground" Value="#4A4750" />
+            <Setter Property="FontFamily" Value="{StaticResource UiFont}" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Padding" Value="18,8" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Grid>
+                            <Border CornerRadius="6" Background="#26000000" Margin="0,2,0,-2" />
+                            <Border x:Name="face" CornerRadius="6" Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" TextElement.Foreground="{TemplateBinding Foreground}" />
+                            </Border>
+                            <Border x:Name="lighten" CornerRadius="6" Background="#FFFFFF" Opacity="0" IsHitTestVisible="False" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="lighten" Property="Opacity" Value="0.25" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="lighten" Property="Opacity" Value="0.55" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="face" Property="Opacity" Value="0.5" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="GbpFlatPink" TargetType="{x:Type Button}" BasedOn="{StaticResource GbpFlat}">
+            <Setter Property="Background" Value="#FF3B72" />
+            <Setter Property="BorderBrush" Value="#FF3B72" />
+            <Setter Property="Foreground" Value="#FFFFFF" />
+        </Style>
+        <!-- big action button: pink face inside a white frame -->
+        <Style x:Key="GbpAction" TargetType="{x:Type Button}">
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Background" Value="#FF3B72" />
+            <Setter Property="Foreground" Value="#FFFFFF" />
+            <Setter Property="FontFamily" Value="{StaticResource UiFont}" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="FontSize" Value="22" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Grid>
+                            <Border CornerRadius="8" Background="#30000000" Margin="0,3,0,-3" />
+                            <Border CornerRadius="8" Background="#FFFFFF" Padding="4">
+                                <Border x:Name="face" CornerRadius="5" Background="{TemplateBinding Background}">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" TextElement.Foreground="{TemplateBinding Foreground}" />
+                                </Border>
+                            </Border>
+                            <Border x:Name="lighten" CornerRadius="8" Background="#FFFFFF" Opacity="0" IsHitTestVisible="False" Margin="4" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="lighten" Property="Opacity" Value="0.15" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="lighten" Property="Opacity" Value="0.4" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!-- dark capsule label -->
+        <Style x:Key="GbpDarkPill" TargetType="{x:Type Border}">
+            <Setter Property="Background" Value="#4A4750" />
+            <Setter Property="CornerRadius" Value="14" />
+            <Setter Property="Padding" Value="16,3" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+        </Style>
+        <Style x:Key="GbpDarkPillText" TargetType="{x:Type TextBlock}">
+            <Setter Property="Foreground" Value="#FFFFFF" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="Bold" />
+        </Style>
+        <!-- GBP radio -->
+        <Style x:Key="GbpRadio" TargetType="{x:Type RadioButton}">
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Foreground" Value="#4A4750" />
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="FontFamily" Value="{StaticResource UiFont}" />
+            <Setter Property="Margin" Value="0,0,26,12" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type RadioButton}">
+                        <StackPanel Orientation="Horizontal" Background="Transparent">
+                            <Grid Width="26" Height="26" VerticalAlignment="Center">
+                                <Ellipse Fill="#FFFFFF" Stroke="#D9D6DC" StrokeThickness="1.5" />
+                                <Ellipse x:Name="ring" Stroke="#FF3B72" StrokeThickness="2" Margin="2" Visibility="Collapsed" />
+                                <Ellipse x:Name="dot" Fill="#FF3B72" Margin="6" Visibility="Collapsed" />
+                            </Grid>
+                            <ContentPresenter Margin="8,0,0,0" VerticalAlignment="Center" />
+                        </StackPanel>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="ring" Property="Visibility" Value="Visible" />
+                                <Setter TargetName="dot" Property="Visibility" Value="Visible" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- White panel with soft lip, the basic GBP card -->
+        <Style x:Key="GbpPanel" TargetType="{x:Type Border}">
+            <Setter Property="Background" Value="#FFFFFF" />
+            <Setter Property="BorderBrush" Value="#F3DDE7" />
+            <Setter Property="BorderThickness" Value="1.5,1.5,1.5,4" />
+            <Setter Property="CornerRadius" Value="12" />
+        </Style>
+
+        <!-- Pink slanted section label -->
+        <Style x:Key="GbpLabelPlate" TargetType="{x:Type Border}">
+            <Setter Property="Background" Value="{StaticResource StripePattern}" />
+            <Setter Property="CornerRadius" Value="3" />
+            <Setter Property="Padding" Value="10,2,12,2" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <SkewTransform AngleX="-12" />
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- GBP scrollbar: thin grey rail with a white capsule thumb -->
+        <Style x:Key="ModernScrollThumb" TargetType="{x:Type Thumb}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Thumb}">
+                        <Grid>
+                            <Border CornerRadius="7" Background="#30000000" Margin="1,2,-1,-2" />
+                            <Border CornerRadius="7" BorderBrush="#CFCBD1" BorderThickness="1">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                        <GradientStop Color="#FFFFFF" Offset="0" />
+                                        <GradientStop Color="#E9E6EB" Offset="1" />
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                            </Border>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="{x:Type ScrollBar}">
+            <Setter Property="Width" Value="16" />
+            <Setter Property="MinWidth" Value="16" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ScrollBar}">
+                        <Grid Background="Transparent">
+                            <Border Width="4" CornerRadius="2" Background="#99D0CBD2" HorizontalAlignment="Center" />
+                            <!-- ViewportSize=NaN: fixed-size capsule (sized by the thumb) instead of a proportional one that got clipped -->
+                            <Track x:Name="PART_Track" IsDirectionReversed="true" ViewportSize="NaN">
+                                <Track.Thumb>
+                                    <Thumb Style="{StaticResource ModernScrollThumb}" Width="14" Height="48" />
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="VirtualSongListBox" TargetType="{x:Type ListBox}">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+            <Setter Property="VirtualizingStackPanel.IsVirtualizing" Value="True" />
+            <Setter Property="VirtualizingStackPanel.VirtualizationMode" Value="Recycling" />
+        </Style>
+
+        <!-- menus (input device, practice range, tempo, delete): white card, pink check dot -->
+        <Style TargetType="{x:Type ContextMenu}">
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="HasDropShadow" Value="False" />
+            <Setter Property="FontFamily" Value="{StaticResource UiFont}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ContextMenu}">
+                        <Border Margin="6" Padding="4" MinWidth="150" Background="#FFFFFF" BorderBrush="#F1DCE5" BorderThickness="1" CornerRadius="6">
+                            <Border.Effect>
+                                <DropShadowEffect Color="#50304A" BlurRadius="12" ShadowDepth="2" Opacity="0.22" />
+                            </Border.Effect>
+                            <ScrollViewer MaxHeight="420" VerticalScrollBarVisibility="Auto">
+                                <ItemsPresenter />
+                            </ScrollViewer>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type MenuItem}">
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type MenuItem}">
+                        <Border x:Name="bd" Height="30" Padding="10,0,12,0" Background="Transparent" CornerRadius="4">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="16" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Ellipse x:Name="dot" Width="6" Height="6" Fill="#FF3377" VerticalAlignment="Center" Visibility="Hidden" />
+                                <ContentPresenter Grid.Column="1" ContentSource="Header" RecognizesAccessKey="False" VerticalAlignment="Center"
+                                                  TextElement.FontSize="12.5" TextElement.FontWeight="Bold" TextElement.Foreground="#3D3A4B" />
+                                <TextBlock Grid.Column="2" Text="{TemplateBinding InputGestureText}" Margin="18,0,0,0" VerticalAlignment="Center"
+                                           FontFamily="{StaticResource NumFont}" FontStyle="Italic" FontSize="12.5" Foreground="#FF3377" />
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="dot" Property="Visibility" Value="Visible" />
+                            </Trigger>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="#FFF1F5" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Application.Resources>
+</Application>

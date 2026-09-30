@@ -1,0 +1,9 @@
+{
+  "_comment": "Per-folder corrections that folder names / GP metadata get wrong. Keys: title, artist, franchise, version.",
+  "又三郎 _ ヨルシカ _ BanG Dream! 经典曲目": {"title": "又三郎"},
+  "ソナーレ (朝 LIVE ver.) _ 違国日記 OP #13": {"artist": "TOMOO"},
+  "ムリムリ進化論 _ 戀人不行 OP _ ナナヲアカリ": {"artist": "ナナヲアカリ"},
+  "Throughout the Drinkeries of This Planet  在这颗行星所有的酒馆 _ Omnipotent Youth Society (万能青年旅店) _ BanG Dream!": {"artist": "万能青年旅店"},
+  "『 春日影 』MyGO!!!!!(CRYCHIC) _ アニメ「BanG Dream! It's MyGO!!!!!」#3 插入歌": {"artist": "MyGO!!!!!(CRYCHIC)"},
+  "核对测试 _ BanG Dream! _ AI 原声": {"artist": "", "franchise": ""}
+}

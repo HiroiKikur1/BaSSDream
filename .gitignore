@@ -1,0 +1,95 @@
+# ==========================================
+# Large Assets, Models, and Local Data
+# ==========================================
+tabs/
+cache/
+tools/
+snapshots/
+incoming/
+scores/
+
+# ==========================================
+# Python / Virtual Environments
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+backend/*.mp3
+backend/*.wav
+backend/*.flac
+
+# ==========================================
+# Node / Frontend Build Outputs
+# ==========================================
+node_modules/
+frontend/node_modules/
+dist/
+frontend/dist/
+dist-ssr/
+*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ==========================================
+# .NET / C# Build Outputs & Binaries
+# ==========================================
+bin/
+obj/
+publish/
+release/
+release_native/
+win-x64/
+runtimes/
+*.dll
+*.exe
+*.pdb
+*.deps.json
+*.runtimeconfig.json
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# ==========================================
+# Database & Logs
+# ==========================================
+*.db
+*.db-shm
+*.db-wal
+*.log
+@AutomationLog.txt
+
+# ==========================================
+# Temporary Render Outputs & Test Artifacts
+# ==========================================
+*.lnk
+*.bak
+*.pre_*
+appClient.js
+songsterr_page.html
+matasaburo_test.gp
+out.png
+test1.png
+ave_mujica_v*.png
+henceforth_v*.png
+henceforth_new.png
+roselia_v*.png
+roselia_new.png
+
+# ==========================================
+# IDE / Agent Config
+# ==========================================
+.agents/
+.claude/
+.vscode/
+.idea/
+.vs/
+*.swp

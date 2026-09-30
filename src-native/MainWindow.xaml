@@ -1,0 +1,809 @@
+﻿<Window x:Class="BassStation.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="clr-namespace:BassStation.Views"
+        xmlns:models="clr-namespace:BassStation.Models"
+        Title="BaSSDream"
+        WindowStyle="None"
+        SizeToContent="WidthAndHeight"
+        ResizeMode="CanMinimize"
+        WindowStartupLocation="CenterScreen"
+        UseLayoutRounding="True"
+        TextOptions.TextFormattingMode="Display"
+        TextOptions.TextRenderingMode="ClearType"
+        FontFamily="{StaticResource UiFont}"
+        Foreground="#4A4750"
+        Background="#FBF1F7"
+        AllowDrop="True"
+        DragOver="MainWindow_DragOver"
+        Drop="MainWindow_Drop"
+        PreviewMouseLeftButtonDown="Fx_MouseDown"
+        PreviewMouseMove="Fx_MouseMove">
+
+    <Window.Resources>
+        <!-- song bar -->
+        <Style x:Key="SongItemStyle" TargetType="{x:Type ListBoxItem}">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Margin" Value="0,0,0,6" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                        <Grid x:Name="root" Margin="8,0,8,0">
+                            <Border x:Name="bar" Background="#E6575359" CornerRadius="3" Height="52">
+                                <ContentPresenter />
+                            </Border>
+                            <Border x:Name="lighten" Background="#FFFFFF" Opacity="0" CornerRadius="3" IsHitTestVisible="False" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="lighten" Property="Opacity" Value="0.12" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="bar" Property="Background" Value="#FF3B72" />
+                                <Setter TargetName="bar" Property="Height" Value="76" />
+                                <Setter TargetName="root" Property="Margin" Value="0,2,0,4" />
+                                <Setter TargetName="lighten" Property="Opacity" Value="0" />
+                                <Setter TargetName="bar" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect BlurRadius="10" ShadowDepth="2" Direction="270" Color="#B0144A" Opacity="0.35" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- left category tabs (Background = accent colour) -->
+        <Style x:Key="CategoryTabIdle" TargetType="{x:Type Button}">
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Height" Value="58" />
+            <Setter Property="Margin" Value="0,0,0,8" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Grid>
+                            <Border Background="#1F000000" Margin="0,2,0,-2" CornerRadius="0,3,3,0" />
+                            <Border Background="#FFFFFF" CornerRadius="0,3,3,0">
+                                <Grid>
+                                    <Border Background="{TemplateBinding Background}" Width="8" HorizontalAlignment="Left" />
+                                    <TextBlock Text="{TemplateBinding Content}" FontSize="17" FontWeight="Bold" Foreground="#4A4750"
+                                               Margin="24,0,8,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                </Grid>
+                            </Border>
+                            <Border x:Name="lighten" Background="#FF3B72" Opacity="0" CornerRadius="0,3,3,0" IsHitTestVisible="False" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="lighten" Property="Opacity" Value="0.06" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="lighten" Property="Opacity" Value="0.15" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="CategoryTabActive" TargetType="{x:Type Button}">
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Height" Value="64" />
+            <Setter Property="Margin" Value="0,0,0,8" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Grid>
+                            <Border Background="#26000000" Margin="0,2,0,-2" CornerRadius="0,3,3,0" />
+                            <Border Background="#FF3B72" CornerRadius="0,3,3,0" Margin="0,0,-10,0">
+                                <TextBlock Text="{TemplateBinding Content}" FontSize="19" FontWeight="Bold" Foreground="#FFFFFF"
+                                           Margin="24,0,8,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                            </Border>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- filter: band tile -->
+        <Style x:Key="BandTile" TargetType="{x:Type ToggleButton}">
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Height" Value="70" />
+            <Setter Property="Margin" Value="0,0,12,12" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Grid>
+                            <Border CornerRadius="6" Background="#26000000" Margin="0,2,0,-2" />
+                            <Border x:Name="face" CornerRadius="6" Background="{StaticResource GbpFlatFace}" BorderBrush="#D9D6DC" BorderThickness="1">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <Border x:Name="lighten" CornerRadius="6" Background="#FFFFFF" Opacity="0" IsHitTestVisible="False" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="face" Property="Background" Value="#FF3B72" />
+                                <Setter TargetName="face" Property="BorderBrush" Value="#FF3B72" />
+                                <Setter Property="TextElement.Foreground" Value="#FFFFFF" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="lighten" Property="Opacity" Value="0.25" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="lighten" Property="Opacity" Value="0.55" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- favourite slot button 1/2/3 -->
+        <Style x:Key="FavSlot" TargetType="{x:Type ToggleButton}">
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Width" Value="48" />
+            <Setter Property="Height" Value="44" />
+            <Setter Property="Margin" Value="0,0,10,0" />
+            <Setter Property="FontFamily" Value="{StaticResource NumFont}" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Foreground" Value="#4A4750" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Grid>
+                            <Border CornerRadius="6" Background="#26000000" Margin="0,2,0,-2" />
+                            <Border x:Name="face" CornerRadius="6" Background="{StaticResource GbpFlatFace}" BorderBrush="#D9D6DC" BorderThickness="1">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <Border x:Name="lighten" CornerRadius="6" Background="#FFFFFF" Opacity="0" IsHitTestVisible="False" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="face" Property="Background" Value="#FF3B72" />
+                                <Setter TargetName="face" Property="BorderBrush" Value="#FFFFFF" />
+                                <Setter TargetName="face" Property="BorderThickness" Value="2" />
+                                <Setter Property="Foreground" Value="#FFFFFF" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="lighten" Property="Opacity" Value="0.5" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid x:Name="rootGrid" Width="1440" Height="810" ClipToBounds="True" MouseLeftButtonDown="Root_DragMove" MouseMove="Root_MouseMove">
+        <!-- ============ BACKGROUND ============ -->
+        <Border>
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#FBDDEB" Offset="0" />
+                    <GradientStop Color="#F5CFE6" Offset="0.4" />
+                    <GradientStop Color="#E2CFF2" Offset="0.72" />
+                    <GradientStop Color="#CFDDF6" Offset="1" />
+                </LinearGradientBrush>
+            </Border.Background>
+        </Border>
+        <!-- ambient layer is decoded tiny and upscaled: soft blur without a per-frame BlurEffect -->
+        <Image x:Name="imgStageBackdropAmbient" Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center"
+               RenderOptions.BitmapScalingMode="Linear" Opacity="0.18" CacheMode="BitmapCache" />
+        <Image x:Name="imgStageBackdrop" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"
+               RenderOptions.BitmapScalingMode="HighQuality" Opacity="0.22" CacheMode="BitmapCache" />
+
+        <!-- hollow BasSStation lettering: two bands point-symmetric about the window centre (720,405),
+             drifting in opposite directions; the cached rectangle itself moves so it is never re-rasterised -->
+        <Canvas IsHitTestVisible="False" ClipToBounds="False">
+            <Rectangle Width="4800" Height="200" Opacity="0.8" Canvas.Left="-1680" Canvas.Top="35"
+                       RenderTransformOrigin="0.5,0.5" CacheMode="BitmapCache">
+                <Rectangle.RenderTransform>
+                    <TransformGroup>
+                        <TranslateTransform x:Name="bgTextTopShift" />
+                        <RotateTransform Angle="-11" />
+                    </TransformGroup>
+                </Rectangle.RenderTransform>
+                <Rectangle.Fill>
+                    <ImageBrush ImageSource="/assets/bg_outline_text.png" TileMode="Tile" Stretch="Fill" ViewportUnits="Absolute" Viewport="0,0,1305,200" />
+                </Rectangle.Fill>
+            </Rectangle>
+            <Rectangle Width="4800" Height="200" Opacity="0.8" Canvas.Left="-1680" Canvas.Top="575"
+                       RenderTransformOrigin="0.5,0.5" CacheMode="BitmapCache">
+                <Rectangle.RenderTransform>
+                    <TransformGroup>
+                        <TranslateTransform x:Name="bgTextBottomShift" />
+                        <RotateTransform Angle="-11" />
+                    </TransformGroup>
+                </Rectangle.RenderTransform>
+                <Rectangle.Fill>
+                    <ImageBrush ImageSource="/assets/bg_outline_text.png" TileMode="Tile" Stretch="Fill" ViewportUnits="Absolute" Viewport="0,0,1305,200" />
+                </Rectangle.Fill>
+            </Rectangle>
+        </Canvas>
+        <Grid IsHitTestVisible="False" CacheMode="BitmapCache">
+            <Border>
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#A6FFF4F9" Offset="0" />
+                        <GradientStop Color="#73FFF4F9" Offset="0.38" />
+                        <GradientStop Color="#26FFFFFF" Offset="0.62" />
+                        <GradientStop Color="#00FFFFFF" Offset="1" />
+                    </LinearGradientBrush>
+                </Border.Background>
+            </Border>
+            <Border Background="{StaticResource DotPattern}" Opacity="0.55" />
+        </Grid>
+
+        <!-- ============ LAYOUT ============ -->
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="92" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- header -->
+            <Grid Margin="18,14,20,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
+                    <Image x:Name="imgLogo" Source="/assets/bassdream_logo.png" Height="72" Stretch="Uniform" Margin="0,-4,0,0"
+                           RenderOptions.BitmapScalingMode="HighQuality" VerticalAlignment="Top">
+                        <Image.Effect>
+                            <DropShadowEffect BlurRadius="6" ShadowDepth="1" Direction="270" Opacity="0.2" />
+                        </Image.Effect>
+                    </Image>
+                    <Grid Margin="18,2,0,0" Width="330">
+                        <Border Background="#FFFFFF" CornerRadius="20" Height="42" VerticalAlignment="Top" Margin="0,24,0,0">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="6" ShadowDepth="1" Direction="270" Opacity="0.12" />
+                            </Border.Effect>
+                            <TextBlock Text="选择乐曲" FontSize="21" FontWeight="Bold" Foreground="#4A4750" VerticalAlignment="Center" Margin="26,0,0,0" />
+                        </Border>
+                        <Border Background="#FF3B72" CornerRadius="14" Height="28" Width="250" VerticalAlignment="Top" HorizontalAlignment="Left">
+                            <TextBlock Text="自由练习" FontSize="15" FontWeight="Bold" Foreground="#FFFFFF" VerticalAlignment="Center" Margin="24,0,0,1" />
+                        </Border>
+                    </Grid>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Top" Margin="0,8,96,0">
+                    <Border Width="260" Height="44" CornerRadius="22" Background="#FFFFFF" BorderBrush="#E4DCE2" BorderThickness="1" Margin="0,0,14,0">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="5" ShadowDepth="1" Direction="270" Opacity="0.1" />
+                        </Border.Effect>
+                        <Grid Margin="18,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Path Data="M 6.5,2 A 4.5,4.5 0 1,0 9.8,9.8 L 13,13" Stroke="#FF3B72" StrokeThickness="2.2"
+                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round" Width="15" Height="15" Stretch="Uniform"
+                                  VerticalAlignment="Center" Margin="0,0,10,0" />
+                            <TextBox x:Name="txtSearch" Grid.Column="1" TextChanged="TxtSearch_TextChanged" Background="Transparent"
+                                     BorderThickness="0" VerticalAlignment="Center" FontSize="15" Foreground="#4A4750" CaretBrush="#FF3B72" />
+                            <TextBlock x:Name="txtPlaceholder" Grid.Column="1" Text="搜索" IsHitTestVisible="False"
+                                       Foreground="#B3ACBC" FontSize="15" VerticalAlignment="Center" />
+                        </Grid>
+                    </Border>
+                    <Button x:Name="btnCalendar" Click="BtnCalendar_Click" Style="{StaticResource GbpFlat}" Height="48" Width="96" Margin="0,0,12,0" Content="日历" />
+                    <Button x:Name="btnAddSong" Click="BtnAddSong_Click" Style="{StaticResource GbpFlat}" Height="48" Width="96" Margin="0,0,12,0" Content="添加" />
+                    <Button x:Name="btnFilter" Click="BtnFilter_Click" Style="{StaticResource GbpFlatPink}" Height="48" Width="120" FontSize="16">
+                        <Grid>
+                            <TextBlock Text="筛选" />
+                            <Ellipse x:Name="dotFilterActive" Width="9" Height="9" Fill="#FFFFFF" HorizontalAlignment="Right"
+                                     VerticalAlignment="Top" Margin="0,-6,-18,0" Visibility="Collapsed" />
+                        </Grid>
+                    </Button>
+                </StackPanel>
+            </Grid>
+
+            <!-- body -->
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="200" />
+                    <ColumnDefinition Width="470" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <ScrollViewer VerticalScrollBarVisibility="Hidden" Margin="0,40,0,0">
+                    <StackPanel x:Name="pnlCategories" Margin="0,0,14,16" />
+                </ScrollViewer>
+
+                <!-- song list -->
+                <Grid Grid.Column="1" Margin="0,40,0,0">
+                    <ListBox x:Name="lstSongs" SelectionChanged="LstSongs_SelectionChanged" PreviewKeyDown="LstSongs_PreviewKeyDown"
+                             VirtualizingStackPanel.IsVirtualizing="True" VirtualizingStackPanel.VirtualizationMode="Recycling"
+                             ScrollViewer.CanContentScroll="True" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                             ScrollViewer.VerticalScrollBarVisibility="Auto" ItemContainerStyle="{StaticResource SongItemStyle}"
+                             BorderThickness="0" Background="Transparent" Padding="0,0,6,12">
+                        <!-- top inset so the heart badge above the first bar is not clipped by the scroll viewport -->
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel Margin="0,12,0,0" />
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                        <ListBox.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem x:Name="menuDeleteSong" Header="删除" Click="MenuDeleteSong_Click" />
+                            </ContextMenu>
+                        </ListBox.ContextMenu>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate DataType="{x:Type models:SongModel}">
+                                <Grid>
+                                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="52,0,52,0">
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <TextBlock x:Name="txtItemTitle" Text="{Binding Title}" FontSize="16" FontWeight="Bold" Foreground="#FFFFFF"
+                                                       TextTrimming="CharacterEllipsis" MaxWidth="250" VerticalAlignment="Center" />
+                                            <Border Background="#40FFFFFF" CornerRadius="3" Padding="5,0,5,1" Margin="7,0,0,0" VerticalAlignment="Center"
+                                                    Visibility="{Binding HasVersion, Converter={x:Static views:BooleanToVisibilityConverter.Instance}}">
+                                                <TextBlock Text="{Binding Version}" FontSize="11" FontWeight="Bold" Foreground="#FFFFFF" />
+                                            </Border>
+                                        </StackPanel>
+                                        <TextBlock x:Name="txtItemSub" Text="{Binding Artist}" FontSize="13" FontWeight="Bold" Foreground="#FFE3EC"
+                                                   HorizontalAlignment="Center" Visibility="Collapsed" TextTrimming="CharacterEllipsis" Margin="0,2,0,0" />
+                                    </StackPanel>
+                                    <!-- favourite heart badge -->
+                                    <Border x:Name="heartBadge" Background="#FF3B72" BorderBrush="#FF8FB4" BorderThickness="1.5" CornerRadius="11"
+                                            Width="46" Height="22" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,-10,0,0"
+                                            Visibility="{Binding IsFavorite, Converter={x:Static views:BooleanToVisibilityConverter.Instance}}">
+                                        <Path Data="M 6,10 L 1,5 C -0.5,3.5 0.5,0.5 3,0.5 C 4.5,0.5 5.5,1.5 6,2.5 C 6.5,1.5 7.5,0.5 9,0.5 C 11.5,0.5 12.5,3.5 11,5 Z"
+                                              Fill="#FFFFFF" Width="12" Height="10" Stretch="Uniform" />
+                                    </Border>
+                                    <Border Background="#FFAE1A" CornerRadius="3" Padding="5,1" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0"
+                                            Visibility="{Binding HasStringTag, Converter={x:Static views:BooleanToVisibilityConverter.Instance}}">
+                                        <TextBlock Text="{Binding StringTag}" FontSize="11" FontWeight="Bold" Foreground="#FFFFFF" />
+                                    </Border>
+                                    <TextBlock x:Name="txtItemLevel" Text="{Binding Level}" FontFamily="{StaticResource NumFont}" FontStyle="Italic" FontSize="16"
+                                               Foreground="{Binding TierColor}" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,14,0" />
+                                </Grid>
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected}" Value="True">
+                                        <Setter TargetName="txtItemTitle" Property="FontSize" Value="19" />
+                                        <Setter TargetName="txtItemSub" Property="Visibility" Value="Visible" />
+                                        <Setter TargetName="txtItemLevel" Property="Foreground" Value="#FFFFFF" />
+                                        <Setter TargetName="txtItemLevel" Property="FontSize" Value="20" />
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+
+                <!-- sort switch (round) -->
+                <Button x:Name="btnSort" Grid.Column="1" Grid.ColumnSpan="2" Click="BtnSort_Click" Cursor="Hand" Width="70" Height="70"
+                        HorizontalAlignment="Left" VerticalAlignment="Top" Margin="436,-34,0,0">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Grid>
+                                <Ellipse Fill="#26000000" Margin="0,2,0,-2" />
+                                <Ellipse x:Name="face" Fill="#FFFFFF" Stroke="#E4DCE2" StrokeThickness="1" />
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <Path Data="M 0,1 L 14,1 M 0,6 L 10,6 M 0,11 L 6,11 M 13,4 L 13,13 M 13,13 L 10.5,10.5 M 13,13 L 15.5,10.5"
+                                          Stroke="#4A4750" StrokeThickness="2.2" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                          Width="20" Height="16" Stretch="Uniform" HorizontalAlignment="Center" />
+                                    <TextBlock x:Name="txtSortLabel" Text="难度" FontSize="11.5" FontWeight="Bold" Foreground="#4A4750" HorizontalAlignment="Center" Margin="0,3,0,0" />
+                                </StackPanel>
+                                <Ellipse x:Name="lighten" Fill="#FFFFFF" Opacity="0" IsHitTestVisible="False" />
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="face" Property="Fill" Value="#FFF0F5" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+
+                <!-- ============ STAGE ============ -->
+                <Grid Grid.Column="2" Margin="34,40,22,20">
+                    <!-- jacket + info sit centred between the top of the category column and the start button -->
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="400" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- jacket -->
+                    <StackPanel Grid.Row="1" VerticalAlignment="Top" Margin="0,10,0,0">
+                        <Grid Width="390" Height="390" HorizontalAlignment="Left">
+                            <Border Background="#EE2E4E" Margin="14,-10,-10,14" />
+                            <Border Background="#FFFFFF" Padding="5">
+                                <Border.Effect>
+                                    <DropShadowEffect BlurRadius="10" ShadowDepth="2" Direction="270" Opacity="0.25" />
+                                </Border.Effect>
+                                <Border Background="#2A2830" ClipToBounds="True">
+                                    <Image x:Name="imgStageCover" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality" />
+                                </Border>
+                            </Border>
+                            <Border x:Name="bdStageTierPill" Background="#E04BD6" BorderBrush="#FFFFFF" BorderThickness="2" Padding="12,2"
+                                    HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-8,16,0,0">
+                                <TextBlock x:Name="txtStageTierPill" Text="" FontFamily="{StaticResource NumFont}" FontSize="15" Foreground="#FFFFFF" />
+                            </Border>
+                        </Grid>
+                        <Border Background="#FFFFFF" Width="390" HorizontalAlignment="Left" Padding="18,10,18,12" Margin="0,-1,0,0">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="8" ShadowDepth="2" Direction="270" Opacity="0.12" />
+                            </Border.Effect>
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock x:Name="txtStageTitle" Text="" FontSize="23" FontWeight="Bold" Foreground="#4A4750" TextTrimming="CharacterEllipsis" />
+                                    <Border x:Name="bdStageVersion" Background="#4A4750" CornerRadius="3" Padding="7,1,7,2" Margin="10,0,0,0"
+                                            VerticalAlignment="Center" Visibility="Collapsed">
+                                        <TextBlock x:Name="txtStageVersion" Text="" FontSize="13" FontWeight="Bold" Foreground="#FFFFFF" />
+                                    </Border>
+                                </StackPanel>
+                                <TextBlock x:Name="txtStageArtist" Text="" FontSize="14.5" FontWeight="Bold" Foreground="#FF3B72" Margin="0,2,0,0" TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- info column -->
+                    <StackPanel Grid.Row="1" Grid.Column="1" Margin="22,10,0,0" VerticalAlignment="Top">
+                        <!-- level -->
+                        <Border Background="#FFFFFF" CornerRadius="6" Padding="10,8,14,8">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="6" ShadowDepth="1" Direction="270" Opacity="0.12" />
+                            </Border.Effect>
+                            <Grid>
+                                <Border Style="{StaticResource GbpDarkPill}" VerticalAlignment="Center">
+                                    <TextBlock Text="乐曲等级" Style="{StaticResource GbpDarkPillText}" />
+                                </Border>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <TextBlock x:Name="txtStageLevel" Text="" FontFamily="{StaticResource NumFont}" FontSize="28" Foreground="#4A4750" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <!-- meta -->
+                        <Border Background="#E64A4750" CornerRadius="6" Padding="14,8" Margin="0,12,0,0">
+                            <Grid>
+                                <TextBlock x:Name="txtStageTelemetry" Text="" FontSize="13.5" FontWeight="Bold" Foreground="#FFFFFF" VerticalAlignment="Center" />
+                                <!-- 4弦 / 5弦 switch: only when the song has both arrangements -->
+                                <Border x:Name="stringSwitch" HorizontalAlignment="Right" VerticalAlignment="Center" Background="#33FFFFFF"
+                                        CornerRadius="10" Padding="2" Visibility="Collapsed">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Border x:Name="pill4" CornerRadius="8" Padding="9,1" Cursor="Hand" MouseLeftButtonUp="Pill4_Click" Background="Transparent">
+                                            <TextBlock x:Name="txtPill4" Text="4弦" FontSize="12" FontWeight="Bold" Foreground="#C9C4D3" />
+                                        </Border>
+                                        <Border x:Name="pill5" CornerRadius="8" Padding="9,1" Cursor="Hand" MouseLeftButtonUp="Pill5_Click" Background="#FF3B72">
+                                            <TextBlock x:Name="txtPill5" Text="5弦" FontSize="12" FontWeight="Bold" Foreground="#FFFFFF" />
+                                        </Border>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                        </Border>
+
+                        <!-- best score -->
+                        <Border Background="#FFFFFF" CornerRadius="6" Padding="12,10,16,10" Margin="0,12,0,0" Cursor="Hand" MouseLeftButtonUp="CardScore_MouseDown">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="6" ShadowDepth="1" Direction="270" Opacity="0.12" />
+                            </Border.Effect>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid Width="62" Height="62">
+                                    <Ellipse x:Name="bdBestGrade" Fill="#F4F1F5" Stroke="#E4DCE2" StrokeThickness="2" />
+                                    <TextBlock x:Name="txtBestGrade" Text="" FontFamily="{StaticResource NumFont}" FontStyle="Italic" FontSize="22"
+                                               Foreground="#B3ACBC" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Grid>
+                                <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <TextBlock Text="最高分" FontSize="14" FontWeight="Bold" Foreground="#7C7688" HorizontalAlignment="Right" />
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                        <TextBlock x:Name="txtBestScore" Text="--" FontFamily="{StaticResource NumFont}" FontSize="26" Foreground="#4A4750" />
+                                        <TextBlock x:Name="txtScoreSub" Text="" FontSize="12" Foreground="#B3ACBC" VerticalAlignment="Bottom" Margin="4,0,0,4" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <!-- favourite -->
+                        <Border Background="#FFFFFF" CornerRadius="6" Padding="12,10" Margin="0,12,0,0">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="6" ShadowDepth="1" Direction="270" Opacity="0.12" />
+                            </Border.Effect>
+                            <StackPanel>
+                                <Border Style="{StaticResource GbpDarkPill}" HorizontalAlignment="Stretch" Margin="0,0,0,10">
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                        <Path Data="M 6,10 L 1,5 C -0.5,3.5 0.5,0.5 3,0.5 C 4.5,0.5 5.5,1.5 6,2.5 C 6.5,1.5 7.5,0.5 9,0.5 C 11.5,0.5 12.5,3.5 11,5 Z"
+                                              Fill="#FFFFFF" Width="14" Height="12" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,8,0" />
+                                        <TextBlock Text="收藏" Style="{StaticResource GbpDarkPillText}" />
+                                    </StackPanel>
+                                </Border>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <ToggleButton x:Name="favSlot1" Content="1" Tag="1" Style="{StaticResource FavSlot}" Click="FavSlot_Click" />
+                                    <ToggleButton x:Name="favSlot2" Content="2" Tag="2" Style="{StaticResource FavSlot}" Click="FavSlot_Click" />
+                                    <ToggleButton x:Name="favSlot3" Content="3" Tag="3" Style="{StaticResource FavSlot}" Click="FavSlot_Click" Margin="0" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Grid Margin="0,14,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Button x:Name="btnSendTablet" Click="BtnSendTablet_Click" Style="{StaticResource GbpFlat}" Height="46" Padding="10,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <Path x:Name="pathCopyIcon" Stroke="#FF3B72" StrokeThickness="1.7" Width="14" Height="14" Stretch="Uniform"
+                                          StrokeStartLineCap="Round" StrokeEndLineCap="Round" VerticalAlignment="Center" Margin="0,0,8,0"
+                                          Data="M 4,2 L 12,2 C 12.5,2 13,2.5 13,3 L 13,10 M 2,5 L 9,5 C 9.5,5 10,5.5 10,6 L 10,13 C 10,13.5 9.5,14 9,14 L 2,14 C 1.5,14 1,13.5 1,13 L 1,6 C 1,5.5 1.5,5 2,5 Z" />
+                                    <TextBlock x:Name="txtSendTabletLabel" Text="复制PDF谱面" FontSize="14" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                            <Button x:Name="btnDeleteSelectedSong" Grid.Column="1" Click="BtnDeleteSelectedSong_Click" Style="{StaticResource GbpFlat}"
+                                    Height="46" Width="52" Margin="10,0,0,0" Padding="0" ToolTip="删除">
+                                <Path Data="M 3,5 L 13,5 M 6,5 V 3 C 6,2.5 6.5,2 7,2 H 9 C 9.5,2 10,2.5 10,3 V 5 M 4,5 L 5,14 C 5,14.5 5.5,15 6,15 H 10 C 10.5,15 11,14.5 11,14 L 12,5"
+                                      Stroke="#7C7688" StrokeThickness="1.6" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Width="15" Height="15" Stretch="Uniform" />
+                            </Button>
+                        </Grid>
+                    </StackPanel>
+
+                    <!-- bottom actions -->
+                    <Grid Grid.Row="3" Grid.ColumnSpan="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Button x:Name="btnRandom" Click="BtnRandom_Click" Style="{StaticResource GbpFlat}" Width="78" Height="78" Padding="0" VerticalAlignment="Bottom">
+                            <StackPanel>
+                                <Path Data="M 0,3 L 4,3 C 8,3 9,12 13,12 L 17,12 M 14,9 L 17,12 L 14,15 M 0,12 L 4,12 C 6,12 7,10 8,8 M 10,5 C 11,4 12,3 13,3 L 17,3 M 14,0 L 17,3 L 14,6"
+                                      Stroke="#4A4750" StrokeThickness="2.2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Width="26" Height="22" Stretch="Uniform" HorizontalAlignment="Center" />
+                                <TextBlock Text="随机选曲" FontSize="12" HorizontalAlignment="Center" Margin="0,5,0,0" />
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="btnStartPractice" Grid.Column="1" Click="BtnStartPractice_Click" Style="{StaticResource GbpAction}" Height="82" Margin="18,0,0,0">
+                            <StackPanel Orientation="Horizontal">
+                                <Path x:Name="pathPlayIcon" Data="M 2,1 L 14,8 L 2,15 Z" Fill="#FFFFFF" Width="18" Height="18" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,14,0" />
+                                <TextBlock x:Name="txtPlayLabel" Text="开始练习" FontSize="25" FontWeight="Bold" Foreground="#FFFFFF" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Bottom">
+                        <!-- in-app score: tab + backing + editing -->
+                        <Button x:Name="btnScore" Click="BtnScore_Click" Style="{StaticResource GbpFlat}"
+                                Width="78" Height="78" Padding="0" Margin="18,0,0,0" VerticalAlignment="Bottom">
+                            <StackPanel>
+                                <Path Data="M 0,2 L 26,2 M 0,8 L 26,8 M 0,14 L 26,14 M 0,20 L 26,20 M 7,0 L 7,22 M 18,6 L 18,16"
+                                      Stroke="#4A4750" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                      Width="26" Height="22" Stretch="Uniform" HorizontalAlignment="Center" />
+                                <TextBlock Text="谱面" FontSize="12" HorizontalAlignment="Center" Margin="0,5,0,0" />
+                            </StackPanel>
+                        </Button>
+                        <!-- 核对版: song + boosted bass stem; edits sync back to the practice file -->
+                        <Button x:Name="btnCheckVersion" Click="BtnCheckVersion_Click" Style="{StaticResource GbpFlat}"
+                                Width="78" Height="78" Padding="0" Margin="18,0,0,0" VerticalAlignment="Bottom" Visibility="Collapsed">
+                            <StackPanel>
+                                <Grid Width="26" Height="22" HorizontalAlignment="Center">
+                                    <Path Data="M 0,11 L 3,11 L 5,5 L 8,17 L 11,2 L 14,20 L 17,8 L 19,14 L 21,11 L 26,11"
+                                          Stroke="#4A4750" StrokeThickness="2.2" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                          StrokeLineJoin="Round" Stretch="Uniform" />
+                                </Grid>
+                                <TextBlock Text="核对" FontSize="12" HorizontalAlignment="Center" Margin="0,5,0,0" />
+                            </StackPanel>
+                        </Button>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Grid>
+
+        <!-- caption buttons (window has no system title bar) -->
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,22,20,0">
+            <Button Click="BtnMinimize_Click" Style="{StaticResource GbpFlat}" Width="42" Height="42" Padding="0" Margin="0,0,8,0" ToolTip="最小化">
+                <Rectangle Width="14" Height="2.6" Fill="#4A4750" RadiusX="1.3" RadiusY="1.3" />
+            </Button>
+            <Button Click="BtnClose_Click" Style="{StaticResource GbpFlat}" Width="42" Height="42" Padding="0" ToolTip="关闭">
+                <Path Data="M 0,0 L 12,12 M 12,0 L 0,12" Stroke="#FF3B72" StrokeThickness="2.6" StrokeStartLineCap="Round" StrokeEndLineCap="Round" />
+            </Button>
+        </StackPanel>
+
+        <!-- ============ FILTER OVERLAY ============ -->
+        <Grid x:Name="filterOverlay" Visibility="Collapsed">
+            <Border x:Name="filterScrim" Background="#59000000" MouseLeftButtonDown="FilterScrim_MouseDown" />
+            <Border x:Name="filterPanel" Width="690" HorizontalAlignment="Right" Background="#FFFFFF">
+                <Border.RenderTransform>
+                    <TranslateTransform x:Name="filterSlide" X="0" />
+                </Border.RenderTransform>
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="16" ShadowDepth="0" Opacity="0.25" />
+                </Border.Effect>
+                <Grid Margin="34,24,34,24">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
+                            <Path Data="{StaticResource ExclaimBoltGeometry}" Fill="#FFAE1A" Stretch="Uniform" Width="16" Height="30"  Margin="0,0,12,4" />
+                            <StackPanel>
+                                <TextBlock Text="乐曲筛选" FontSize="26" FontWeight="Bold" Foreground="#4A4750" />
+                                <Border Height="3" Background="#FF3B72" Width="400" HorizontalAlignment="Left" Margin="0,4,0,0" />
+                            </StackPanel>
+                        </StackPanel>
+                        <Button Click="FilterReset_Click" Style="{StaticResource GbpFlat}" Content="恢复默认值" HorizontalAlignment="Right" VerticalAlignment="Top" Height="46" Width="150" FontSize="16" />
+                    </Grid>
+
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="0,22,0,10">
+                        <StackPanel>
+                            <Border Background="#FF3B72" CornerRadius="12" Height="26" Margin="0,0,0,18">
+                                <StackPanel Orientation="Horizontal" Margin="12,0">
+                                    <Path Data="{StaticResource StarGeometry}" Fill="#FFFFFF" Width="16" Height="16" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,8,0" />
+                                    <TextBlock Text="筛选" FontSize="15" FontWeight="Bold" Foreground="#FFFFFF" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource GbpDarkPill}" Margin="0,0,0,12">
+                                <TextBlock Text="乐队" Style="{StaticResource GbpDarkPillText}" />
+                            </Border>
+                            <UniformGrid x:Name="gridBands" Columns="4" Margin="0,0,-12,10" />
+
+                            <Border Style="{StaticResource GbpDarkPill}" Margin="0,8,0,14">
+                                <TextBlock Text="难易度" Style="{StaticResource GbpDarkPillText}" />
+                            </Border>
+                            <WrapPanel x:Name="pnlTierRadios" Margin="4,0,0,8">
+                                <RadioButton Content="全部" Tag="ALL" GroupName="tier" Style="{StaticResource GbpRadio}" Checked="TierRadio_Checked" IsChecked="True" Width="120" />
+                                <RadioButton Content="EASY" Tag="EASY" GroupName="tier" Style="{StaticResource GbpRadio}" Checked="TierRadio_Checked" Width="120" />
+                                <RadioButton Content="NORMAL" Tag="NORMAL" GroupName="tier" Style="{StaticResource GbpRadio}" Checked="TierRadio_Checked" Width="140" />
+                                <RadioButton Content="HARD" Tag="HARD" GroupName="tier" Style="{StaticResource GbpRadio}" Checked="TierRadio_Checked" Width="120" />
+                                <RadioButton Content="EXPERT" Tag="EXPERT" GroupName="tier" Style="{StaticResource GbpRadio}" Checked="TierRadio_Checked" Width="120" />
+                                <RadioButton Content="SPECIAL" Tag="SPECIAL" GroupName="tier" Style="{StaticResource GbpRadio}" Checked="TierRadio_Checked" Width="140" />
+                            </WrapPanel>
+
+                            <Border Style="{StaticResource GbpDarkPill}" Margin="0,8,0,10">
+                                <TextBlock Text="乐曲等级" Style="{StaticResource GbpDarkPillText}" />
+                            </Border>
+                            <Grid Margin="4,4,4,10" Height="80">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="52" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="52" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock x:Name="txtLevelMin" Text="1" FontFamily="{StaticResource NumFont}" FontSize="30" Foreground="#FF3B72" VerticalAlignment="Center" />
+                                <Canvas x:Name="rangeCanvas" Grid.Column="1" Height="76" Margin="10,0" SizeChanged="RangeCanvas_SizeChanged" Background="Transparent">
+                                    <Border x:Name="rangeTrack" Height="4" CornerRadius="2" Background="#E9E3E8" Canvas.Top="36" />
+                                    <Border x:Name="rangeFill" Height="16" Background="#FF3B72" Canvas.Top="30" />
+                                    <Thumb x:Name="thumbMin" Width="40" Height="76" Canvas.Top="0" DragDelta="ThumbMin_DragDelta" Cursor="Hand">
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="Thumb">
+                                                <Grid>
+                                                    <Border CornerRadius="12" Background="#2E000000" Margin="1,3,-1,-3" />
+                                                    <Border CornerRadius="12" BorderBrush="#CFCBD1" BorderThickness="1.5">
+                                                        <Border.Background>
+                                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                                <GradientStop Color="#FFFFFF" Offset="0" />
+                                                                <GradientStop Color="#F6F5F7" Offset="0.55" />
+                                                                <GradientStop Color="#E4E1E6" Offset="1" />
+                                                            </LinearGradientBrush>
+                                                        </Border.Background>
+                                                    </Border>
+                                                </Grid>
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                    <Thumb x:Name="thumbMax" Width="40" Height="76" Canvas.Top="0" DragDelta="ThumbMax_DragDelta" Cursor="Hand">
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="Thumb">
+                                                <Grid>
+                                                    <Border CornerRadius="12" Background="#2E000000" Margin="1,3,-1,-3" />
+                                                    <Border CornerRadius="12" BorderBrush="#CFCBD1" BorderThickness="1.5">
+                                                        <Border.Background>
+                                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                                <GradientStop Color="#FFFFFF" Offset="0" />
+                                                                <GradientStop Color="#F6F5F7" Offset="0.55" />
+                                                                <GradientStop Color="#E4E1E6" Offset="1" />
+                                                            </LinearGradientBrush>
+                                                        </Border.Background>
+                                                    </Border>
+                                                </Grid>
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Canvas>
+                                <TextBlock x:Name="txtLevelMax" Grid.Column="2" Text="32" FontFamily="{StaticResource NumFont}" FontSize="30" Foreground="#FF3B72"
+                                           VerticalAlignment="Center" HorizontalAlignment="Right" />
+                            </Grid>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <Button Grid.Row="2" Click="FilterClose_Click" Style="{StaticResource GbpFlat}" Content="关闭" Width="300" Height="64" FontSize="24" />
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- ============ IN-WINDOW SHEET (add song / evaluation / calendar) ============ -->
+        <Grid x:Name="sheetOverlay" Visibility="Collapsed">
+            <Border x:Name="sheetScrim" Background="#66000000" MouseLeftButtonDown="SheetScrim_MouseDown" />
+            <Border x:Name="sheetHost" HorizontalAlignment="Center" VerticalAlignment="Center" CornerRadius="6" ClipToBounds="True">
+                <Border.RenderTransform>
+                    <ScaleTransform x:Name="sheetScale" ScaleX="1" ScaleY="1" />
+                </Border.RenderTransform>
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="18" ShadowDepth="2" Opacity="0.3" />
+                </Border.Effect>
+            </Border>
+        </Grid>
+
+        <!-- ============ FX + TOAST ============ -->
+        <!-- ============ CONFIRM DIALOG (in-window, GBP style) ============ -->
+        <Grid x:Name="dialogOverlay" Visibility="Collapsed" Focusable="True" KeyDown="Dialog_KeyDown">
+            <Border x:Name="dialogScrim" Background="#66000000" MouseLeftButtonDown="DialogScrim_MouseDown" />
+            <Grid x:Name="dialogPanel" Width="560" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+                <Grid.RenderTransform>
+                    <ScaleTransform x:Name="dialogScale" ScaleX="1" ScaleY="1" />
+                </Grid.RenderTransform>
+                <Border CornerRadius="10" Background="#30000000" Margin="0,4,0,-4" />
+                <Border CornerRadius="10" Background="#FFFFFF" ClipToBounds="True">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <!-- title band -->
+                        <Border Background="#FF3B72" CornerRadius="10,10,0,0" Height="56">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Path Data="{StaticResource ExclaimBoltGeometry}" Fill="#FFD84A" Stretch="Uniform" Width="12" Height="24" Margin="0,0,12,0" VerticalAlignment="Center" />
+                                <TextBlock x:Name="txtDialogTitle" Text="删除乐曲" FontSize="21" FontWeight="Bold" Foreground="#FFFFFF" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- the song being acted on -->
+                        <Border Grid.Row="1" Background="{StaticResource DotPattern}" Padding="34,28,34,26">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid Width="112" Height="112">
+                                    <Border Background="#EE2E4E" Margin="7,-5,-5,7" />
+                                    <Border Background="#FFFFFF" Padding="3">
+                                        <Border Background="#2A2830" ClipToBounds="True">
+                                            <Image x:Name="imgDialogCover" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality" />
+                                        </Border>
+                                    </Border>
+                                </Grid>
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="24,0,0,0">
+                                    <TextBlock x:Name="txtDialogSong" FontSize="20" FontWeight="Bold" Foreground="#4A4750" TextWrapping="Wrap" MaxHeight="56" TextTrimming="CharacterEllipsis" />
+                                    <TextBlock x:Name="txtDialogArtist" FontSize="14" FontWeight="Bold" Foreground="#FF3B72" Margin="0,6,0,0" TextTrimming="CharacterEllipsis" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <!-- actions -->
+                        <Border Grid.Row="2" Background="#F6F2F5" BorderBrush="#EDE4EA" BorderThickness="0,1,0,0" Padding="0,18,0,22">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Button x:Name="btnDialogCancel" Click="DialogCancel_Click" Style="{StaticResource GbpFlat}" Content="取消" Width="190" Height="56" FontSize="19" Margin="0,0,22,0" />
+                                <Button x:Name="btnDialogOk" Click="DialogOk_Click" Style="{StaticResource GbpFlatPink}" Content="删除" Width="190" Height="56" FontSize="19" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <Canvas x:Name="fxLayer" IsHitTestVisible="False" ClipToBounds="True" />
+
+        <Border x:Name="bdToast" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,100,0,0"
+                Background="#F24A4750" CornerRadius="18" Padding="22,9" Opacity="0" IsHitTestVisible="False" Visibility="Collapsed" MaxWidth="760">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock x:Name="txtToastIcon" Text="✓" FontSize="14" FontWeight="Bold" Foreground="#34C274" Margin="0,0,9,0" VerticalAlignment="Top" />
+                <TextBlock x:Name="txtToastMessage" Text="" FontSize="14" FontWeight="Bold" Foreground="#FFFFFF" VerticalAlignment="Center" TextWrapping="Wrap" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
