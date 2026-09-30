@@ -12,21 +12,9 @@ def get_db():
     return conn
 
 def init_history_db():
+    import schema
     conn = get_db()
-    cur = conn.cursor()
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS practice_sessions (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            song_id TEXT,
-            song_title TEXT,
-            artist TEXT,
-            start_time TEXT,
-            end_time TEXT,
-            duration_seconds REAL,
-            notes TEXT
-        )
-    ''')
-    conn.commit()
+    schema.ensure(conn)
     conn.close()
 
 # Ensure table exists on import

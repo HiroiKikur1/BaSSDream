@@ -616,54 +616,10 @@ def evaluate_audio_performance(audio_file_path: str, song_id: str, gp_path: str,
 
 # ---------------------------------------------------------------- persistence
 
-_NEW_COLUMNS = {"combo_badge": "TEXT", "heatmap_json": "TEXT", "pitch_score": "REAL",
-                "complete_score": "REAL", "clean_score": "REAL", "judgments_json": "TEXT"}
-
-
 def init_eval_db():
+    import schema
     conn = sqlite3.connect(DB_PATH)
-    cur = conn.cursor()
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS performance_scores (
-            song_id TEXT PRIMARY KEY,
-            overall_score REAL,
-            grade TEXT,
-            timing_score REAL,
-            dynamics_score REAL,
-            articulation_score REAL,
-            tone_score REAL,
-            coach_comment TEXT,
-            evaluated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
-    have = {r[1] for r in cur.execute("PRAGMA table_info(performance_scores)")}
-    for col, typ in _NEW_COLUMNS.items():
-        if col not in have:
-            cur.execute(f"ALTER TABLE performance_scores ADD COLUMN {col} {typ}")
-    # every take (the table above keeps only the best full-song take)
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS performance_takes (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            song_id TEXT NOT NULL,
-            evaluated_at TEXT,
-            overall_score REAL,
-            grade TEXT,
-            combo_badge TEXT,
-            notes_total INTEGER,
-            coverage REAL,
-            range_start INTEGER,
-            range_end INTEGER,
-            range_label TEXT,
-            rate REAL,
-            complete INTEGER,
-            new_best INTEGER,
-            report_path TEXT,
-            audio_path TEXT,
-            sections_json TEXT
-        )
-    """)
-    cur.execute("CREATE INDEX IF NOT EXISTS idx_takes_song ON performance_takes(song_id, evaluated_at)")
-    conn.commit()
+    schema.ensure(conn)
     conn.close()
 
 

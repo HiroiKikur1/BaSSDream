@@ -80,47 +80,14 @@ def extract_metadata(folder: str):
     return title, artist, franchise
 
 def init_db():
+    import schema
     os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
     conn = sqlite3.connect(DB_PATH)
-    cur = conn.cursor()
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS song_cache (
-            id TEXT PRIMARY KEY,
-            folder_name TEXT,
-            title TEXT,
-            artist TEXT,
-            franchise TEXT,
-            gp_path TEXT,
-            pdf_path TEXT,
-            mtime REAL,
-            tempo REAL,
-            duration REAL,
-            measures INTEGER,
-            notes_count INTEGER,
-            is_5string INTEGER,
-            tuning TEXT,
-            has_backing_track INTEGER,
-            audio_path TEXT,
-            cover_url TEXT,
-            level INTEGER,
-            level_exact REAL,
-            tier TEXT,
-            radar_json TEXT,
-            tags_json TEXT,
-            peak_nps REAL
-        )
-    ''')
-    cols = {r[1] for r in cur.execute("PRAGMA table_info(song_cache)")}
-    for col in ("version", "group_key", "alt_gp_path"):
-        if col not in cols:
-            cur.execute(f"ALTER TABLE song_cache ADD COLUMN {col} TEXT DEFAULT ''")
-    conn.commit()
+    schema.ensure(conn)
     conn.close()
-    # tables the WPF client reads (badges, mastery, practice sessions) are created here, next to the song cache
+    # default badges
     from gamification_service import init_gamification_db
-    from practice_history import init_history_db
     init_gamification_db()
-    init_history_db()
 
 def parse_gp_file(gp_path: str) -> Dict[str, Any]:
     try:

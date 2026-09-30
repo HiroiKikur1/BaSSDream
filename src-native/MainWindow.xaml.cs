@@ -52,11 +52,20 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        FitToScreen();
         BuildCategoryMenu();
         InitFilterPanel();
         StartBackgroundDrift();
         Loaded += MainWindow_Loaded;
         Closing += MainWindow_Closing;
+    }
+
+    /// <summary>The layout is drawn for 1440 × 810; on a smaller work area everything scales down evenly.</summary>
+    private void FitToScreen()
+    {
+        var wa = SystemParameters.WorkArea;
+        double k = Math.Min(1, Math.Min(wa.Width / rootGrid.Width, wa.Height / rootGrid.Height));
+        if (k < 1) rootGrid.LayoutTransform = new ScaleTransform(k, k);
     }
 
     /// <summary>Boot animation over the whole window; ends in the header logo. A fixed time shows one frame (debug).</summary>

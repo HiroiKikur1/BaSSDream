@@ -93,6 +93,7 @@ public class DatabaseService
     }
 
     // version / group_key / alt_gp_path are written by tab_scanner; older databases lack them
+    // (mirror of backend/schema.py, for a database opened before any script ran)
     private static async Task EnsureIdentityColumnsAsync(SqliteConnection conn)
     {
         var cols = new HashSet<string>();
@@ -107,6 +108,7 @@ public class DatabaseService
         }
     }
 
+    // mirror of backend/schema.py
     private async Task EnsureFavoritesTableAsync(SqliteConnection conn)
     {
         using var cmd = new SqliteCommand("CREATE TABLE IF NOT EXISTS favorites (song_id TEXT NOT NULL, slot INTEGER NOT NULL, PRIMARY KEY (song_id, slot));", conn);

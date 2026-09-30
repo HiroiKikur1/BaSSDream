@@ -83,32 +83,9 @@ def init_gamification_db():
     os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS badges (
-            id TEXT PRIMARY KEY,
-            name TEXT NOT NULL,
-            rarity TEXT NOT NULL,
-            description TEXT,
-            franchise TEXT
-        )
-    ''')
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS user_badges (
-            badge_id TEXT PRIMARY KEY,
-            unlocked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            is_equipped INTEGER DEFAULT 0
-        )
-    ''')
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS song_mastery (
-            song_id TEXT PRIMARY KEY,
-            play_count INTEGER DEFAULT 0,
-            best_score INTEGER DEFAULT 0,
-            mastery_level TEXT DEFAULT '初见',
-            last_practiced_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-    
+    import schema
+    schema.ensure(conn)
+
     # Insert default badges if missing
     for b in DEFAULT_BADGES:
         cur.execute('''
