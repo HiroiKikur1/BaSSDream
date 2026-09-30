@@ -1,4 +1,5 @@
 """Shared jacket for the classical etude category (drawn once, reused by every classical song)."""
+import paths
 import math
 import os
 import random
@@ -6,7 +7,7 @@ import random
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 FONTS = r"C:\Windows\Fonts"
-OUT = r"E:\BassStation\assets\classical_cover.jpg"
+OUT = os.path.join(paths.ASSETS, r"classical_cover.jpg")
 S = 1200
 
 
@@ -144,7 +145,7 @@ def build():
     return OUT
 
 
-def apply_to(song_ids, covers_dir=r"E:\BassStation\cache\covers"):
+def apply_to(song_ids, covers_dir=paths.cache(r"covers")):
     import shutil
     src = OUT if os.path.exists(OUT) else build()
     for sid in song_ids:

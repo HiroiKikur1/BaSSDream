@@ -11,6 +11,7 @@ CLI (Python311): eval_session.py <gp_path> [--range START END] [--rate R] | --se
   lead_s    backing-audio time at session time 0, / rate (negative = silence before the audio starts)
   count_in  seconds of count-in before bar 1
 """
+import paths
 import hashlib
 import json
 import os
@@ -25,9 +26,9 @@ from bassnet.gpif_parser import parse_gp  # noqa: E402
 from performance_evaluator import FFMPEG_EXE, score_time_map  # noqa: E402
 
 SR = 44100
-ROOT = r"E:\BassStation\cache\eval_session"
-STEMS = [r"E:\BassStation\cache\bassnet\stems", os.path.join(ROOT, "stems")]
-MODELS = r"E:\BassStation\cache\models"
+ROOT = paths.cache(r"eval_session")
+STEMS = [paths.cache(r"bassnet\stems"), os.path.join(ROOT, "stems")]
+MODELS = paths.cache(r"models")
 VERSION = 4
 COUNT_IN = 4
 CLICK_HZ = (3400.0, 2800.0)     # accent, normal

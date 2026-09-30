@@ -1,0 +1,9 @@
+{
+  "_comment": "复制为 bassdream.json 后按需修改；不写的项按项目根目录推算。",
+  "root": "E:\\BassStation",
+  "python_ml": "C:\\Users\\hongw\\AppData\\Local\\Programs\\Python\\Python311\\python.exe",
+  "python": "python",
+  "originals": "C:\\Users\\hongw\\Desktop\\曲谱",
+  "ffmpeg": "E:\\BassStation\\tools\\Ultimate Vocal Remover\\ffmpeg.exe",
+  "guitar_pro": "C:\\Program Files\\Arobas Music\\Guitar Pro 8\\GuitarPro.exe"
+}

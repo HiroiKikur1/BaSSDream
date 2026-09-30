@@ -1,4 +1,5 @@
 """P1 orchestration: features -> train v1 -> eval ablations -> EM realign -> train v2 -> eval -> legacy baseline."""
+import paths
 import os
 import re
 import subprocess
@@ -7,7 +8,7 @@ import time
 
 PY = sys.executable
 BACK = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CACHE = r"E:\BassStation\cache"
+CACHE = paths.CACHE
 LOG = os.path.join(CACHE, "p1_orchestrator.log")
 ENV = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1")
 
@@ -37,12 +38,12 @@ def main():
         run(["bassnet/dataset.py"], "p1_feats.log")
         time.sleep(240)
     run(["bassnet/dataset.py"], "p1_feats.log")
-    run(["-m", "bassnet.train", "--epochs", "50", "--out", r"E:\BassStation\cache\bassnet\bassnet.pt"], "p1_train_v1.log")
+    run(["-m", "bassnet.train", "--epochs", "50", "--out", paths.cache(r"bassnet\bassnet.pt")], "p1_train_v1.log")
     run(["-m", "bassnet.eval_e2e", "--no-consensus", "--tag", "_v1_base"], "p1_eval.log")
     run(["-m", "bassnet.eval_e2e", "--tag", "_v1_cons"], "p1_eval.log")
     run(["-m", "bassnet.eval_e2e", "--lm", "--tag", "_v1_cons_lm"], "p1_eval.log")
     run(["-m", "bassnet.realign"], "p1_realign.log")
-    run(["-m", "bassnet.train", "--epochs", "50", "--out", r"E:\BassStation\cache\bassnet\bassnet_v2.pt"], "p1_train_v2.log")
+    run(["-m", "bassnet.train", "--epochs", "50", "--out", paths.cache(r"bassnet\bassnet_v2.pt")], "p1_train_v2.log")
     run(["-m", "bassnet.eval_e2e", "--no-consensus", "--tag", "_v12_base"], "p1_eval.log")
     run(["-m", "bassnet.eval_e2e", "--lm", "--tag", "_v12_cons_lm"], "p1_eval.log")
     run(["bassnet/bench_legacy.py", "--test"], "p1_legacy.log")

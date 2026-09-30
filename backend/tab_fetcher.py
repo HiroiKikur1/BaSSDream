@@ -1,3 +1,4 @@
+import paths
 import os
 import re
 import html
@@ -17,7 +18,7 @@ from cover_generator import generate_procedural_jacket
 from cover_match import fetch_cover
 from gp_audio_linker import inject_backing_track_to_gp
 
-TABS_ROOT = r"E:\BassStation\tabs"
+TABS_ROOT = paths.TABS
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
@@ -634,7 +635,7 @@ def search_bilibili_references(keyword: str) -> List[Dict[str, Any]]:
         print(f"Bilibili search exception: {e}")
     return results
 
-FFMPEG_EXE = r"E:\BassStation\tools\Ultimate Vocal Remover\ffmpeg.exe"
+FFMPEG_EXE = paths.FFMPEG
 
 def extract_bass_onsets_from_audio(audio_path: str, max_duration: float = 300.0) -> List[Dict[str, Any]]:
     """Extracts bass transient onsets (<250Hz) and fundamental pitches via ffmpeg and autocorrelation profiling."""
@@ -1315,7 +1316,7 @@ def transcribe_audio_to_library(title: str, artist: str, audio_id: int = None, a
         raise FileNotFoundError(f"未能获取曲目「{safe_title}」的原声音源")
 
     # 2. AI separation and transcription pipeline via Python 3.11 subprocess
-    py311 = r"C:\Users\hongw\AppData\Local\Programs\Python\Python311\python.exe"
+    py311 = paths.PY311
     script = os.path.join(os.path.dirname(__file__), "ai_transcriber.py")
     cmd = [
         py311, script,
@@ -1422,7 +1423,7 @@ def transcribe_local_audio_to_library(
     except Exception:
         pass
 
-    py311 = r"C:\Users\hongw\AppData\Local\Programs\Python\Python311\python.exe"
+    py311 = paths.PY311
     script = os.path.join(os.path.dirname(__file__), "ai_transcriber.py")
     cmd = [
         py311, script,

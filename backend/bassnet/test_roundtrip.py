@@ -1,4 +1,5 @@
 """Quantiser + writer fidelity: GT notes/beats -> QScore -> .gp -> parse -> compare with GT."""
+import paths
 import glob
 import json
 import os
@@ -33,10 +34,10 @@ def run(meta_path, out_dir):
 
 
 if __name__ == "__main__":
-    out_dir = r"E:\BassStation\cache\bassnet\roundtrip"
+    out_dir = paths.cache(r"bassnet\roundtrip")
     os.makedirs(out_dir, exist_ok=True)
     rs = []
-    for f in sorted(glob.glob(r"E:\BassStation\cache\bassnet\feats\*.json"))[: int(sys.argv[1]) if len(sys.argv) > 1 else 50]:
+    for f in sorted(glob.glob(paths.cache(r"bassnet\feats\*.json")))[: int(sys.argv[1]) if len(sys.argv) > 1 else 50]:
         r = run(f, out_dir)
         if r:
             print(os.path.basename(os.path.dirname(json.load(open(f, encoding='utf8'))['gp']))[:30], {k: round(v, 4) if isinstance(v, float) else v for k, v in r.items()})

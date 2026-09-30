@@ -1,4 +1,5 @@
 """End-to-end: audio -> separated bass -> BassNet (ensemble + TTA) -> beat-grid quantisation -> .gp"""
+import paths
 import glob
 import os
 import sys
@@ -13,7 +14,7 @@ from bassnet.quantize import quantize  # noqa: E402
 from bassnet.fretboard import assign_frets  # noqa: E402
 from bassnet.gp_writer import write_gp  # noqa: E402
 
-MODEL_DIR = r"E:\BassStation\cache\bassnet"
+MODEL_DIR = paths.cache(r"bassnet")
 LOW_CONF = 0.5   # val (v3+v4): flags ~4.4% of notes, ~69% of them wrong
 
 

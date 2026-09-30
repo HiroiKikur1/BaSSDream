@@ -1,11 +1,13 @@
 """Default dreamy stage backdrop (used when a song has no band key visual)."""
+import os
+import paths
 import math
 import random
 
 from PIL import Image, ImageDraw, ImageFilter
 
 W, H = 1920, 1080
-OUT = r"E:\BassStation\src-native\assets\stage_default.jpg"
+OUT = os.path.join(paths.ROOT, r"src-native\assets\stage_default.jpg")
 
 
 def lerp(a, b, t):

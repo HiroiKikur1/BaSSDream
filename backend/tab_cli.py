@@ -11,9 +11,11 @@ try:
 except Exception:
     pass
 
-backend_dir = r"E:\BassStation\backend"
+backend_dir = os.path.dirname(os.path.abspath(__file__))
 if backend_dir not in sys.path:
     sys.path.insert(0, backend_dir)
+
+import paths  # noqa: E402
 
 from tab_fetcher import search_online_tabs, search_audio_sources, search_bilibili_references, import_tab_to_library, transcribe_audio_to_library, clean_name
 from backing_track_enhancer import auto_ensure_backing_track
@@ -152,7 +154,7 @@ def main():
             safe_title = clean_name(title)
             safe_artist = clean_name(artist)
             folder_name = f"{safe_title} _ {safe_artist} _ {franchise}"
-            folder_path = os.path.join(r"E:\BassStation\tabs", folder_name)
+            folder_path = os.path.join(paths.TABS, folder_name)
             os.makedirs(folder_path, exist_ok=True)
 
             dest_path = os.path.join(folder_path, os.path.basename(src_file))
@@ -195,9 +197,9 @@ def main():
 
             folder = os.path.dirname(gp_path) if gp_path and os.path.exists(gp_path) else ""
             if not folder or not os.path.exists(folder):
-                for f in os.listdir(r"E:\BassStation\tabs"):
+                for f in os.listdir(paths.TABS):
                     if title and title in f:
-                        folder = os.path.join(r"E:\BassStation\tabs", f)
+                        folder = os.path.join(paths.TABS, f)
                         break
 
             pdf_file = None
@@ -238,9 +240,9 @@ def main():
 
             folder = os.path.dirname(gp_path) if gp_path and os.path.exists(gp_path) else ""
             if not folder or not os.path.exists(folder):
-                for f in os.listdir(r"E:\BassStation\tabs"):
+                for f in os.listdir(paths.TABS):
                     if title and title in f:
-                        folder = os.path.join(r"E:\BassStation\tabs", f)
+                        folder = os.path.join(paths.TABS, f)
                         break
 
             res = None

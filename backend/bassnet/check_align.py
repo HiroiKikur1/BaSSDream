@@ -1,4 +1,5 @@
 """Verifies that GP-derived note times line up with the separated bass stem."""
+import paths
 import json
 import os
 import sys
@@ -9,7 +10,7 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from bassnet.gpif_parser import parse_gp  # noqa: E402
 
-ROOT = r"E:\BassStation\cache\bassnet"
+ROOT = paths.cache(r"bassnet")
 
 
 def align_score(gp, stem, max_lag=1.5):

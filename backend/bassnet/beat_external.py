@@ -3,6 +3,7 @@
 python -m bassnet.beat_external --split val|test     -> cache/bassnet/eval/beatthis/<md5>.json
 `track(audio_path)` is the entry point used by the pipeline.
 """
+import paths
 import argparse
 import json
 import os
@@ -10,8 +11,8 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-OUT = r"E:\BassStation\cache\bassnet\eval\beatthis"
-MIX_DIR = r"E:\BassStation\cache\bassnet\mixes"
+OUT = paths.cache(r"bassnet\eval\beatthis")
+MIX_DIR = paths.cache(r"bassnet\mixes")
 _MODEL = None
 
 

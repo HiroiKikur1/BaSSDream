@@ -1,8 +1,10 @@
+import os
+import paths
 import sqlite3
 import datetime
 from typing import Dict, Any, List
 
-DB_PATH = r"E:\BassStation\backend\data.db"
+DB_PATH = paths.DB
 
 def get_db():
     conn = sqlite3.connect(DB_PATH, timeout=30.0)

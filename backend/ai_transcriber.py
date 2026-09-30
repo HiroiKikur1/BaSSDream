@@ -1,3 +1,4 @@
+import paths
 import os
 import shutil
 import sys
@@ -7,7 +8,7 @@ import numpy as np
 from typing import List, Dict, Any, Tuple, Optional
 
 # Ensure soundfile and librosa can find ffmpeg if present
-UVR_TOOLS_DIR = r"E:\BassStation\tools\Ultimate Vocal Remover"
+UVR_TOOLS_DIR = paths.UVR_DIR
 if os.path.exists(UVR_TOOLS_DIR) and UVR_TOOLS_DIR not in os.environ.get("PATH", ""):
     os.environ["PATH"] = UVR_TOOLS_DIR + os.pathsep + os.environ.get("PATH", "")
 
@@ -17,7 +18,7 @@ def get_roformer_separator():
     global _ROFORMER_SEPARATOR
     if _ROFORMER_SEPARATOR is None:
         from audio_separator.separator import Separator
-        models_dir = r"E:\BassStation\cache\models"
+        models_dir = paths.cache(r"models")
         os.makedirs(models_dir, exist_ok=True)
         print("[AI Transcriber] Initializing SOTA BS-Roformer separator (persistent)...")
         sep = Separator(

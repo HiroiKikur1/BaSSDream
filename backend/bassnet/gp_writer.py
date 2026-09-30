@@ -1,4 +1,5 @@
 """QScore -> Guitar Pro 8 (.gp) with per-bar SyncPoints locked to the audio."""
+import paths
 import glob
 import json
 import os
@@ -28,7 +29,7 @@ COMPOUND = [(72, ("Half", 1, None)), (48, ("Half", 0, None)), (36, ("Quarter", 1
 
 # Fixed template: a purchased GP8 original with a clean bass sound (copied once, never written).
 # Everything written below follows the element order / values of real GP8 files (see bassnet/gp_lint.py).
-TEMPLATE = r"E:\BassStation\cache\bassnet\template.gp"
+TEMPLATE = paths.cache(r"bassnet\template.gp")
 
 
 def _template_gp() -> str:

@@ -1,9 +1,10 @@
+import paths
 import os
 import sqlite3
 from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
 
-DB_PATH = r"E:\BassStation\backend\data.db"
+DB_PATH = paths.DB
 
 DEFAULT_BADGES = [
     {

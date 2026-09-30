@@ -1,3 +1,4 @@
+import paths
 import re
 import sys
 import os
@@ -13,9 +14,9 @@ from cover_generator import generate_procedural_jacket
 from netease_service import search_song_info, download_cover_image
 from library_meta import describe, finalize_versions, string_alternate
 
-DB_PATH = r"E:\BassStation\backend\data.db"
-TABS_ROOT = r"E:\BassStation\tabs"
-COVERS_DIR = r"E:\BassStation\cache\covers"
+DB_PATH = paths.DB
+TABS_ROOT = paths.TABS
+COVERS_DIR = paths.cache(r"covers")
 
 os.makedirs(COVERS_DIR, exist_ok=True)
 

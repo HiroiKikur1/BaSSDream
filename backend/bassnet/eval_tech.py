@@ -4,6 +4,7 @@ python -m bassnet.eval_tech --split val --cache DIR [DIR ...] [--tune]   # --tun
 python -m bassnet.eval_tech --split test --cache DIR [DIR ...]           # report with the tuned thresholds
 Notes are matched to the original tab by onset (+-50 ms) and pitch; each technique is scored per matched note.
 """
+import paths
 import argparse
 import json
 import os
@@ -15,7 +16,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from bassnet.decode import decode_notes  # noqa: E402
 from bassnet.model import TECH_NAMES  # noqa: E402
 
-THR_FILE = r"E:\BassStation\cache\bassnet\tech_thr.json"
+THR_FILE = paths.cache(r"bassnet\tech_thr.json")
 
 
 def gt_flags(gt, i):

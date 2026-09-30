@@ -1,10 +1,11 @@
+import paths
 import os
 import shutil
 import zipfile
 import subprocess
 from typing import Dict, Any, Optional
 
-UVR_DIR = r"E:\BassStation\tools\Ultimate Vocal Remover"
+UVR_DIR = paths.UVR_DIR
 UVR_EXE = os.path.join(UVR_DIR, "UVR.exe")
 
 def check_backing_track_status(gp_path: str) -> Dict[str, Any]:
@@ -57,7 +58,7 @@ def run_uvr_gui_or_cli():
         return True
     return False
 
-PY311 = r"C:\Users\hongw\AppData\Local\Programs\Python\Python311\python.exe"
+PY311 = paths.PY311
 ALIGN_SCRIPT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "bassnet", "score_align.py")
 
 

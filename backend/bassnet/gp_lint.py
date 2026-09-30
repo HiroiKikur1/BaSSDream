@@ -8,6 +8,7 @@ The profile is learned from the library originals:
   * values    - leaf text for enumerated tags (few distinct values in real files) must be a known value
 Usage: python -m bassnet.gp_lint file.gp [...]      (profile cached in cache/bassnet/gp_profile.json)
 """
+import paths
 import glob
 import json
 import os
@@ -17,9 +18,9 @@ import zipfile
 import xml.etree.ElementTree as ET
 from collections import defaultdict
 
-PROFILE = r"E:\BassStation\cache\bassnet\gp_profile.json"
+PROFILE = paths.cache(r"bassnet\gp_profile.json")
 # purchased originals only: tabs/ also holds files written by older BassStation code
-LIB_GLOBS = [r"C:\Users\hongw\Desktop\曲谱\*\*.gp"]
+LIB_GLOBS = [os.path.join(paths.ORIGINALS, "*", "*.gp")]
 MAX_ENUM = 40
 # free text / numeric-like leaves that are never enumerations
 FREE = {"Title", "SubTitle", "Artist", "Album", "Words", "Music", "WordsAndMusic", "Copyright", "Tabber",

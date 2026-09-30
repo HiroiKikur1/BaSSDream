@@ -14,6 +14,7 @@ CLI: performance_evaluator.py <audio_path> <song_id> <gp_path> [--lag-hint S] [-
                                [--label NAME] [--no-save]
      -> JSON on the last stdout line; the per-note report goes to the file in report_path
 """
+import paths
 import hashlib
 import json
 import os
@@ -29,10 +30,10 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from bassnet.gpif_parser import parse_gp  # noqa: E402
 
-FFMPEG_EXE = r"E:\BassStation\tools\Ultimate Vocal Remover\ffmpeg.exe"
-DB_PATH = r"E:\BassStation\backend\data.db"
-BASSNET_CACHE = r"E:\BassStation\cache\bassnet"
-REPORT_DIR = r"E:\BassStation\cache\evaluations\reports"
+FFMPEG_EXE = paths.FFMPEG
+DB_PATH = paths.DB
+BASSNET_CACHE = paths.cache(r"bassnet")
+REPORT_DIR = paths.cache(r"evaluations\reports")
 
 SR = 22050
 HOP = 256

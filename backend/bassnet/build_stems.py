@@ -2,6 +2,7 @@
 
 Output: cache/bassnet/stems/<md5>.flac (mono 22050 Hz) + cache/bassnet/index.json
 """
+import paths
 import glob
 import hashlib
 import json
@@ -14,11 +15,11 @@ import zipfile
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from bassnet.gpif_parser import parse_gp  # noqa: E402
 
-TABS = r"E:\BassStation\tabs"
-ROOT = r"E:\BassStation\cache\bassnet"
+TABS = paths.TABS
+ROOT = paths.cache(r"bassnet")
 STEMS = os.path.join(ROOT, "stems")
 TMP = os.path.join(ROOT, "_tmp")
-FFMPEG = r"E:\BassStation\tools\Ultimate Vocal Remover\ffmpeg.exe"
+FFMPEG = paths.FFMPEG
 os.environ["PATH"] = os.path.dirname(FFMPEG) + os.pathsep + os.environ.get("PATH", "")
 
 
@@ -71,7 +72,7 @@ def main():
     print(f"{len(index)} scores, {len(set(v['md5'] for v in index.values()))} unique audio, {len(todo)} to separate", flush=True)
 
     from audio_separator.separator import Separator
-    sep = Separator(model_file_dir=r"E:\BassStation\cache\models", output_dir=TMP, output_format="WAV",
+    sep = Separator(model_file_dir=paths.cache(r"models"), output_dir=TMP, output_format="WAV",
                     use_soundfile=True, log_level=30, use_autocast=True)
     sep.load_model("BS-Roformer-SW.ckpt")
     if getattr(sep, "model_instance", None) is not None:

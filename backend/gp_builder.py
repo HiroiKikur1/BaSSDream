@@ -1,3 +1,4 @@
+import paths
 import os
 import math
 import zipfile
@@ -165,7 +166,7 @@ def create_clean_gp_project(
 
     # Find a structural base gp file in tabs to copy container stylesheet structures
     base_gp = None
-    tabs_root = r"E:\BassStation\tabs"
+    tabs_root = paths.TABS
     if os.path.exists(tabs_root):
         for root, dirs, files in os.walk(tabs_root):
             for f in files:

@@ -7,6 +7,7 @@ After the user edits and saves the check file in Guitar Pro, `sync_check_to_prac
 the check file's score (everything the user changed, incl. sync points) with the practice audio put back.
 Standard library only (runs under the app's Python 3.14 as well).
 """
+import paths
 import glob
 import json
 import os
@@ -16,7 +17,7 @@ import time
 import zipfile
 
 CHECK_TAG = "[核对版]"
-BACKUP_DIR = r"E:\BassStation\cache\check_sync_backup"
+BACKUP_DIR = paths.cache(r"check_sync_backup")
 
 
 def check_path_for(practice_gp: str) -> str:

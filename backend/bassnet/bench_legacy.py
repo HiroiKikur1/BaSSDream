@@ -1,4 +1,5 @@
 """Legacy engine baseline on the BassNet test metric (what the user gets from the old GP output)."""
+import paths
 import glob
 import json
 import os
@@ -10,7 +11,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from bassnet.gpif_parser import parse_gp  # noqa: E402
 from bassnet.score_eval import compare_notes  # noqa: E402
 
-OUT = r"E:\BassStation\cache\bassnet\legacy"
+OUT = paths.cache(r"bassnet\legacy")
 
 
 def best_offset(gt, est, span=1.5):
@@ -53,7 +54,7 @@ if __name__ == "__main__":
     only = None
     if "--test" in sys.argv:
         only = set(json.load(open(os.path.join(os.path.dirname(OUT), "test_split.json"), encoding="utf8")))
-    for f in sorted(glob.glob(r"E:\BassStation\cache\bassnet\feats\*.json")):
+    for f in sorted(glob.glob(paths.cache(r"bassnet\feats\*.json"))):
         m = json.load(open(f, encoding="utf8"))
         if m["rate_final"] < 0.85 or (only is not None and m["gp"] not in only):
             continue

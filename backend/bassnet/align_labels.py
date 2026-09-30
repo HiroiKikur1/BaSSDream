@@ -5,6 +5,7 @@ The first-pass alignment used CQT energy, whose long low-frequency windows smear
 (median smoothed), then a per-note snap to the nearest onset peak. Beats/downbeats follow the
 same shift curve. Original GP times are kept as time_gp / end_gp.
 """
+import paths
 import glob
 import json
 import os
@@ -15,7 +16,7 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from bassnet.dataset import SR, HOP, FPS, semitone_energy, MIDI_LO  # noqa: E402
 
-ROOT = r"E:\BassStation\cache\bassnet"
+ROOT = paths.cache(r"bassnet")
 
 
 def onset_env(stem):

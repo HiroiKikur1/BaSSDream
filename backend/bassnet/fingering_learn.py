@@ -4,6 +4,7 @@ Stats (saved to cache/bassnet/fingering.json):
   emit[nstr][string][fret]           how often a pitch is played at (string, fret), per 4/5-string
   trans[bucket][dfret][dstring]      hand movement between consecutive notes, by inter-onset gap
 """
+import paths
 import glob
 import json
 import math
@@ -14,7 +15,7 @@ from collections import defaultdict
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from bassnet.gpif_parser import parse_gp  # noqa: E402
 
-ROOT = r"E:\BassStation\cache\bassnet"
+ROOT = paths.cache(r"bassnet")
 OUT = os.path.join(ROOT, "fingering.json")
 MAXF = 24
 
@@ -30,7 +31,7 @@ def note_seq(info):
 def collect(exclude):
     emit = defaultdict(lambda: defaultdict(lambda: defaultdict(float)))
     trans = defaultdict(lambda: defaultdict(float))
-    for gp in glob.glob(r"E:\BassStation\tabs\*\*.gp"):
+    for gp in glob.glob(os.path.join(paths.TABS, r"*\*.gp")):
         if gp in exclude:
             continue
         try:
@@ -124,7 +125,7 @@ if __name__ == "__main__":
     test = set(json.load(open(split_path, encoding="utf8"))) if os.path.exists(split_path) else set()
     if not test:
         import random
-        allg = sorted(glob.glob(r"E:\BassStation\tabs\*\*.gp"))
+        allg = sorted(glob.glob(os.path.join(paths.TABS, r"*\*.gp")))
         random.Random(3).shuffle(allg)
         test = set(allg[:30])
     stats = collect(test)

@@ -1,8 +1,9 @@
+import paths
 import os
 from PIL import Image, ImageDraw
 
-COVERS_DIR = r"E:\BassStation\cache\covers"
-LOGO_DIR = r"E:\BassStation\assets\band_logos"
+COVERS_DIR = paths.cache(r"covers")
+LOGO_DIR = os.path.join(paths.ASSETS, r"band_logos")
 os.makedirs(COVERS_DIR, exist_ok=True)
 
 # accent colour + official logo file per band (logo None: accent-only card)

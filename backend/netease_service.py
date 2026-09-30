@@ -1,3 +1,4 @@
+import paths
 import os
 import re
 import json
@@ -8,8 +9,8 @@ import requests
 from typing import Optional, Dict, Any, List
 from Crypto.Cipher import AES
 
-COVERS_DIR = r"E:\BassStation\cache\covers"
-AUDIO_DIR = r"E:\BassStation\cache\audio"
+COVERS_DIR = paths.cache(r"covers")
+AUDIO_DIR = paths.cache(r"audio")
 
 os.makedirs(COVERS_DIR, exist_ok=True)
 os.makedirs(AUDIO_DIR, exist_ok=True)

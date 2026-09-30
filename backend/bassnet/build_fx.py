@@ -5,6 +5,7 @@ and onset errors. Training swaps the clean CQT for one of these at random (label
 Output: cache/bassnet/feats_fx/<md5>_<k>.npz  (cqt float16)
 Usage: python -m bassnet.build_fx [--variants 2]
 """
+import paths
 import argparse
 import glob
 import json
@@ -16,7 +17,7 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from bassnet.dataset import SR, compute_cqt  # noqa: E402
 
-ROOT = r"E:\BassStation\cache\bassnet"
+ROOT = paths.cache(r"bassnet")
 OUT = os.path.join(ROOT, "feats_fx")
 
 

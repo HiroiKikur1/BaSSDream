@@ -2,6 +2,7 @@
 
 Usage: python -m bassnet.eval_e2e [--limit N] [--no-consensus] [--tag NAME]
 """
+import paths
 import argparse
 import json
 import os
@@ -19,7 +20,7 @@ from bassnet.gpif_parser import parse_gp  # noqa: E402
 from bassnet.score_eval import compare_scores  # noqa: E402
 from bassnet import pipeline  # noqa: E402
 
-ROOT = r"E:\BassStation\cache\bassnet"
+ROOT = paths.cache(r"bassnet")
 OUT = os.path.join(ROOT, "eval")
 
 

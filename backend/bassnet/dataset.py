@@ -3,6 +3,7 @@
 For each unique backing track: CQT of the separated bass stem, and GP notes
 re-aligned to the stem (global offset search + piecewise local refinement).
 """
+import paths
 import json
 import os
 import sys
@@ -12,7 +13,7 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from bassnet.gpif_parser import parse_gp  # noqa: E402
 
-ROOT = r"E:\BassStation\cache\bassnet"
+ROOT = paths.cache(r"bassnet")
 FEAT = os.path.join(ROOT, "feats")
 
 SR = 22050
@@ -152,7 +153,7 @@ def mix_mel(gp, info):
         except Exception:
             import subprocess
             wav = tmp + ".wav"
-            ff = r"E:\BassStation\tools\Ultimate Vocal Remover\ffmpeg.exe"
+            ff = paths.FFMPEG
             subprocess.run([ff, "-y", "-loglevel", "error", "-i", tmp, "-ac", "1", "-ar", str(SR), wav])
             y, _ = librosa.load(wav, sr=SR, mono=True)
             os.remove(wav)

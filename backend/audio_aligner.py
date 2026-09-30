@@ -1,3 +1,4 @@
+import paths
 import os
 import re
 import zipfile
@@ -5,7 +6,7 @@ import subprocess
 import xml.etree.ElementTree as ET
 from typing import Dict, Any, Optional
 
-FFMPEG_EXE = r"E:\BassStation\tools\Ultimate Vocal Remover\ffmpeg.exe"
+FFMPEG_EXE = paths.FFMPEG
 
 NOTE_VALUES_IN_QUARTERS = {
     "Whole": 4.0,
@@ -360,7 +361,7 @@ def resolve_audio_file(gp_path: str, extract_if_embedded: bool = True) -> Option
                             return target_path
                     except Exception:
                         # Fallback to cache directory if folder is read-only
-                        cache_dir = r"E:\BassStation\cache\audio_extracted"
+                        cache_dir = paths.cache(r"audio_extracted")
                         os.makedirs(cache_dir, exist_ok=True)
                         import hashlib
                         h = hashlib.md5(gp_path.encode('utf-8')).hexdigest()[:12]

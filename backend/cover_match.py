@@ -1,6 +1,8 @@
 """Album art lookup that only accepts a NetEase result whose song name matches the title AND whose credited artists
 include the song's band / artist. The old bulk fetch took the first search hit, which produced live photos,
 unrelated albums and a generic "4th Anniversary" image for many songs."""
+import os
+import paths
 import re
 import sys
 import unicodedata
@@ -114,7 +116,7 @@ def fetch_cover(song_id: str, title: str, artist: str, folder: str = "", version
 if __name__ == "__main__":
     import sqlite3
     ids = sys.argv[1:]
-    con = sqlite3.connect(r"E:\BassStation\backend\data.db")
+    con = sqlite3.connect(paths.DB)
     for sid in ids:
         row = con.execute("SELECT title, artist, version FROM song_cache WHERE id = ?", (sid,)).fetchone()
         if not row:

@@ -4,6 +4,7 @@ For each training song, per-note shifts within +-60 ms maximise onset_prob * pit
 median-smoothed along the song (tab sync errors are smooth, not per-note), then written back to
 the feature json (original times kept under "time_gp").
 """
+import paths
 import glob
 import json
 import os
@@ -15,7 +16,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from bassnet.decode import FPS  # noqa: E402
 from bassnet.model import PITCH_LO  # noqa: E402
 
-ROOT = r"E:\BassStation\cache\bassnet"
+ROOT = paths.cache(r"bassnet")
 
 
 def refine_song(meta, fr, on, max_shift=0.06, smooth=9):

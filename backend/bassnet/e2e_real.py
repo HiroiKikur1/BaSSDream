@@ -4,6 +4,7 @@ Usage: python -m bassnet.e2e_real [--limit N] [--names substr1,substr2] [--out D
 Scores the written GP after parsing it back (audio time via its own SyncPoints), so separation, sync and
 packaging are all covered. Stems are cached per song in DIR/<md5>/ (delete to re-separate).
 """
+import paths
 import argparse
 import json
 import os
@@ -19,7 +20,7 @@ from bassnet.gpif_parser import parse_gp, extract_audio  # noqa: E402
 from bassnet.score_eval import compare_notes  # noqa: E402
 
 BACKEND = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DEFAULT_OUT = r"E:\BassStation\cache\bassnet\e2e"
+DEFAULT_OUT = paths.cache(r"bassnet\e2e")
 
 
 def run_cli(audio, out_dir, title, five):

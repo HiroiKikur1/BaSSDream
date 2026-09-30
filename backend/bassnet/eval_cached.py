@@ -3,6 +3,7 @@
 python -m bassnet.eval_cached --build [--models GLOB]     # compute posteriors (GPU)
 python -m bassnet.eval_cached --variant NAME              # evaluate a named variant
 """
+import paths
 import argparse
 import glob
 import json
@@ -20,7 +21,7 @@ from bassnet.gp_writer import write_gp  # noqa: E402
 from bassnet.gpif_parser import parse_gp  # noqa: E402
 from bassnet.score_eval import compare_scores  # noqa: E402
 
-CACHE = r"E:\BassStation\cache\bassnet\eval\post_cache"
+CACHE = paths.cache(r"bassnet\eval\post_cache")
 
 
 def build(models_glob):
@@ -163,7 +164,7 @@ def run(variant, caches=None, beat_caches=None, down_caches=None):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--build", action="store_true")
-    ap.add_argument("--models", default=r"E:\BassStation\cache\bassnet\bassnet.pt")
+    ap.add_argument("--models", default=paths.cache(r"bassnet\bassnet.pt"))
     ap.add_argument("--variant", nargs="*", default=["base"])
     ap.add_argument("--cache", default=CACHE)
     ap.add_argument("--combine", nargs="*", help="average posteriors from several cache dirs")

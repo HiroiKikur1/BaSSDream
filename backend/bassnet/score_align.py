@@ -4,6 +4,7 @@
 2. fine: per-bar search (+-120 ms) maximising bass-pitch energy at the notated pitches
 3. quality: fraction of notes whose pitch is present in the aligned audio
 """
+import paths
 import os
 import re
 import sys
@@ -243,7 +244,7 @@ def _align_cqt(gp_path: str, audio_path: str, y: Optional[np.ndarray] = None) ->
 # BassNet-based alignment: model posteriors of the separated bass (pitch / onset / beat) instead
 # of raw CQT, a coarse DTW, then a beat-level DP with a smooth-tempo prior.
 
-POST_DIR = r"E:\BassStation\cache\bassnet\align_post"
+POST_DIR = paths.cache(r"bassnet\align_post")
 PFPS = SR / 256                 # posterior frame rate (bassnet.dataset HOP)
 P_LO = 23                       # posterior pitch classes 1..48 = MIDI 23..70
 COARSE_H = 8                    # coarse DTW hop in posterior frames (~93 ms)

@@ -95,3 +95,6 @@ roselia_new.png
 .idea/
 .vs/
 *.swp
+
+# machine-specific paths (see bassdream.example.json)
+bassdream.json

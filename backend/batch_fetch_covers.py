@@ -1,3 +1,4 @@
+import paths
 import os
 import re
 import sys
@@ -7,8 +8,8 @@ import requests
 
 sys.stdout.reconfigure(encoding='utf-8')
 
-TABS_ROOT = r"E:\BassStation\tabs"
-COVERS_DIR = r"E:\BassStation\cache\covers"
+TABS_ROOT = paths.TABS
+COVERS_DIR = paths.cache(r"covers")
 os.makedirs(COVERS_DIR, exist_ok=True)
 
 session = requests.Session()

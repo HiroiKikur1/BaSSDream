@@ -1,4 +1,5 @@
 """Trains BassNet on GP-aligned bass stems. Usage: python -m bassnet.train [--epochs N] [--resume]"""
+import paths
 import argparse
 import glob
 import json
@@ -17,7 +18,7 @@ from bassnet.model import BassNet, PITCH_LO, PITCH_HI, BINS_PER_SEMI, TECH_NAMES
 N_TECH = len(TECH_NAMES)
 from bassnet.decode import decode_notes, note_metrics, decode_beats, FPS  # noqa: E402
 
-ROOT = r"E:\BassStation\cache\bassnet"
+ROOT = paths.cache(r"bassnet")
 FEAT = os.path.join(ROOT, "feats")
 CKPT = os.path.join(ROOT, "bassnet.pt")
 CROP = 862            # ~10 s
