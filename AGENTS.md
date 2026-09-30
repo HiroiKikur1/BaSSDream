@@ -15,3 +15,6 @@ always_on: true
 ## 4. 空即是多（Zero Visual Noise）
 - 不在同一视口内重复表达相同信息。
 - 如果状态是默认或已完成，使用极简微标（如纯绿点或简洁字样），不出现冗长描述性语句。
+
+## 5. 界面设计准则
+- 设计或修改任何界面前，先读 `.claude/skills/human-made-ui/SKILL.md`。

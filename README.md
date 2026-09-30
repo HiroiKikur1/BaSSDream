@@ -29,10 +29,15 @@
 BaSSDream/
 ├── backend/          # Python 后端：扒谱管线、曲库扫描、评测、tab_cli 命令行（WPF 通过它调用）
 │   ├── bassnet/      # AI 扒谱模型与特征工程管线
-│   └── ...
+│   ├── bassnet/lab/  # 研究、评测、数据工具脚本（软件不调用）
+│   ├── paths.py      # 路径（从项目根目录推算，bassdream.json 可覆盖）
+│   ├── schema.py     # data.db 结构的唯一定义
+│   └── worker.py     # WPF 调用的常驻 Python 工作进程
 ├── src-native/       # WPF (.NET 10 C#) 原生客户端工程
 ├── assets/           # 乐队图标、Logo、字体与视觉资源
-└── docs/             # 交接文档（HANDOVER.md）、架构方案与排查清单
+├── docs/             # 交接文档（HANDOVER.md）、架构方案与排查清单
+├── .claude/skills/   # 界面设计准则 human-made-ui（改界面前先读）
+└── bassdream.example.json  # 本机路径配置模板（复制为 bassdream.json）
 ```
 
 ---

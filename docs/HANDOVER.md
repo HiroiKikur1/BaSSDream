@@ -538,7 +538,7 @@ cd backend && python -c "from tab_scanner import scan_all_tabs; scan_all_tabs(fo
 - **总结论**：v3/v4/v5/v6m 无论改损失、加技法头、加效果器增广、加预训练特征，验证集都收敛到 note F1≈0.78、音高≈82%、小节完全一致≈25–27%；通用大模型（YourMT3+）远差于我们。→ 瓶颈是**数据量与标签（记谱）本身**，不是模型容量或特征。路线定为：**自训专用模型 + 扩充数据（见 docs/训练数据扩充清单.md）+ 记谱层建模（节拍网格）+ 核对版修正回流**。
 
 ### 11.12 数据扩充工具（用户决定：暂不使用 Songsterr 与社区谱）
-- Songsterr：robots.txt 对所有程序禁止 `/api/`，条款禁止自动化绕过 Plus 付费下载 → 不做抓取。**注意**：现有 `tab_fetcher.fetch_songsterr_gp_url`（「添加曲目」的 Songsterr 导入）调用 `/api/` 并直接取修订里的 GP 原文件，不经 Plus；是否保留待用户决定。
+- Songsterr：robots.txt 对所有程序禁止 `/api/`，条款禁止自动化绕过 Plus 付费下载 → 不做抓取。**注意**：现有 `tab_fetcher.fetch_songsterr_gp_url`（「添加曲目」的 Songsterr 导入）调用 `/api/` 并直接取修订里的 GP 原文件，不经 Plus；是否保留待用户决定。**用户 09-30 决定：Songsterr 导入保留，继续修缮维护**（上面“暂不使用”只指训练数据扩充）。
 - 用户曲库 = 雪鹽子在爱发电出售的全部 GP 谱（已全部购买）。社区谱质量堪忧，用户决定先放弃。
 - 保留的工具：`backend/ingest_incoming.py`（`E:\BassStation\incoming\` 收件夹 → 读谱元数据、拒绝无贝斯轨/AI 谱 → 建曲目 → 取音源 → 对齐质量门控 → 通过的生成 [伴奏].gp 进入训练索引；.gp5/.gpx 放 `需要转换/`，用 GP8「文件 > 批量转换」）。模拟测试（去掉音频的 Tomorrow's Door）：自动取音源、对齐质量 3.41 → 收录；测试产物已删除。
 - **训练索引排除 AI 谱**：`build_stems.is_ai_transcription`（Tabber=BaSSDream 或文件名含 [核对版]）。
@@ -798,3 +798,33 @@ cd backend && python -c "from tab_scanner import scan_all_tabs; scan_all_tabs(fo
 - **已删除**：`frontend/`（React Web UI）、`desktop/`、`desktop_app.py`、`start_bass_station.bat/.vbs`、`启动BassStation.bat`、`AI_HANDOVER.md`、WPF 的 `LogoComparisonWindow` / `LogoControl` 与 `--render-logo` 调试入口、`backend/test_*.gp`、`backend/ai_transcriber_test.py`、未被引用的旧 logo 素材（根目录和 `assets/` 下的 `bangdream_*`、`bassdream_plain.svg`、`bassstation_*`）。`backend/app.py`（FastAPI）及只被它引用的 `clipboard_service` / `fretboard_service` / `gp_process_monitor` 也已删除（用户决定整体去掉 FastAPI；练琴监控、剪贴板导出由 WPF 自己做）。`gamification_service`（徽章 / 熟练度表，WPF 直接读）和 `practice_history`（练习记录表）保留，建表改由 `tab_scanner.init_db()` 调用，新库不会缺表。
 - 邻近会话在本机未推送的进行中工作（云端看不到）：报告页判定彩带改版（中性数字 + 连续彩带，PERFECT 幻彩，MISS 断开虚线，错音变紫）、便签与选中小节高亮、小节重放控制条（我的演奏 / 原曲贝斯 / 交替对比）。最后停在核对"原曲贝斯"重放位置比预期早 0.38 秒（怀疑重复段落导致误判），需在本机确认。
 - 云端能做的验证：`dotnet build -c Release -p:EnableWindowsTargeting=true` 可编译 WPF（Linux 上只能编译，无法运行界面和声音）。
+
+## 25. 2026-09-30 夜：开机动画、界面准则 skill、架构整理
+
+### 25.1 用户决定（审阅页 https://claude.ai/artifact/3mQGz2eDaiAYNaJUcZce6i）
+- 界面**保持现状**，不换风格。上一轮“为什么飘”的诊断作废：用户说的“飘”是**看起来不像人做的、没有落地感**，而那一版方案本身也是 AI 网页式设计。准则见 `.claude/skills/human-made-ui/SKILL.md`（从隐喻和参照截图出发、按素材逻辑画：统一光源 / 接触影 / 材质 / 描边、稳定感、动效只说明去向、交付前自查清单）。**改任何界面前先加载这个 skill。**
+- 品牌粉统一为 logo 原色 **#E50050**。
+- 开机动画每次启动都播放；Songsterr 保留维护；屏幕 1920×1080 100%。
+
+### 25.2 开机动画（`Views/BootOverlay.cs`，3.75 秒，点击或按键跳过）
+- 首帧 `src-native/assets/boot/splash.png` 由 WPF `SplashScreen` 在 .NET 启动前显示：白底 + 用户的 Atelier Z M#265（按用户发的照片原色描成矢量，`assets/boot/atelierz_m265.svg`，描图脚本 `trace_m265.py`）放大 1.2 倍、25% 透明，作为字符 logo 的背景板，一直留到主界面出现。
+- B a S S 依次从左侧抛物线飞入 → 边界线沿 B 左边界画出（上端与 B 顶齐平，左侧向左渐浅的光晕）→ Dream 从右侧冲入撞线（1.54 s）→ 闪电、星、バンドリ → 碎裂成约 5 千片（`WriteableBitmap`）流向主界面 logo 的真实坐标，主界面渐显。
+- logo 路径数据 `assets/boot/logo_glyphs.json` 已规整为 WPF 可解析的绝对命令（`assets/boot/normalize_paths.py`，与原图逐像素一致）。资源出错时直接跳过动画。
+- **未在真机验证**。检查单帧：`BassStation.exe --render-boot out.png 1.56`。需确认：SplashScreen 与主窗口位置是否完全重合、动画帧率、碎屑落点是否正好是左上角 logo。可调常数都在 `BootOverlay` 顶部（时间轴、背景板透明度/缩放）。
+
+### 25.3 架构（均已提交）
+- **路径**：`backend/paths.py` 与 `src-native/Services/AppPaths.cs`。根目录由代码位置推算（WPF 从 exe 向上找 `backend/tab_cli.py`），项目根的 `bassdream.json`（可选，模板 `bassdream.example.json`）覆盖单项：`root / python / python_ml / originals / ffmpeg / guitar_pro`。圆体字体改为运行时从 `assets/fonts` 加载。
+- **调试入口**：全部 `--render-*` 移到 `DebugTools/RenderHarness.cs`，`App.xaml.cs` 只剩启动逻辑。
+- **颜色令牌**：`Themes/Palette.xaml`（XAML 用 `{StaticResource BrandBrush}` 等）+ `Services/Palette.cs`（C# 用 `Palette.Brand`、`Palette.Tier(tier)`）。XAML 里 409 处十六进制色 293 处改为色名；旧名 `PinkPrimaryBrush` 等保留为别名。字号、圆角**未收敛**（会改变外观，用户要求保持现状）。乐队代表色、判定色不在令牌里。
+- **常驻 Python**：`backend/worker.py` + `Services/PyHost.cs`。`score_format / eval_session / performance_evaluator` 在常驻 Python311 里按原命令行运行（启动时预热 1 个，最多 3 个并行；超时结束该进程；起不来退回一次性进程；协议流与子进程输出隔离）。`tab_cli.py` 仍是一次性进程（Python314）。
+- **实时变速**：`Services/StretchProvider.cs`（NuGet `SoundTouch.Net` 2.3.2，LGPL-2.1）。谱面页直接读 1.00 原始 wav 实时变速，不再调 `score_format.py stretch`（报告页重放仍用）。参数与提前量补偿由点击音轨实测确定：伴奏与节拍器起音差各速度平均 ≤0.3 ms，单个 ±5 ms。
+- **数据库**：`backend/schema.py` 是 data.db 全部 9 张表、后加列、索引和 `PRAGMA user_version` 的唯一定义；各模块的 init 函数改为调用 `schema.ensure`。WPF 的 favorites 表与 song_cache 身份列是镜像，改表时两边一起改。
+- **研究脚本**：39 个只在实验里用的模块移到 `backend/bassnet/lab/`（按软件入口的真实 import 追踪判定），运行 `python -m bassnet.lab.<名字>`；本文前面各节的路径已同步。
+- **窗口**：工作区小于 1440×810 时整体等比缩小。
+
+### 25.4 暂缓（等用户推送本机未提交的改动后再做）
+- 统一谱面排版引擎（ReportView 与 ScoreCanvas/StaffDrawer 合一，报告页也有五线谱）、报告页分层渲染、拆分 MainWindow。原因：另一个会话在本机改了 ReportView / 评测结算页（判定彩带、便签、小节重放）且未推送，现在重写这些文件会和那批改动大面积冲突。
+
+### 25.5 已知问题
+- `backend/ai_transcriber.py` 约 784 行引用未定义的 `min_allowed_midi`（旧版扒谱器，此前就存在）：走到 PYIN 下 19 半音修正分支时会 NameError。
+
