@@ -24,8 +24,6 @@ namespace BassStation.Views;
 /// </summary>
 public partial class ScoreView : UserControl
 {
-    private static readonly string Py = AppPaths.PythonMl;
-    private static readonly string Script = AppPaths.Script("score_format.py");
     private static readonly double[] Rates = { 1.25, 1.1, 1.0, 0.9, 0.8, 0.7, 0.6, 0.5 };
     private BandEdition _ed = BandEdition.Default;
     private double _baseBpm = 120;
@@ -126,40 +124,7 @@ public partial class ScoreView : UserControl
     private static string? Str(JsonElement e, string k) =>
         e.TryGetProperty(k, out var v) && v.ValueKind == JsonValueKind.String ? v.GetString() : null;
 
-    private static JsonElement? RunPy(params string[] args)
-    {
-        var psi = new ProcessStartInfo
-        {
-            FileName = Py,
-            UseShellExecute = false,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            CreateNoWindow = true,
-            StandardOutputEncoding = Encoding.UTF8
-        };
-        psi.ArgumentList.Add(Script);
-        foreach (var a in args) psi.ArgumentList.Add(a);
-        psi.EnvironmentVariables["PYTHONUTF8"] = "1";
-        psi.EnvironmentVariables["PYTHONIOENCODING"] = "utf-8";
-        try
-        {
-            using var p = Process.Start(psi);
-            if (p == null) return null;
-            var err = p.StandardError.ReadToEndAsync();
-            string stdout = p.StandardOutput.ReadToEnd();
-            p.WaitForExit();
-            _ = err.Result;
-            string? line = stdout.Split('\n').Select(l => l.Trim()).LastOrDefault(l => l.StartsWith('{'));
-            if (line == null) return null;
-            using var doc = JsonDocument.Parse(line);
-            return doc.RootElement.Clone();
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine(ex);
-            return null;
-        }
-    }
+    private static JsonElement? RunPy(params string[] args) => PyHost.Run("score_format.py", TimeSpan.FromMinutes(30), args);
 
     private void Shutdown()
     {

@@ -24,12 +24,14 @@ public partial class App : Application
             try { File.WriteAllText("crash_dispatcher.log", args.Exception.ToString()); } catch { }
         };
 
+        Exit += (_, _) => Services.PyHost.Shutdown();
         var mainWindow = new MainWindow();
         if (await DebugTools.RenderHarness.TryRunAsync(mainWindow, e.Args))
         {
             Shutdown(0);
             return;
         }
+        Services.PyHost.Warm();
         mainWindow.Show();
     }
 }

@@ -318,32 +318,8 @@ public partial class EvaluationResultView : UserControl
         return st is System.Text.Json.JsonElement s && s.TryGetProperty("bass", out var sb) && sb.ValueKind == System.Text.Json.JsonValueKind.String ? sb.GetString() : null;
     }
 
-    private static System.Text.Json.JsonElement? ScoreFormatCli(params string[] args)
-    {
-        var psi = new System.Diagnostics.ProcessStartInfo
-        {
-            FileName = AppPaths.PythonMl,
-            UseShellExecute = false, RedirectStandardOutput = true, RedirectStandardError = true, CreateNoWindow = true,
-            StandardOutputEncoding = System.Text.Encoding.UTF8
-        };
-        psi.ArgumentList.Add(AppPaths.Script("score_format.py"));
-        foreach (var a in args) psi.ArgumentList.Add(a);
-        psi.EnvironmentVariables["PYTHONUTF8"] = "1";
-        try
-        {
-            using var p = System.Diagnostics.Process.Start(psi);
-            if (p == null) return null;
-            var err = p.StandardError.ReadToEndAsync();
-            string stdout = p.StandardOutput.ReadToEnd();
-            p.WaitForExit();
-            _ = err.Result;
-            string? line = stdout.Split('\n').Select(l => l.Trim()).LastOrDefault(l => l.StartsWith('{'));
-            if (line == null) return null;
-            using var doc = System.Text.Json.JsonDocument.Parse(line);
-            return doc.RootElement.Clone();
-        }
-        catch { return null; }
-    }
+    private static System.Text.Json.JsonElement? ScoreFormatCli(params string[] args) =>
+        PyHost.Run("score_format.py", TimeSpan.FromMinutes(30), args);
 
     private void SetReplayEnabled(bool on) => btnMine.IsEnabled = btnOrig.IsEnabled = btnAB.IsEnabled = on;
 

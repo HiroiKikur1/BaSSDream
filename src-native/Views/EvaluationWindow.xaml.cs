@@ -19,7 +19,6 @@ namespace BassStation.Views;
 public partial class EvaluationWindow : Window
 {
     // librosa lives in the ML environment, not in the backend's default Python
-    private static readonly string EvalPython = AppPaths.PythonMl;
     private static readonly string EvalScript = AppPaths.Script("performance_evaluator.py");
     private static readonly string SessionScript = AppPaths.Script("eval_session.py");
     private static readonly string TakesDir = AppPaths.CachePath(@"evaluations\takes");
@@ -542,77 +541,36 @@ public partial class EvaluationWindow : Window
 
     // ---------------------------------------------------------------- backend
 
-    private static ProcessStartInfo PythonStart(string script)
-    {
-        var psi = new ProcessStartInfo
-        {
-            FileName = EvalPython,
-            UseShellExecute = false,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            CreateNoWindow = true,
-            StandardOutputEncoding = Encoding.UTF8
-        };
-        psi.ArgumentList.Add(script);
-        psi.EnvironmentVariables["PYTHONUTF8"] = "1";
-        psi.EnvironmentVariables["PYTHONIOENCODING"] = "utf-8";
-        return psi;
-    }
-
-    /// <summary>Runs a backend script with the ML Python; returns the JSON on its last stdout line.</summary>
-    private static JsonElement? RunPython(ProcessStartInfo psi)
-    {
-        using var proc = Process.Start(psi);
-        if (proc == null) return null;
-        // drain stderr (librosa warnings) so a full pipe can't block the script
-        proc.ErrorDataReceived += (_, _) => { };
-        proc.BeginErrorReadLine();
-        string stdout = proc.StandardOutput.ReadToEnd();
-        proc.WaitForExit();
-
-        int start = stdout.LastIndexOf("\n{", StringComparison.Ordinal) + 1;
-        if (start == 0 && !stdout.StartsWith('{')) return null;
-        using var doc = JsonDocument.Parse(stdout[start..]);
-        return doc.RootElement.Clone();
-    }
-
-    private static JsonElement? RunPythonJson(string script, params string[] args)
-    {
-        if (!File.Exists(script)) return null;
-        var psi = PythonStart(script);
-        foreach (var a in args) psi.ArgumentList.Add(a);
-        return RunPython(psi);
-    }
+    /// <summary>Runs a backend script in the resident ML worker; returns the JSON on its last stdout line.</summary>
+    private static JsonElement? RunPythonJson(string script, params string[] args) =>
+        File.Exists(script) ? PyHost.Run(Path.GetFileName(script), TimeSpan.FromMinutes(30), args) : null;
 
     private (PerformanceScoreDetailModel?, string?) RunEvaluator(string audioPath, double? lagHint, PracticeSection? section, double rate)
     {
         if (!File.Exists(EvalScript)) return (null, null);
         if (string.IsNullOrEmpty(_song.GpPath) || !File.Exists(_song.GpPath)) return (null, "曲谱文件不存在");
 
-        var psi = PythonStart(EvalScript);
-        psi.ArgumentList.Add(audioPath);
-        psi.ArgumentList.Add(_song.Id);
-        psi.ArgumentList.Add(EvalGpPath);
+        var psi = new List<string> { audioPath, _song.Id, EvalGpPath };
         if (lagHint.HasValue)
         {
-            psi.ArgumentList.Add("--lag-hint");
-            psi.ArgumentList.Add(lagHint.Value.ToString("F4", System.Globalization.CultureInfo.InvariantCulture));
+            psi.Add("--lag-hint");
+            psi.Add(lagHint.Value.ToString("F4", System.Globalization.CultureInfo.InvariantCulture));
         }
         if (section != null)
         {
-            psi.ArgumentList.Add("--range");
-            psi.ArgumentList.Add(section.Start.ToString());
-            psi.ArgumentList.Add(section.End.ToString());
-            psi.ArgumentList.Add("--label");
-            psi.ArgumentList.Add(section.Name);
+            psi.Add("--range");
+            psi.Add(section.Start.ToString());
+            psi.Add(section.End.ToString());
+            psi.Add("--label");
+            psi.Add(section.Name);
         }
         if (rate < 0.999)
         {
-            psi.ArgumentList.Add("--rate");
-            psi.ArgumentList.Add(rate.ToString("F2", System.Globalization.CultureInfo.InvariantCulture));
+            psi.Add("--rate");
+            psi.Add(rate.ToString("F2", System.Globalization.CultureInfo.InvariantCulture));
         }
 
-        if (RunPython(psi) is not JsonElement root) return (null, null);
+        if (RunPythonJson(EvalScript, psi.ToArray()) is not JsonElement root) return (null, null);
         if (!root.TryGetProperty("success", out var ok) || !ok.GetBoolean())
             return (null, root.TryGetProperty("error", out var err) ? err.GetString() : null);
 
