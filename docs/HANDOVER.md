@@ -32,7 +32,7 @@
 |---|---|
 | 项目根 | `E:\BassStation\` |
 | WPF 客户端 | `src-native/`（.NET 10，`dotnet build -c Release`），产物复制到根目录 `BassStation.exe/.dll/...` 即部署 |
-| 后端 Python（FastAPI、扫描器、tab_cli） | `C:\Python314\python.exe`（PATH 中的 `python` 就是它；**没有** librosa/torch） |
+| 后端 Python（扫描器、tab_cli） | `C:\Python314\python.exe`（PATH 中的 `python` 就是它；**没有** librosa/torch） |
 | 机器学习 Python | `C:\Users\hongw\AppData\Local\Programs\Python\Python311\python.exe`（torch 2.6 cu124、librosa、audio_separator 0.47、PIL） |
 | GPU | RTX 3060 Ti 8GB |
 | ffmpeg | `E:\BassStation\tools\Ultimate Vocal Remover\ffmpeg.exe` |
@@ -795,6 +795,6 @@ cd backend && python -c "from tab_scanner import scan_all_tabs; scan_all_tabs(fo
 - **需求变更（用户）**：软件内谱面**不做改谱**，改谱交给 GP；软件内只做内置看谱与播放。§23 里的编辑相关内容（数字改品位、Del / X / Ctrl+↑↓ / -+ / Ctrl+Z、审核本段、edits.jsonl、用户改动蓝字 / 已审核绿底、保存按钮）**已全部移除**，§23 "未做 / 待定" 里的小节线 / 速度 / 段落编辑、插入删除拍、连音编辑、导出 GP 都**取消**。
 - **保留**：播放（伴奏 / 原贝斯 / 谱面合成 / 节拍器混音）、变速、段落或选区循环、伴奏对齐（± 步进、自动；偏移写入 `score.json` 的 `meta.audio_offset_ms`，退出时自动保存）、点击选格、双击从该处播放、低置信度虚线框。键：空格 播放/暂停 · Enter 从选中处播放 · 方向键移动 · L 循环 · Esc 返回。速度 / 对齐输入框聚焦时按键归输入框（此前会被谱面吞掉，数字会改写品位）。
 - 后端 `score_format.py`：`open_score` 只要 GP 旁的 `.score.json` 比工作副本新就采纳（不再看 edits.jsonl）；`edits.jsonl` 不再产生。扒谱会话原计划用 edits 回流标签，这条路径没有了，回流改由 GP 里核对后的谱（核对版）提供。
-- **已删除**：`frontend/`（React Web UI）、`desktop/`、`desktop_app.py`、`start_bass_station.bat/.vbs`、`启动BassStation.bat`、`AI_HANDOVER.md`、WPF 的 `LogoComparisonWindow` / `LogoControl` 与 `--render-logo` 调试入口、`backend/test_*.gp`、`backend/ai_transcriber_test.py`、未被引用的旧 logo 素材（根目录和 `assets/` 下的 `bangdream_*`、`bassdream_plain.svg`、`bassstation_*`）。`backend/app.py`（FastAPI，原为 Web UI 服务）**仍在但已无启动入口也无前端**，WPF 只走 `tab_cli.py`；确认不需要后可整体删除（连同 `gamification_service` / `clipboard_service` / `fretboard_service` / `gp_process_monitor` 等只被它引用的模块）。
+- **已删除**：`frontend/`（React Web UI）、`desktop/`、`desktop_app.py`、`start_bass_station.bat/.vbs`、`启动BassStation.bat`、`AI_HANDOVER.md`、WPF 的 `LogoComparisonWindow` / `LogoControl` 与 `--render-logo` 调试入口、`backend/test_*.gp`、`backend/ai_transcriber_test.py`、未被引用的旧 logo 素材（根目录和 `assets/` 下的 `bangdream_*`、`bassdream_plain.svg`、`bassstation_*`）。`backend/app.py`（FastAPI）及只被它引用的 `clipboard_service` / `fretboard_service` / `gp_process_monitor` 也已删除（用户决定整体去掉 FastAPI；练琴监控、剪贴板导出由 WPF 自己做）。`gamification_service`（徽章 / 熟练度表，WPF 直接读）和 `practice_history`（练习记录表）保留，建表改由 `tab_scanner.init_db()` 调用，新库不会缺表。
 - 邻近会话在本机未推送的进行中工作（云端看不到）：报告页判定彩带改版（中性数字 + 连续彩带，PERFECT 幻彩，MISS 断开虚线，错音变紫）、便签与选中小节高亮、小节重放控制条（我的演奏 / 原曲贝斯 / 交替对比）。最后停在核对"原曲贝斯"重放位置比预期早 0.38 秒（怀疑重复段落导致误判），需在本机确认。
 - 云端能做的验证：`dotnet build -c Release -p:EnableWindowsTargeting=true` 可编译 WPF（Linux 上只能编译，无法运行界面和声音）。

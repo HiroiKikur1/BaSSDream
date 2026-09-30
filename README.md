@@ -40,7 +40,7 @@ BaSSDream/
 ## 🚀 快速上手
 
 ### 环境要求
-- **Python**: 3.11 / 3.14（FastAPI、librosa 等基础库）
+- **Python**: 3.11 / 3.14（librosa 等基础库）
 - **.NET SDK**: 10.0（构建 WPF 客户端）
 - **Guitar Pro**: Guitar Pro 8（用于乐谱同步与交互）
 

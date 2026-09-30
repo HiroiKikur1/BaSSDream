@@ -115,6 +115,11 @@ def init_db():
             cur.execute(f"ALTER TABLE song_cache ADD COLUMN {col} TEXT DEFAULT ''")
     conn.commit()
     conn.close()
+    # tables the WPF client reads (badges, mastery, practice sessions) are created here, next to the song cache
+    from gamification_service import init_gamification_db
+    from practice_history import init_history_db
+    init_gamification_db()
+    init_history_db()
 
 def parse_gp_file(gp_path: str) -> Dict[str, Any]:
     try:
