@@ -454,6 +454,12 @@ public partial class ScoreView : UserControl
     private void OnKey(object sender, KeyEventArgs e)
     {
         if (_score == null) return;
+        // typing in the tempo / offset field: the keys belong to the field, Esc leaves it
+        if (Keyboard.FocusedElement is TextBox)
+        {
+            if (e.Key == Key.Escape) { e.Handled = true; Focus(); }
+            return;
+        }
         bool ctrl = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
         var key = e.Key == Key.System ? e.SystemKey : e.Key;
         e.Handled = true;
