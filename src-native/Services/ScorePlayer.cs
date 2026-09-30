@@ -7,9 +7,9 @@ using BassStation.Models;
 namespace BassStation.Services;
 
 /// <summary>
-/// Plays a score with its tracks mixed live: bass-less backing, the original bass (both pre-stretched wav
-/// files for tempo changes), a tab synth and a metronome (both generated from the score at any tempo).
-/// Session time s plays recording time s * Rate.
+/// Plays a score with its tracks mixed live: bass-less backing and the original bass (the 1.00 wav files, tempo
+/// changed in real time by <see cref="StretchProvider"/>), a tab synth and a metronome (both generated from the
+/// score at any tempo). Session time s plays recording time s * Rate.
 /// </summary>
 public sealed class ScorePlayer : IDisposable
 {
@@ -37,7 +37,7 @@ public sealed class ScorePlayer : IDisposable
     public double GetVolume(Track t) => _mixer.Volume[(int)t];
     public bool HasTrack(Track t) => t switch { Track.Backing => _mixer.HasBacking, Track.Bass => _mixer.HasBass, _ => true };
 
-    /// <summary>Tracks for a tempo (backing / bass wavs stretched by backend score_format.py; null = absent).</summary>
+    /// <summary>Tracks at their original tempo (null = absent), played at <paramref name="rate"/>.</summary>
     public void Load(string? backingWav, string? bassWav, double rate)
     {
         bool was = IsPlaying;
@@ -49,6 +49,9 @@ public sealed class ScorePlayer : IDisposable
     }
 
     public void Seek(double recTime) => _mixer.Seek(recTime);
+
+    /// <summary>Tempo change, instant: the audio is stretched while it plays.</summary>
+    public void SetRate(double rate) => _mixer.SetRate(rate);
 
     /// <summary>Backing / bass alignment (ms): the audio heard at score time t is the recording at t + offset.</summary>
     public double AudioOffsetMs
@@ -129,7 +132,7 @@ public sealed class ScorePlayer : IDisposable
         private readonly BassScore _score;
         private readonly object _lock = new();
         private WaveFileReader? _backing, _bass;
-        private ISampleProvider? _backingSp, _bassSp;
+        private StretchProvider? _backingSp, _bassSp;
         private float[] _tmp = new float[8192];
         private List<(double T, double Dur, int Midi, bool Dead)> _notes = new();
         private List<(double T, bool Accent)> _clicks = new();
@@ -138,7 +141,9 @@ public sealed class ScorePlayer : IDisposable
         private readonly List<ClickVoice> _clickVoices = new();
         private double? _loopA, _loopB;
         public double OffsetSec { get; private set; }
-        private long OffsetFrames => (long)Math.Round(OffsetSec / Rate * Sr);
+
+        /// <summary>Recording time (s) the audio tracks are read from at a session frame.</summary>
+        private double ReadTime(long frame) => frame / (double)Sr * Rate + OffsetSec - StretchProvider.LeadSeconds(Rate) * Rate;
 
         public WaveFormat WaveFormat { get; } = WaveFormat.CreateIeeeFloatWaveFormat(Sr, 2);
         public readonly float[] Volume = { 0.9f, 0.9f, 0.0f, 0.0f };
@@ -180,10 +185,29 @@ public sealed class ScorePlayer : IDisposable
                 _bass?.Dispose();
                 _backing = backingWav != null ? new WaveFileReader(backingWav) : null;
                 _bass = bassWav != null ? new WaveFileReader(bassWav) : null;
-                _backingSp = _backing == null ? null : Stereo(_backing.ToSampleProvider());
-                _bassSp = _bass == null ? null : Stereo(_bass.ToSampleProvider());
                 Rate = rate;
-                if (_backing != null) DurationRec = Math.Max(DurationRec, _backing.TotalTime.TotalSeconds * rate);
+                Wrap();
+                if (_backing != null) DurationRec = Math.Max(DurationRec, _backing.TotalTime.TotalSeconds);
+            }
+        }
+
+        private void Wrap()
+        {
+            _backingSp = _backing == null ? null : new StretchProvider(Stereo(_backing.ToSampleProvider()), Rate);
+            _bassSp = _bass == null ? null : new StretchProvider(Stereo(_bass.ToSampleProvider()), Rate);
+        }
+
+        public void SetRate(double rate)
+        {
+            lock (_lock)
+            {
+                double rec = Frame / (double)Sr * Rate;
+                Rate = rate;
+                Wrap();
+                Frame = (long)(rec / Rate * Sr);
+                SeekReader(_backing, _backingSp);
+                SeekReader(_bass, _bassSp);
+                ResetCursors(rec);
             }
         }
 
@@ -196,8 +220,8 @@ public sealed class ScorePlayer : IDisposable
             {
                 recTime = Math.Clamp(recTime, 0, Math.Max(0, DurationRec));
                 Frame = (long)(recTime / Rate * Sr);
-                SeekReader(_backing);
-                SeekReader(_bass);
+                SeekReader(_backing, _backingSp);
+                SeekReader(_bass, _bassSp);
                 ResetCursors(recTime);
             }
         }
@@ -207,8 +231,8 @@ public sealed class ScorePlayer : IDisposable
             lock (_lock)
             {
                 OffsetSec = Math.Clamp(sec, -2.0, 2.0);
-                SeekReader(_backing);
-                SeekReader(_bass);
+                SeekReader(_backing, _backingSp);
+                SeekReader(_bass, _bassSp);
             }
         }
 
@@ -220,11 +244,12 @@ public sealed class ScorePlayer : IDisposable
             }
         }
 
-        private void SeekReader(WaveFileReader? r)
+        private void SeekReader(WaveFileReader? r, StretchProvider? st)
         {
             if (r == null) return;
-            long pos = Math.Max(0, Frame + OffsetFrames) * r.WaveFormat.BlockAlign;
+            long pos = (long)Math.Max(0, ReadTime(Frame) * r.WaveFormat.SampleRate) * r.WaveFormat.BlockAlign;
             r.Position = Math.Min(pos, r.Length);
+            st?.Reset();
         }
 
         private void ResetCursors(double recTime)
@@ -255,8 +280,8 @@ public sealed class ScorePlayer : IDisposable
                     RenderBlock(buffer, offset, head);
                     double a = _loopA!.Value;
                     Frame = (long)(a / Rate * Sr);
-                    SeekReader(_backing);
-                    SeekReader(_bass);
+                    SeekReader(_backing, _backingSp);
+                    SeekReader(_bass, _bassSp);
                     ResetCursors(a);
                     RenderBlock(buffer, offset + head * 2, frames - head);
                 }
@@ -275,8 +300,8 @@ public sealed class ScorePlayer : IDisposable
             Array.Clear(buf, off, n);
             if (_tmp.Length < n) _tmp = new float[n];
             // before the audio starts (negative offset) the tracks are silent, then read on in step
-            long src = Frame + OffsetFrames;
-            int skip = src < 0 ? (int)Math.Min(frames, -src) : 0;
+            double rt = ReadTime(Frame);
+            int skip = rt < 0 ? (int)Math.Min(frames, Math.Ceiling(-rt / Rate * Sr)) : 0;
             AddReader(_backingSp, Volume[0], buf, off + 2 * skip, n - 2 * skip);
             AddReader(_bassSp, Volume[1], buf, off + 2 * skip, n - 2 * skip);
             RenderSynth(buf, off, frames);

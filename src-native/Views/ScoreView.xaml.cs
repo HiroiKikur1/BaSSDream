@@ -216,16 +216,13 @@ public partial class ScoreView : UserControl
         menuRate.IsOpen = true;
     }
 
-    private async Task SetRateAsync(double rate)
+    private Task SetRateAsync(double rate)
     {
-        if (_player == null) return;
-        rate = Math.Round(Math.Clamp(rate, 0.5, 1.5), 2);
-        txtRate.Text = "…";
-        var res = await Task.Run(() => RunPy("stretch", _song.Id, rate.ToString("F2", CultureInfo.InvariantCulture)));
-        if (res is JsonElement r && r.TryGetProperty("success", out var ok) && ok.GetBoolean())
-            _player.Load(Str(r, "backing"), Str(r, "bass"), rate);
+        if (_player == null) return Task.CompletedTask;
+        _player.SetRate(Math.Round(Math.Clamp(rate, 0.5, 1.5), 2));
         ShowRate();
         ApplyLoop();
+        return Task.CompletedTask;
     }
 
     private async void BtnSlower_Click(object sender, RoutedEventArgs e) => await SetRateAsync((_player?.Rate ?? 1) - 0.05);
