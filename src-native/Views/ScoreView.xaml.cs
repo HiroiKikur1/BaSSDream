@@ -17,13 +17,10 @@ using BassStation.Services;
 namespace BassStation.Views;
 
 /// <summary>
-/// In-app score view: the song's BassScore with the backing, the original bass, a tab synth and a metronome
-/// mixed live, tempo change, section loop, and note editing. Every edit is appended to edits.jsonl next to
-/// score.json (before / after with recording time and pitch): corrections that feed the transcription training.
+/// In-app score viewer / player: the song's BassScore with the backing, the original bass, a tab synth and a
+/// metronome mixed live, tempo change, section loop and backing alignment. Not an editor: scores are edited in GP.
 ///
-/// Keys: Space play/pause · Enter play from the selection · arrows move · digits set the fret · Del delete ·
-/// X dead note · Ctrl+Up/Down same pitch on the next string · - / + shorter / longer · Ctrl+Z undo ·
-/// Ctrl+S save · Ctrl+R review the section.
+/// Keys: Space play/pause · Enter play from the selection · arrows move · L loop · Esc back.
 /// </summary>
 public partial class ScoreView : UserControl
 {
@@ -40,12 +37,8 @@ public partial class ScoreView : UserControl
     private readonly string _gpPath;
     private BassScore? _score;
     private ScorePlayer? _player;
-    private string? _editsPath;
     private bool _dirty;
     private bool _loop;
-    private int _seq;
-    private readonly Stack<(int Bar, ScoreBar Before, int Seq)> _undo = new();
-    private (long At, int Val, (int, int, int) Cell)? _lastDigit;
 
     public event Action? RequestClose;
 
@@ -89,8 +82,6 @@ public partial class ScoreView : UserControl
         }
         string path = r.GetProperty("score").GetString()!;
         _score = BassScore.Load(path);
-        _editsPath = Path.Combine(Path.GetDirectoryName(path)!, "edits.jsonl");
-        _seq = File.Exists(_editsPath) ? File.ReadLines(_editsPath).Count() : 0;
         canvas.Score = _score;
         _player = new ScorePlayer(_score);
         var audio = r.GetProperty("audio");
@@ -224,8 +215,6 @@ public partial class ScoreView : UserControl
         if (b.Extra != null && b.Extra.TryGetValue("key", out var bk) && bk.ValueKind == JsonValueKind.Array) k = bk[0].GetInt32();
         bool minor = _score.Key.Count > 1 && _score.Key[1].ValueKind == JsonValueKind.String && _score.Key[1].GetString() == "Minor";
         stKey.Text = minor ? $"{MinorKeys[Math.Clamp(k, -7, 7) + 7]} 小调" : $"{MajorKeys[Math.Clamp(k, -7, 7) + 7]} 大调";
-        int reviewed = _score.Bars.Count(x => x.Reviewed);
-        stReview.Text = reviewed > 0 ? $"已审核 {reviewed} / {_score.Bars.Count} 小节" : "";
     }
 
     private static string Clock(double s) => $"{(int)(s / 60)}:{(int)(s % 60):00}";
@@ -316,7 +305,6 @@ public partial class ScoreView : UserControl
         _player.AudioOffsetMs = Math.Round(Math.Clamp(ms, -2000, 2000));
         _score.Meta["audio_offset_ms"] = _player.AudioOffsetMs.ToString("0", CultureInfo.InvariantCulture);
         _dirty = true;
-        dotDirty.Visibility = Visibility.Visible;
         ShowOffset();
     }
 
@@ -444,12 +432,7 @@ public partial class ScoreView : UserControl
         }
     }
 
-    // ---------------------------------------------------------------- editing
-
-    private ScoreBeat? SelBeat => canvas.Selection is { } s && _score != null && s.Beat < _score.Bars[s.Bar].Beats.Count
-        ? _score.Bars[s.Bar].Beats[s.Beat] : null;
-
-    private ScoreNote? SelNote => canvas.Selection is { } s ? SelBeat?.Notes.FirstOrDefault(n => n.S == s.Str) : null;
+    // ---------------------------------------------------------------- keys
 
     private void OnKey(object sender, KeyEventArgs e)
     {
@@ -460,229 +443,19 @@ public partial class ScoreView : UserControl
             if (e.Key == Key.Escape) { e.Handled = true; Focus(); }
             return;
         }
-        bool ctrl = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
-        var key = e.Key == Key.System ? e.SystemKey : e.Key;
         e.Handled = true;
-        switch (key)
+        switch (e.Key == Key.System ? e.SystemKey : e.Key)
         {
             case Key.Space: TogglePlay(); break;
             case Key.Enter: PlayFromSelection(); break;
             case Key.Left: Move(-1, 0); break;
             case Key.Right: Move(1, 0); break;
-            case Key.Up when ctrl: MoveString(1); break;
-            case Key.Down when ctrl: MoveString(-1); break;
             case Key.Up: Move(0, 1); break;
             case Key.Down: Move(0, -1); break;
-            case Key.Delete or Key.Back: DeleteNote(); break;
-            case Key.X when !ctrl: ToggleDead(); break;
-            case Key.L when !ctrl: ToggleLoop(); break;
-            case Key.Z when ctrl: Undo(); break;
-            case Key.S when ctrl: Save(); break;
-            case Key.R when ctrl: ReviewSection(); break;
-            case Key.OemMinus or Key.Subtract: Shorter(); break;
-            case Key.OemPlus or Key.Add: Longer(); break;
-            case >= Key.D0 and <= Key.D9: Digit(key - Key.D0); break;
-            case >= Key.NumPad0 and <= Key.NumPad9: Digit(key - Key.NumPad0); break;
+            case Key.L: ToggleLoop(); break;
             case Key.Escape: RequestClose?.Invoke(); break;
             default: e.Handled = false; break;
         }
-    }
-
-    private void Digit(int d)
-    {
-        if (canvas.Selection is not { } s) return;
-        long now = Environment.TickCount64;
-        int fret = d;
-        // two digits in quick succession on the same cell: 1 then 2 = fret 12
-        if (_lastDigit is { } l && now - l.At < 800 && l.Cell == (s.Bar, s.Beat, s.Str) && l.Val * 10 + d <= 24)
-            fret = l.Val * 10 + d;
-        _lastDigit = (now, fret, (s.Bar, s.Beat, s.Str));
-        SetFret(fret);
-    }
-
-    private void SetFret(int fret)
-    {
-        if (_score == null || canvas.Selection is not { } s || SelBeat is not { } bt) return;
-        var n = SelNote;
-        int seq = Snapshot(s.Bar);
-        if (n != null)
-        {
-            var before = n.Clone();
-            n.F = fret;
-            n.Midi = _score.Tuning[s.Str] + fret;
-            n.X = false;
-            n.Tie = false;
-            n.Src = "user";
-            Log(seq, "set", s.Bar, bt, before, n);
-        }
-        else
-        {
-            n = new ScoreNote { Id = _score.NewNoteId(), S = s.Str, F = fret, Midi = _score.Tuning[s.Str] + fret, Src = "user" };
-            bt.Notes.Add(n);
-            bt.Notes.Sort((a, b) => a.S.CompareTo(b.S));
-            Log(seq, "add", s.Bar, bt, null, n);
-        }
-        Changed(false);
-    }
-
-    private void DeleteNote()
-    {
-        if (canvas.Selection is not { } s || SelBeat is not { } bt || SelNote is not { } n) return;
-        int seq = Snapshot(s.Bar);
-        bt.Notes.Remove(n);
-        Log(seq, "delete", s.Bar, bt, n, null);
-        Changed(false);
-    }
-
-    private void ToggleDead()
-    {
-        if (canvas.Selection is not { } s || SelBeat is not { } bt || SelNote is not { } n) return;
-        int seq = Snapshot(s.Bar);
-        var before = n.Clone();
-        n.X = !n.X;
-        n.Src = "user";
-        Log(seq, "set", s.Bar, bt, before, n);
-        Changed(false);
-    }
-
-    /// <summary>Same pitch on the neighbouring string (fingering change).</summary>
-    private void MoveString(int dir)
-    {
-        if (_score == null || canvas.Selection is not { } s || SelBeat is not { } bt || SelNote is not { } n) return;
-        int to = s.Str + dir;
-        if (to < 0 || to >= _score.Strings || bt.Notes.Any(x => x.S == to)) return;
-        int fret = n.Midi - _score.Tuning[to];
-        if (fret < 0 || fret > 24) return;
-        int seq = Snapshot(s.Bar);
-        var before = n.Clone();
-        n.S = to;
-        n.F = fret;
-        n.Src = "user";
-        Log(seq, "set", s.Bar, bt, before, n);
-        canvas.Selection = (s.Bar, s.Beat, to);
-        Changed(false);
-    }
-
-    /// <summary>Halves the beat and fills the freed half with a rest (the bar stays full).</summary>
-    private void Shorter()
-    {
-        if (_score == null || canvas.Selection is not { } s || SelBeat is not { } bt) return;
-        if (bt.Dots > 0 || bt.Tuplet > 0 || bt.Value >= 64 || bt.Dur % 2 != 0) return;
-        int seq = Snapshot(s.Bar);
-        var bar = _score.Bars[s.Bar];
-        int half = bt.Dur / 2;
-        bt.Dur = half;
-        bt.Value *= 2;
-        bar.Beats.Insert(s.Beat + 1, new ScoreBeat { Tick = bt.Tick + half, Dur = half, Value = bt.Value });
-        LogRhythm(seq, s.Bar);
-        Changed(true);
-    }
-
-    /// <summary>Takes the following rest into the beat: same length doubles the value, half length adds a dot.</summary>
-    private void Longer()
-    {
-        if (_score == null || canvas.Selection is not { } s || SelBeat is not { } bt) return;
-        var bar = _score.Bars[s.Bar];
-        if (s.Beat + 1 >= bar.Beats.Count || bt.Tuplet > 0) return;
-        var next = bar.Beats[s.Beat + 1];
-        if (!next.IsRest || next.Tuplet > 0) return;
-        bool dbl = next.Dur == bt.Dur && bt.Dots == 0 && bt.Value > 1 && bt.Tick % (2 * bt.Dur) == 0;
-        bool dot = next.Dur * 2 == bt.Dur && bt.Dots == 0;
-        if (!dbl && !dot) return;
-        int seq = Snapshot(s.Bar);
-        if (dbl) bt.Value /= 2; else bt.Dots = 1;
-        bt.Dur += next.Dur;
-        bar.Beats.RemoveAt(s.Beat + 1);
-        LogRhythm(seq, s.Bar);
-        Changed(true);
-    }
-
-    private void ReviewSection()
-    {
-        if (_score == null || canvas.Selection is not { } s) return;
-        var (a, b) = SectionOf(s.Bar);
-        bool value = !_score.Bars[a].Reviewed;
-        int seq = ++_seq;
-        for (int i = a; i < b; i++)
-        {
-            _undo.Push((i, CloneBar(_score.Bars[i]), seq));
-            _score.Bars[i].Reviewed = value;
-        }
-        Append(new Dictionary<string, object?> { ["op"] = "review", ["bars"] = new[] { a, b }, ["value"] = value,
-                                                  ["t"] = new[] { _score.Bars[a].T0, _score.Bars[b - 1].T1 } }, seq);
-        Changed(false);
-    }
-
-    private void BtnReview_Click(object sender, RoutedEventArgs e) => ReviewSection();
-
-    private int Snapshot(int bar)
-    {
-        int seq = ++_seq;
-        _undo.Push((bar, CloneBar(_score!.Bars[bar]), seq));
-        return seq;
-    }
-
-    private static ScoreBar CloneBar(ScoreBar b) => JsonSerializer.Deserialize<ScoreBar>(JsonSerializer.Serialize(b))!;
-
-    private void Undo()
-    {
-        if (_score == null || _undo.Count == 0) return;
-        int seq = _undo.Peek().Seq;
-        while (_undo.Count > 0 && _undo.Peek().Seq == seq)
-        {
-            var (bar, before, _) = _undo.Pop();
-            _score.Bars[bar] = before;
-        }
-        Append(new Dictionary<string, object?> { ["op"] = "undo", ["of"] = seq }, ++_seq);
-        if (canvas.Selection is { } s && s.Beat >= _score.Bars[s.Bar].Beats.Count)
-            canvas.Selection = (s.Bar, Math.Max(0, _score.Bars[s.Bar].Beats.Count - 1), s.Str);
-        Changed(true);
-    }
-
-    private void Changed(bool relayout)
-    {
-        _dirty = true;
-        dotDirty.Visibility = Visibility.Visible;
-        if (relayout) canvas.Relayout(); else canvas.InvalidateVisual();
-        _player?.Refresh();
-    }
-
-    // ---------------------------------------------------------------- edit log (training data)
-
-    private object? NoteRecord(int bar, ScoreBeat bt, ScoreNote? n) => n == null ? null : new Dictionary<string, object?>
-    {
-        ["id"] = n.Id, ["s"] = n.S, ["f"] = n.F, ["midi"] = n.Midi, ["x"] = n.X, ["src"] = n.Src, ["conf"] = n.Conf,
-        ["tick"] = bt.Tick, ["dur"] = bt.Dur, ["time"] = Math.Round(_score!.TimeOf(bar, bt.Tick), 4),
-        ["end"] = Math.Round(_score.TimeOf(bar, bt.Tick + bt.Dur), 4)
-    };
-
-    private void Log(int seq, string op, int bar, ScoreBeat bt, ScoreNote? before, ScoreNote? after) =>
-        Append(new Dictionary<string, object?>
-        {
-            ["op"] = op, ["bar"] = bar, ["note_id"] = (after ?? before)?.Id,
-            ["before"] = NoteRecord(bar, bt, before), ["after"] = NoteRecord(bar, bt, after)
-        }, seq);
-
-    private void LogRhythm(int seq, int bar)
-    {
-        var b = _score!.Bars[bar];
-        Append(new Dictionary<string, object?>
-        {
-            ["op"] = "set_rhythm", ["bar"] = bar,
-            ["after"] = b.Beats.Select(bt => new { bt.Tick, bt.Dur, v = bt.Value, d = bt.Dots, notes = bt.Notes.Select(n => n.Id) })
-        }, seq);
-    }
-
-    private void Append(Dictionary<string, object?> entry, int seq)
-    {
-        if (_editsPath == null) return;
-        entry["seq"] = seq;
-        entry["ts"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-        try
-        {
-            File.AppendAllText(_editsPath, JsonSerializer.Serialize(entry) + "\n");
-        }
-        catch (IOException ex) { Debug.WriteLine(ex); }
     }
 
     private void Save()
@@ -692,7 +465,6 @@ public partial class ScoreView : UserControl
         {
             _score.Save();
             _dirty = false;
-            dotDirty.Visibility = Visibility.Collapsed;
         }
         catch (Exception ex)
         {
@@ -700,8 +472,6 @@ public partial class ScoreView : UserControl
             (Application.Current.MainWindow as MainWindow)?.ShowToast("保存失败", isSuccess: false);
         }
     }
-
-    private void BtnSave_Click(object sender, RoutedEventArgs e) => Save();
 
     // Debug: offline mix of the current tracks at a tempo, with the given volumes (backing, bass, synth, click).
     internal async Task DebugRenderAsync(string wav, double rate, double from, double seconds, double[] vols)
@@ -717,17 +487,12 @@ public partial class ScoreView : UserControl
             _player.DebugRender(wav, from, seconds);
     }
 
-    // Debug: selects a cell, types a fret and plays for a moment (render checks without a keyboard).
-    internal async Task DebugAsync(int bar, int beat, int str, int? fret, double playSeconds)
+    // Debug: selects a cell and plays for a moment (render checks without a keyboard).
+    internal async Task DebugAsync(int bar, int beat, int str, double playSeconds)
     {
         for (int i = 0; i < 300 && _score == null; i++) await Task.Delay(100);
         if (_score == null) return;
         canvas.Selection = (bar, beat, str);
-        if (fret.HasValue)
-        {
-            SetFret(fret.Value);
-            Save();
-        }
         await Task.Delay(300);
         Move(0, 0);
         if (playSeconds > 0)

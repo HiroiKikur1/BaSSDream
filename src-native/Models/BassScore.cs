@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -96,12 +96,6 @@ public class BassScore
     }
 
     public IEnumerable<ScoreNote> AllNotes() => Bars.SelectMany(b => b.Beats).SelectMany(bt => bt.Notes);
-
-    public string NewNoteId()
-    {
-        int max = AllNotes().Select(n => n.Id.Length > 1 && int.TryParse(n.Id[1..], out int k) ? k : -1).DefaultIfEmpty(-1).Max();
-        return $"n{max + 1}";
-    }
 }
 
 public class ScoreBar
@@ -114,8 +108,6 @@ public class ScoreBar
     [JsonPropertyName("t0")] public double T0 { get; set; }
     [JsonPropertyName("t1")] public double T1 { get; set; }
     [JsonPropertyName("beats")] public List<ScoreBeat> Beats { get; set; } = new();
-    /// <summary>The user checked this bar against the recording: its notes count as ground truth.</summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] [JsonPropertyName("reviewed")] public bool Reviewed { get; set; }
     [JsonExtensionData] public Dictionary<string, JsonElement>? Extra { get; set; }
 
     public int Length(int tpq) => Num * tpq * 4 / Den;
@@ -165,11 +157,4 @@ public class ScoreNote
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] [JsonPropertyName("conf")] public double? Conf { get; set; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] [JsonPropertyName("flag")] public bool Flag { get; set; }      // low-confidence transcription
     [JsonExtensionData] public Dictionary<string, JsonElement>? Extra { get; set; }   // time, end, cand ...
-
-    public ScoreNote Clone()
-    {
-        var c = (ScoreNote)MemberwiseClone();
-        c.Extra = Extra == null ? null : new Dictionary<string, JsonElement>(Extra);
-        return c;
-    }
 }

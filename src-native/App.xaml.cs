@@ -208,7 +208,7 @@ public partial class App : Application
             return;
         }
 
-        // Score view: --render-score out.png <song title> [bar beat string fret [play seconds]]
+        // Score view: --render-score out.png <song title> [bar beat string [play seconds]]
         if (e.Args.Length > 2 && e.Args[0] == "--render-score")
         {
             string outPath = CleanPath(e.Args, 1, "render_score.png");
@@ -218,7 +218,7 @@ public partial class App : Application
             await Task.Delay(400);
             mainWindow.OpenScoreView(mainWindow.DebugSelectedSong!);
             int Arg(int i, int d) => e.Args.Length > i && int.TryParse(e.Args[i], out int v) ? v : d;
-            // BASSDREAM_MIX="<wav>|rate|from|seconds|vb,vbass,vsynth,vclick": offline mix instead of an edit
+            // BASSDREAM_MIX="<wav>|rate|from|seconds|vb,vbass,vsynth,vclick": offline mix instead of a selection
             if (Environment.GetEnvironmentVariable("BASSDREAM_MIX") is { Length: > 0 } mix && mainWindow.DebugScoreView != null)
             {
                 var m = mix.Split('|');
@@ -226,8 +226,7 @@ public partial class App : Application
                 await mainWindow.DebugScoreView.DebugRenderAsync(m[0], D(m[1]), D(m[2]), D(m[3]), m[4].Split(',').Select(D).ToArray());
             }
             else if (mainWindow.DebugScoreView != null)
-                await mainWindow.DebugScoreView.DebugAsync(Arg(3, 0), Arg(4, 0), Arg(5, 0), e.Args.Length > 6 ? Arg(6, 0) : null,
-                                                          e.Args.Length > 7 ? Arg(7, 0) : 0);
+                await mainWindow.DebugScoreView.DebugAsync(Arg(3, 0), Arg(4, 0), Arg(5, 0), Arg(6, 0));
             await Task.Delay(800);
             mainWindow.UpdateLayout();
             var rtbS = new RenderTargetBitmap((int)((FrameworkElement)mainWindow.Content).ActualWidth, (int)((FrameworkElement)mainWindow.Content).ActualHeight, 96, 96, PixelFormats.Pbgra32);
@@ -390,38 +389,6 @@ public partial class App : Application
 
             var rtb = new RenderTargetBitmap(w, h, 96, 96, PixelFormats.Pbgra32);
             rtb.Render(evalWin);
-
-            var encoder = new PngBitmapEncoder();
-            encoder.Frames.Add(BitmapFrame.Create(rtb));
-            using (var stream = File.Create(outPath))
-            {
-                encoder.Save(stream);
-            }
-
-            Shutdown(0);
-            return;
-        }
-
-        if (e.Args.Length > 0 && e.Args[0] == "--render-logo")
-        {
-            string outPath = e.Args.Length > 1 ? e.Args[1] : "logo_options_comparison.png";
-            var logoWin = new Views.LogoComparisonWindow
-            {
-                Width = 1260,
-                Height = 700
-            };
-            logoWin.Show();
-
-            await Task.Delay(1000);
-            logoWin.UpdateLayout();
-
-            int w = (int)logoWin.ActualWidth;
-            int h = (int)logoWin.ActualHeight;
-            if (w <= 0) w = 1260;
-            if (h <= 0) h = 700;
-
-            var rtb = new RenderTargetBitmap(w, h, 96, 96, PixelFormats.Pbgra32);
-            rtb.Render(logoWin);
 
             var encoder = new PngBitmapEncoder();
             encoder.Frames.Add(BitmapFrame.Create(rtb));

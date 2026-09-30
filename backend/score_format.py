@@ -1,7 +1,7 @@
-"""BaSSDream score: our own bass tab format, read and edited by the WPF score view.
+"""BaSSDream score: our own bass tab format, read by the WPF score view.
 
-One file per song, E:\\BassStation\\scores\\<song_id>\\score.json, plus edits.jsonl (every in-app edit, for
-training on user corrections). Bars are in playback order (repeats unrolled); each bar carries its start and
+One file per song, E:\\BassStation\\scores\\<song_id>\\score.json, read only by the WPF score view (scores are edited in GP;
+the view only stores the backing alignment in meta.audio_offset_ms). Bars are in playback order (repeats unrolled); each bar carries its start and
 end in seconds of the backing recording, so the view syncs without GP sync-point semantics.
 
     {"format": "bassdream-score", "version": 1, "tpq": 960,
@@ -308,10 +308,8 @@ def open_score(song_id: str, gp_path: str, title: str = "", artist: str = "") ->
     d = score_dir(song_id)
     path = os.path.join(d, "score.json")
     sibling = os.path.splitext(gp_path)[0] + ".score.json"
-    edits = os.path.join(d, "edits.jsonl")
-    untouched = not os.path.exists(edits) or os.path.getsize(edits) == 0
-    if os.path.exists(path) and os.path.exists(sibling) and untouched and os.path.getmtime(sibling) > os.path.getmtime(path):
-        os.remove(path)     # re-transcribed and never edited here: take the new model output
+    if os.path.exists(path) and os.path.exists(sibling) and os.path.getmtime(sibling) > os.path.getmtime(path):
+        os.remove(path)     # re-transcribed: take the new model output
     if not os.path.exists(path):
         os.makedirs(d, exist_ok=True)
         # a transcription carries the model's own score (confidences, note times) next to its GP

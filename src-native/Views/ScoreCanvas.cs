@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -14,7 +14,7 @@ namespace BassStation.Views;
 /// <summary>
 /// The score as a page of a commemorative score book: running head, outlined title in the band's colours, foil rule,
 /// ribbon bookmark, then systems of standard notation over TAB (as Guitar Pro lays them out). Selection (a cell and a
-/// bar range), low-confidence / edited / reviewed marks. The play cursor is an overlay placed from <see cref="CursorAt"/>.
+/// bar range) and low-confidence marks. The play cursor is an overlay placed from <see cref="CursorAt"/>.
 /// </summary>
 public class ScoreCanvas : FrameworkElement
 {
@@ -32,7 +32,7 @@ public class ScoreCanvas : FrameworkElement
     private static readonly Typeface DinBold = new(new FontFamily("Bahnschrift"), FontStyles.Normal, FontWeights.Bold, FontStretches.Normal);
 
     private static readonly Color Ink = C("#2B2630"), Sub = C("#8A8089"), Hair = C("#D3C8CF"), Rule = C("#2E2932"),
-        Doubt = C("#FF9A1F"), UserC = C("#2F7BFF"), ReviewC = C("#34C274"), Desk = C("#E7E1E6");
+        Doubt = C("#FF9A1F"), Desk = C("#E7E1E6");
 
     private BassScore? _score;
     private BandEdition _ed = BandEdition.Default;
@@ -280,8 +280,6 @@ public class ScoreCanvas : FrameworkElement
                 double top = y + (ShowStaff ? StaffTopOff - 16 : TabTopOff - 12), bot = tabBot + 12;
                 if (Range is { } rg && p.Index >= rg.A && p.Index <= rg.B)
                     dc.DrawRectangle(new SolidColorBrush(Color.FromArgb(150, _ed.Tint.R, _ed.Tint.G, _ed.Tint.B)), null, new Rect(p.X, top, p.W, bot - top));
-                if (sb.Reviewed)
-                    dc.DrawRectangle(new SolidColorBrush(Color.FromArgb(26, ReviewC.R, ReviewC.G, ReviewC.B)), null, new Rect(p.X, top, p.W, bot - top));
                 if (sb.Filled != sb.Length(_score.Tpq))
                     dc.DrawRectangle(new SolidColorBrush(Color.FromArgb(44, 255, 51, 119)), null, new Rect(p.X, tabTop - 6, p.W, TabH + 12));
             }
@@ -435,11 +433,6 @@ public class ScoreCanvas : FrameworkElement
             dc.Pop();
             Tape(dc, tx + w - 14, ay - 7, 30, 12);
         }
-        if (b.Reviewed)
-        {
-            var ck = Text("✓", RoundHeavy, 13, ReviewC);
-            dc.DrawText(ck, new Point(xr - ck.Width - 4, ay));
-        }
 
         if (ShowStaff && !p.RowStart && MeterChanges(p.Index))
         {
@@ -498,7 +491,7 @@ public class ScoreCanvas : FrameworkElement
     {
         string label = n.X ? "x" : n.Tie ? $"({n.F})" : n.F.ToString(CultureInfo.InvariantCulture);
         bool doubt = n.Flag || n.Conf is < 0.6;
-        var col = n.Tie ? Sub : n.Src == "user" ? UserC : Ink;
+        var col = n.Tie ? Sub : Ink;
         var t = Text(label, RoundHeavy, 13.5, col);
         double w = Math.Max(t.Width + 6, 15), h = 15;
         var r = new Rect(x - w / 2, y - h / 2, w, h);

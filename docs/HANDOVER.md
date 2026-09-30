@@ -1,6 +1,6 @@
 # BaSSDream（原 BassStation）项目交接文档
 
-> 更新时间：2026-09-26 早。本文档取代根目录旧的 `AI_HANDOVER.md`（其中的指标和架构描述已过时），并吸收了 `docs/扒谱架构方案.md` 的全部内容。接手的 AI 请先通读本文，再看 `AGENTS.md`（UI 文案规则）。
+> 更新时间：2026-09-26 早。本文档取代旧的 `AI_HANDOVER.md`（已删除，指标和架构描述已过时），并吸收了 `docs/扒谱架构方案.md` 的全部内容。接手的 AI 请先通读本文，再看 `AGENTS.md`（UI 文案规则）。
 
 ---
 
@@ -15,7 +15,7 @@
 
 ## 1. 用户偏好与硬性规则（务必遵守）
 
-1. **WPF 客户端（`src-native/`）才是正式 UI**；`frontend/` 的 React Web UI 已过时，不要再投入。
+1. **WPF 客户端（`src-native/`）才是正式 UI**；React Web UI（`frontend/`）、`desktop/` 壳和 `start_bass_station.*` 已于 2026-09-30 删除（git 历史可找回）。
 2. **UI 文案遵守 `AGENTS.md` 零冗余准则**：不写说教提示，不加英文副标题，Toast 要短。
 3. **扒谱质量优先**：单首新歌分析耗时 1 小时以内都可以接受。目标是持续逼近 100%，数字要如实报告。
 4. **GPU 与用户玩游戏共用**：用户说暂停就暂停重负载任务（分离、训练），等用户通知再开始。
@@ -100,7 +100,7 @@ cd backend && python -c "from tab_scanner import scan_all_tabs; scan_all_tabs(fo
   - 下方片假名仍是原版"バンドリ"（用户要求"只改 nG"）。如果以后想改成"バスドリ"，问用户。
 - 产物：`assets/bassdream_logo.png`（带白描边）、`assets/bassdream_plain.svg`、`src-native/assets/bassdream_logo.png`，程序图标 `src-native/BassStation.ico`（旧图标备份在 `cache/logo/BassStation_old.ico`）。
 - 背景镂空字：`cache/logo/make_outline_strip.py`，生成 `src-native/assets/bg_outline_text.png`（1214×186）。
-- 窗口标题、csproj 的 Product/ApplicationTitle、`start_bass_station.bat` 标题、GP 写出器的 Tabber 都已改名。
+- 窗口标题、csproj 的 Product/ApplicationTitle、GP 写出器的 Tabber 都已改名。
 - **未改**：程序集名、exe 文件名、命名空间、目录名仍是 BassStation（有意保留，避免破坏路径）；Web 前端未改。
 - 旧的 BasS Station 标识（`bassstation_logo_official.png`）仍在 assets 中，但已不被界面引用。
 
@@ -115,7 +115,7 @@ cd backend && python -c "from tab_scanner import scan_all_tabs; scan_all_tabs(fo
 ### 3.4 UI 待办
 - [ ] 下载时顺带看到的"筛选"按钮在某些截图里颜色偏浅，可能是鼠标悬停状态，需在真机上确认。
 - [ ] 真机长时间使用测试：后台伴奏队列、点击特效的性能、拖动窗口。
-- [ ] Web 前端（`frontend/`）没有更名，也没有同步新功能（按用户说法已废弃，可以忽略）。
+- Web 前端已删除（见 §24）。
 
 ---
 
@@ -790,3 +790,11 @@ cd backend && python -c "from tab_scanner import scan_all_tabs; scan_all_tabs(fo
 - **五维评测**（`song_eval prod_1001`，全部新改动）vs 09-29 正式版：音符 F1 0.829 → 0.833、小节线 0.968 → 0.976、强拍 F1 0.946 → 0.953、首小节 0.927 不变、离格音 0.40 → 0.28 /100 音。
 - **滑音**：`slide_note.py` 手工轮廓特征 + 梯度提升，以及音高相对 CQT 片段的小 CNN（`slide_note.py patches|cnn|cnn_eval`），对谱面滑音标记的平均精确率仅 0.1–0.29（音尾下滑最好：阈值 0.9 时 P 0.36 R 0.40）。原因：①谱里约 80% 的"音尾下滑"紧接下一个音，声音上与直接换低音难分；②IDMT 的真实滑音（一个半音的连音滑）被解码成一个音，滑到的新音根本没写出来。**未上线**。可行方向：在细分辨率音高轨迹上检测音符中途的持续音高移动并切分成"连音滑"两音；滑出类标记可在核对版里作为建议给用户确认。
 - **显卡**：用户的 180 W 驱动上限重启后失效（现在 225 W）；`thermal.py` 默认按 180 W 节流，并新增 `hook_module` 在分离模型每块计算前检查（`ext_build` 已接入）。
+
+## 24. 2026-09-30 晚：谱面页改为只看只播 + 清理
+- **需求变更（用户）**：软件内谱面**不做改谱**，改谱交给 GP；软件内只做内置看谱与播放。§23 里的编辑相关内容（数字改品位、Del / X / Ctrl+↑↓ / -+ / Ctrl+Z、审核本段、edits.jsonl、用户改动蓝字 / 已审核绿底、保存按钮）**已全部移除**，§23 "未做 / 待定" 里的小节线 / 速度 / 段落编辑、插入删除拍、连音编辑、导出 GP 都**取消**。
+- **保留**：播放（伴奏 / 原贝斯 / 谱面合成 / 节拍器混音）、变速、段落或选区循环、伴奏对齐（± 步进、自动；偏移写入 `score.json` 的 `meta.audio_offset_ms`，退出时自动保存）、点击选格、双击从该处播放、低置信度虚线框。键：空格 播放/暂停 · Enter 从选中处播放 · 方向键移动 · L 循环 · Esc 返回。速度 / 对齐输入框聚焦时按键归输入框（此前会被谱面吞掉，数字会改写品位）。
+- 后端 `score_format.py`：`open_score` 只要 GP 旁的 `.score.json` 比工作副本新就采纳（不再看 edits.jsonl）；`edits.jsonl` 不再产生。扒谱会话原计划用 edits 回流标签，这条路径没有了，回流改由 GP 里核对后的谱（核对版）提供。
+- **已删除**：`frontend/`（React Web UI）、`desktop/`、`desktop_app.py`、`start_bass_station.bat/.vbs`、`启动BassStation.bat`、`AI_HANDOVER.md`、WPF 的 `LogoComparisonWindow` / `LogoControl` 与 `--render-logo` 调试入口、`backend/test_*.gp`、`backend/ai_transcriber_test.py`、未被引用的旧 logo 素材（根目录和 `assets/` 下的 `bangdream_*`、`bassdream_plain.svg`、`bassstation_*`）。`backend/app.py`（FastAPI，原为 Web UI 服务）**仍在但已无启动入口也无前端**，WPF 只走 `tab_cli.py`；确认不需要后可整体删除（连同 `gamification_service` / `clipboard_service` / `fretboard_service` / `gp_process_monitor` 等只被它引用的模块）。
+- 邻近会话在本机未推送的进行中工作（云端看不到）：报告页判定彩带改版（中性数字 + 连续彩带，PERFECT 幻彩，MISS 断开虚线，错音变紫）、便签与选中小节高亮、小节重放控制条（我的演奏 / 原曲贝斯 / 交替对比）。最后停在核对"原曲贝斯"重放位置比预期早 0.38 秒（怀疑重复段落导致误判），需在本机确认。
+- 云端能做的验证：`dotnet build -c Release -p:EnableWindowsTargeting=true` 可编译 WPF（Linux 上只能编译，无法运行界面和声音）。

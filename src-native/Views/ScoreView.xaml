@@ -213,19 +213,6 @@
                     </StackPanel>
                 </Button>
 
-                <Button x:Name="btnSave" DockPanel.Dock="Right" Click="BtnSave_Click" Style="{StaticResource Tool}">
-                    <StackPanel Orientation="Horizontal">
-                        <Ellipse x:Name="dotDirty" Width="7" Height="7" Fill="{StaticResource Accent}" Margin="0,0,8,0" Visibility="Collapsed" VerticalAlignment="Center" />
-                        <TextBlock Style="{StaticResource Glyph}" Text="&#xE74E;" />
-                        <TextBlock Margin="7,0,0,0" VerticalAlignment="Center" Text="保存" />
-                    </StackPanel>
-                </Button>
-                <Button x:Name="btnReview" DockPanel.Dock="Right" Click="BtnReview_Click" Style="{StaticResource Tool}">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Style="{StaticResource Glyph}" Text="&#xE73E;" />
-                        <TextBlock Margin="7,0,0,0" VerticalAlignment="Center" Text="审核本段" />
-                    </StackPanel>
-                </Button>
             </DockPanel>
         </Border>
 
@@ -274,7 +261,6 @@
                 <TextBlock x:Name="stKey" Style="{StaticResource Readout}" FontSize="12" FontFamily="{StaticResource UiFont}" Width="90" />
                 <TextBlock x:Name="stTempo" Style="{StaticResource Readout}" FontSize="12" Width="170" />
                 <TextBlock x:Name="stAlign" Style="{StaticResource Readout}" FontSize="12" Width="130" />
-                <TextBlock x:Name="stReview" Style="{StaticResource Readout}" FontSize="12" FontFamily="{StaticResource UiFont}" />
             </StackPanel>
         </Border>
     </Grid>
