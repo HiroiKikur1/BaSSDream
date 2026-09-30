@@ -14,9 +14,9 @@ namespace BassStation.Views;
 
 /// <summary>
 /// Boot animation, drawn over the main window (1440 × 810) on every launch:
-/// white page with the traced Atelier Z M#265 as a faint backdrop (the first frame is also the native splash
-/// image, assets/boot/splash.png) → B a S S fly in from the left one by one → a line grows down B's left edge →
-/// "Dream" rushes in from the right and hits it → the bolt, the star and バンドリ land → the logo shatters and the
+/// white page (the first frame is also the native splash image, assets/boot/splash.png) → B a S S fly in from the
+/// left one by one → "Dream" rushes in from the right and hits the line down B's left edge, which appears on the
+/// impact → the bolt, the star and バンドリ land → the logo shatters and the
 /// pieces stream into the main window's logo while the page fades into the UI. A click or a key skips to the end.
 /// Motion is computed from the clock each frame (springs, arcs, squash) so pauses and dropped frames never desync.
 /// </summary>
@@ -25,19 +25,17 @@ public sealed class BootOverlay : FrameworkElement
     private const double W = 1440, H = 810, LW = 259, LH = 135, S = 3.4;
     private static readonly double X0 = 720 - LW * S / 2, Y0 = 405 - LH * S / 2;
     // timeline, seconds
-    private const double TBass0 = .35, BassStep = .1, BassDur = .46, TWall = 1.12, TDream0 = 1.3, TImpact = 1.54,
+    private const double TBass0 = .35, BassStep = .1, BassDur = .46, TDream0 = 1.3, TImpact = 1.54,
         TBolt = 1.64, TStar = 1.76, TKana = 1.86, TShatter = 2.55, TUi0 = 3.05, End = 3.75;
-    private const double PlateOpacity = .25, PlateScale = 1.2, PlateX = 720, PlateY = 400;
 
     private sealed record Glyph(string Name, Geometry Geo, double Cx, double Cy, Rect Box);
     private record struct St(double X, double Y, double S, double R, double Sx, double Sy, double O, bool Moving);
 
     private readonly Glyph[] _all, _bassRow, _dreamRow, _kana;
     private readonly Glyph _bolt, _star;
-    private readonly DrawingGroup _plate;
     private readonly Brush _brand;
     private readonly LinearGradientBrush _halo;
-    private readonly double _wallX, _wallTop, _wallBot, _gap;
+    private readonly double _wallX, _wallTop, _wallBot, _wallHit, _gap;
 
     private readonly Stopwatch _clock = new();
     private FrameworkElement? _logo;
@@ -77,7 +75,7 @@ public sealed class BootOverlay : FrameworkElement
         _wallTop = Y0 + b.Top * S;                                  // level with the top of B
         _wallBot = Y0 + d.Bottom * S + 26;
         _gap = (d.Left - b.Left) * S;                               // D sits this far right of the line at rest
-        _plate = LoadPlate();
+        _wallHit = Y0 + (d.Top + d.Height / 2) * S;                 // where D strikes it
         var halo = Palette.Brand;
         _halo = new LinearGradientBrush(Color.FromArgb(0, halo.R, halo.G, halo.B), Color.FromArgb(82, halo.R, halo.G, halo.B), 0);
         _halo.Freeze();
@@ -139,13 +137,6 @@ public sealed class BootOverlay : FrameworkElement
         dc.DrawRectangle(Brushes.White, null, new Rect(0, 0, W, H));
         dc.Pop();
 
-        // backdrop plate: there from the first frame, leaves with the page
-        dc.PushOpacity(PlateOpacity * (1 - uo));
-        dc.PushTransform(PlateTransform);
-        dc.DrawDrawing(_plate);
-        dc.Pop();
-        dc.Pop();
-
         // camera shake on the impact and the bolt
         double ti = t - TImpact;
         double sh = (ti > 0 ? 4 * Ring(ti, 26, .06) : 0) + (t > TBolt + .1 ? 3 * Ring(t - TBolt - .1, 30, .05) : 0);
@@ -176,19 +167,6 @@ public sealed class BootOverlay : FrameworkElement
             dc.DrawRectangle(new SolidColorBrush(Color.FromArgb((byte)(255 * .7 * Math.Exp(-bf / .06)), 255, 255, 255)), null, new Rect(0, 0, W, H));
     }
 
-    private static readonly Transform PlateTransform = MakePlateTransform();
-
-    private static Transform MakePlateTransform()
-    {
-        var m = Matrix.Identity;
-        m.Translate(-525, -525);
-        m.Scale(PlateScale, PlateScale);
-        m.Translate(PlateX, PlateY);
-        var t = new MatrixTransform(m);
-        t.Freeze();
-        return t;
-    }
-
     private void DrawGlyph(DrawingContext dc, Glyph g, St st, double opacity)
     {
         var m = Matrix.Identity;
@@ -205,15 +183,16 @@ public sealed class BootOverlay : FrameworkElement
 
     private void DrawWall(DrawingContext dc, double t, double ti)
     {
-        if (t < TWall) return;
-        double grow = EOutCubic(Clamp((t - TWall) / .18));
+        // the line appears on the impact, shooting up and down from where D strikes
+        if (t < TImpact) return;
+        double grow = EOutCubic(Clamp((t - TImpact) / .09));
         double fade = 1 - Clamp((t - TImpact - .35) / .3);
         if (fade <= 0) return;
         double vib = ti > 0 ? 3 * Ring(ti, 22, .07) : 0, flare = ti > 0 ? Pulse(ti, .05) : 0;
-        double h = (_wallBot - _wallTop) * grow, gw = 56 + 110 * flare;
+        double top = _wallHit - (_wallHit - _wallTop) * grow, h = (_wallBot - _wallTop) * grow, gw = 56 + 110 * flare;
         dc.PushOpacity(fade * (.85 + .15 * flare));
-        dc.DrawRectangle(_halo, null, new Rect(_wallX - gw + vib, _wallTop, gw, h));
-        dc.DrawRectangle(_brand, null, new Rect(_wallX - 1.6 + vib, _wallTop, 3.2, h));
+        dc.DrawRectangle(_halo, null, new Rect(_wallX - gw + vib, top, gw, h));
+        dc.DrawRectangle(_brand, null, new Rect(_wallX - 1.6 + vib, top, 3.2, h));
         dc.Pop();
     }
 
@@ -397,40 +376,6 @@ public sealed class BootOverlay : FrameworkElement
             list.Add(new Glyph(e.GetProperty("n").GetString()!, geo, box.X + box.Width / 2, box.Y + box.Height / 2, box));
         }
         return list.ToArray();
-    }
-
-    private static DrawingGroup LoadPlate()
-    {
-        using var s = Application.GetResourceStream(new Uri("/assets/boot/m265.json", UriKind.Relative))!.Stream;
-        using var doc = JsonDocument.Parse(s);
-        var r = doc.RootElement;
-        var gr = r.GetProperty("grad");
-        var grad = new LinearGradientBrush { MappingMode = BrushMappingMode.Absolute,
-            StartPoint = new Point(gr.GetProperty("x1").GetDouble(), gr.GetProperty("y1").GetDouble()),
-            EndPoint = new Point(gr.GetProperty("x2").GetDouble(), gr.GetProperty("y2").GetDouble()) };
-        foreach (var st in gr.GetProperty("stops").EnumerateArray())
-            grad.GradientStops.Add(new GradientStop(Hex(st[1].GetString()!), st[0].GetDouble()));
-        grad.Freeze();
-        var group = new DrawingGroup();
-        Geometry? silhouette = null;
-        foreach (var l in r.GetProperty("layers").EnumerateArray())
-        {
-            var geo = Geometry.Parse(l.GetProperty("d").GetString()!);
-            geo.Freeze();
-            string fill = l.GetProperty("fill").GetString()!;
-            Brush brush = fill.StartsWith("url", StringComparison.Ordinal) ? grad : Frozen(new SolidColorBrush(Hex(fill)));
-            silhouette ??= geo;
-            group.Children.Add(new GeometryDrawing(brush, null, geo));
-        }
-        var ol = r.GetProperty("outline");
-        if (silhouette != null)
-        {
-            var pen = new Pen(Frozen(new SolidColorBrush(Hex(ol.GetProperty("color").GetString()!))), ol.GetProperty("width").GetDouble()) { LineJoin = PenLineJoin.Round };
-            pen.Freeze();
-            group.Children.Add(new GeometryDrawing(null, pen, silhouette));
-        }
-        group.Freeze();
-        return group;
     }
 
     /// <summary>SVG transform list ("matrix(a b c d e f) translate(x,y) …") as one matrix; the rightmost applies first.</summary>

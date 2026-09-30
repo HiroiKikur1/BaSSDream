@@ -807,10 +807,10 @@ cd backend && python -c "from tab_scanner import scan_all_tabs; scan_all_tabs(fo
 - 开机动画每次启动都播放；Songsterr 保留维护；屏幕 1920×1080 100%。
 
 ### 25.2 开机动画（`Views/BootOverlay.cs`，3.75 秒，点击或按键跳过）
-- 首帧 `src-native/assets/boot/splash.png` 由 WPF `SplashScreen` 在 .NET 启动前显示：白底 + 用户的 Atelier Z M#265（按用户发的照片原色描成矢量，`assets/boot/atelierz_m265.svg`，描图脚本 `trace_m265.py`）放大 1.2 倍、25% 透明，作为字符 logo 的背景板，一直留到主界面出现。
-- B a S S 依次从左侧抛物线飞入 → 边界线沿 B 左边界画出（上端与 B 顶齐平，左侧向左渐浅的光晕）→ Dream 从右侧冲入撞线（1.54 s）→ 闪电、星、バンドリ → 碎裂成约 5 千片（`WriteableBitmap`）流向主界面 logo 的真实坐标，主界面渐显。
+- 首帧 `src-native/assets/boot/splash.png`（纯白）由 WPF `SplashScreen` 在 .NET 启动前显示，与动画第一帧一致。用户试过把 M#265 描成背景板，觉得怪，已去掉（描图文件在 git 历史里）。
+- B a S S 依次从左侧抛物线飞入 → Dream 从右侧冲入撞线（1.54 s），边界线在撞击瞬间从撞击点沿 B 左边界向上下伸出（上端与 B 顶齐平，左侧向左渐浅的光晕）→ 闪电、星、バンドリ → 碎裂成约 5 千片（`WriteableBitmap`）流向主界面 logo 的真实坐标，主界面渐显。
 - logo 路径数据 `assets/boot/logo_glyphs.json` 已规整为 WPF 可解析的绝对命令（`assets/boot/normalize_paths.py`，与原图逐像素一致）。资源出错时直接跳过动画。
-- **未在真机验证**。检查单帧：`BassStation.exe --render-boot out.png 1.56`。需确认：SplashScreen 与主窗口位置是否完全重合、动画帧率、碎屑落点是否正好是左上角 logo。可调常数都在 `BootOverlay` 顶部（时间轴、背景板透明度/缩放）。
+- **未在真机验证**。检查单帧：`BassStation.exe --render-boot out.png 1.56`。需确认：SplashScreen 与主窗口位置是否完全重合、动画帧率、碎屑落点是否正好是左上角 logo。可调常数都在 `BootOverlay` 顶部（时间轴）。
 
 ### 25.3 架构（均已提交）
 - **路径**：`backend/paths.py` 与 `src-native/Services/AppPaths.cs`。根目录由代码位置推算（WPF 从 exe 向上找 `backend/tab_cli.py`），项目根的 `bassdream.json`（可选，模板 `bassdream.example.json`）覆盖单项：`root / python / python_ml / originals / ffmpeg / guitar_pro`。圆体字体改为运行时从 `assets/fonts` 加载。
