@@ -39,7 +39,7 @@ public class ReportView : FrameworkElement
     public static readonly Color PerfectC = C("#FF3377"), GreatC = C("#FF4DB8"), GoodC = C("#58C322"),
         BadC = C("#2F8CFF"), MissC = C("#8C8998"), WrongC = C("#8E44EC"), FastC = C("#2F7BFF"), SlowC = C("#FF7A1A"),
         InkC = C("#24232B"), SubC = C("#6E6A78"), MutedC = C("#A9A5B2"), LineC = C("#C4C0CC"), RuleC = C("#2B2A33"),
-        AccentC = C("#FF2E7E"), PaperC = C("#FFFFFF");
+        AccentC = Palette.Brand, PaperC = C("#FFFFFF");
 
     private readonly SongModel _song;
     private readonly PerformanceScoreDetailModel _score;
@@ -745,11 +745,7 @@ public class ReportView : FrameworkElement
         "PERFECT" => PerfectC, "GREAT" => GreatC, "GOOD" => GoodC, _ => BadC
     };
 
-    public static Color TierColor(string tier) => tier.ToUpperInvariant() switch
-    {
-        "EASY" => C("#3E8BFF"), "NORMAL" => C("#34C274"), "HARD" => C("#FFAE1A"),
-        "EXPERT" => C("#FF4058"), "SPECIAL" => C("#E04BD6"), _ => C("#FF3377")
-    };
+    public static Color TierColor(string tier) => Palette.Tier(tier);
 
     /// <summary>Plain-text version for the clipboard.</summary>
     public string ToPlainText()

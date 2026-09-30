@@ -99,9 +99,9 @@ public partial class MainWindow : Window
 
     private static Color BandColor(string id) => id switch
     {
-        "ALL" => Color.FromRgb(255, 59, 114),
+        "ALL" => Palette.Brand,
         "FAV" => Color.FromRgb(255, 120, 160),
-        "BANGDREAM" => Color.FromRgb(255, 59, 114),
+        "BANGDREAM" => Palette.Brand,
         "SEKAI" => Color.FromRgb(51, 170, 255),
         "5STRINGS" => Color.FromRgb(255, 174, 26),
         "CLASSICAL" => Color.FromRgb(160, 120, 60),
@@ -301,7 +301,7 @@ public partial class MainWindow : Window
         // Reset Tablet button state
         txtSendTabletLabel.Text = "复制PDF谱面";
         pathCopyIcon.Data = Geometry.Parse("M 4,2 L 12,2 C 12.5,2 13,2.5 13,3 L 13,10 M 2,5 L 9,5 C 9.5,5 10,5.5 10,6 L 10,13 C 10,13.5 9.5,14 9,14 L 2,14 C 1.5,14 1,13.5 1,13 L 1,6 C 1,5.5 1.5,5 2,5 Z");
-        pathCopyIcon.Stroke = new SolidColorBrush(Color.FromRgb(255, 59, 114));
+        pathCopyIcon.Stroke = Palette.BrandBrush;
     }
 
 

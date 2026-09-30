@@ -362,7 +362,7 @@ public class ScoreCanvas : FrameworkElement
         Star(dc, titleRight + 8, PageTop + 104, 3, new SolidColorBrush(_ed.Title[2]));
 
         // tier ribbon + level (left), credits (right) as a score's composer block
-        var tierCol = C(Tier.ToUpperInvariant() switch { "EASY" => "#3E8BFF", "NORMAL" => "#34C274", "HARD" => "#FF9F1A", "EXPERT" => "#F02B4B", "SPECIAL" => "#E04BD6", _ => "#FF3377" });
+        var tierCol = Palette.Tier(Tier);
         var tag = Text($"{Tier.ToUpperInvariant()}  Lv.{Level}", DinBold, 13, Colors.White);
         double tw = tag.Width + 30, ty = PageTop + 66;
         var rg = new StreamGeometry();

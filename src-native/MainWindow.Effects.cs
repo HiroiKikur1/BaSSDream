@@ -53,7 +53,7 @@ public partial class MainWindow
             "ras" => ("#1FB8A8", "Impact", "RAISE A SUILEN"),
             "mygo" => ("#3388BB", "Ink Free", "MyGO!!!!!"),
             "avemujica" => ("#881144", "Gabriola", "Ave Mujica"),
-            _ => ("#FF3B72", "Segoe UI Black", "BaSSDream")
+            _ => (Palette.Hex(Palette.Brand), "Segoe UI Black", "BaSSDream")
         };
         return (new SolidColorBrush((Color)ColorConverter.ConvertFromString(hex)), new FontFamily(font), text);
     }

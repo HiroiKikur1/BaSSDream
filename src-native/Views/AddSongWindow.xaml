@@ -17,12 +17,12 @@
     <Grid Margin="24">
         <Grid.Resources>
         <LinearGradientBrush x:Key="PinkVividGradient" StartPoint="0,0" EndPoint="1,0">
-            <GradientStop Color="#FF3377" Offset="0.0" />
-            <GradientStop Color="#F21D68" Offset="1.0" />
+            <GradientStop Color="{StaticResource BrandColor}" Offset="0.0" />
+            <GradientStop Color="{StaticResource BrandColor}" Offset="1.0" />
         </LinearGradientBrush>
 
         <LinearGradientBrush x:Key="PurpleGradient" StartPoint="0,0" EndPoint="1,0">
-            <GradientStop Color="#E04BD6" Offset="0.0" />
+            <GradientStop Color="{StaticResource SpecialColor}" Offset="0.0" />
             <GradientStop Color="#C43ABB" Offset="1.0" />
         </LinearGradientBrush>
     </Grid.Resources>
@@ -36,10 +36,10 @@
         <!-- 1. Header -->
         <Grid Grid.Row="0" Margin="0,0,0,16">
             <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
-                    <Path Data="{StaticResource ExclaimBoltGeometry}" Fill="#FFAE1A" Stretch="Uniform" Width="14" Height="27"  Margin="0,0,10,4" />
+                    <Path Data="{StaticResource ExclaimBoltGeometry}" Fill="{StaticResource HardBrush}" Stretch="Uniform" Width="14" Height="27"  Margin="0,0,10,4" />
                     <StackPanel>
-                        <TextBlock Text="添加曲目" FontSize="22" FontWeight="Bold" Foreground="#4A4750" />
-                        <Border Height="3" Background="#FF3B72" Width="320" HorizontalAlignment="Left" Margin="0,3,0,0" />
+                        <TextBlock Text="添加曲目" FontSize="22" FontWeight="Bold" Foreground="{StaticResource TextBrush}" />
+                        <Border Height="3" Background="{StaticResource BrandBrush}" Width="320" HorizontalAlignment="Left" Margin="0,3,0,0" />
                     </StackPanel>
                 </StackPanel>
         </Grid>
@@ -52,10 +52,10 @@
                 <ColumnDefinition Width="100" />
             </Grid.ColumnDefinitions>
 
-            <Border Background="#FFFFFF" BorderBrush="#F0CFDD" BorderThickness="1.5" CornerRadius="6" Height="44" Padding="14,0">
+            <Border Background="{StaticResource WhiteBrush}" BorderBrush="#F0CFDD" BorderThickness="1.5" CornerRadius="6" Height="44" Padding="14,0">
                 <Grid VerticalAlignment="Center">
-                    <TextBox x:Name="txtQuery" BorderThickness="0" Background="Transparent" FontSize="14" KeyDown="TxtQuery_KeyDown" TextChanged="TxtQuery_TextChanged" VerticalAlignment="Center" Foreground="#3D3A4B" />
-                    <TextBlock x:Name="txtPlaceholder" Text="搜索" Foreground="#B3ACBC" FontSize="14" IsHitTestVisible="False" VerticalAlignment="Center" />
+                    <TextBox x:Name="txtQuery" BorderThickness="0" Background="Transparent" FontSize="14" KeyDown="TxtQuery_KeyDown" TextChanged="TxtQuery_TextChanged" VerticalAlignment="Center" Foreground="{StaticResource InkBrush}" />
+                    <TextBlock x:Name="txtPlaceholder" Text="搜索" Foreground="{StaticResource MutedBrush}" FontSize="14" IsHitTestVisible="False" VerticalAlignment="Center" />
                 </Grid>
             </Border>
 
@@ -65,7 +65,7 @@
         </Grid>
 
         <!-- 3. Results Container -->
-        <Border Grid.Row="2" Background="#FFFFFF" BorderBrush="#F1DCE5" BorderThickness="1" CornerRadius="6" Padding="16">
+        <Border Grid.Row="2" Background="{StaticResource WhiteBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="6" Padding="16">
             <Grid>
                 <!-- Empty State / File Drop Area -->
                 <StackPanel x:Name="pnlEmptyState" VerticalAlignment="Center" HorizontalAlignment="Center">
@@ -76,7 +76,7 @@
                             <ControlTemplate TargetType="Button">
                                 <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6" Padding="{TemplateBinding Padding}">
                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                        <Path Data="M 2,3 L 6,3 L 8,5 L 14,5 C 14.5,5 15,5.5 15,6 L 15,12 C 15,12.5 14.5,13 14,13 L 2,13 C 1.5,13 1,12.5 1,12 L 1,4 C 1,3.5 1.5,3 2,3 Z" Stroke="#7C7688" StrokeThickness="1.5" Fill="Transparent" Width="14" Height="12" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                        <Path Data="M 2,3 L 6,3 L 8,5 L 14,5 C 14.5,5 15,5.5 15,6 L 15,12 C 15,12.5 14.5,13 14,13 L 2,13 C 1.5,13 1,12.5 1,12 L 1,4 C 1,3.5 1.5,3 2,3 Z" Stroke="{StaticResource SubBrush}" StrokeThickness="1.5" Fill="Transparent" Width="14" Height="12" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,6,0" />
                                         <TextBlock Text="选择本地文件" FontSize="12.5" FontWeight="Bold" Foreground="#5A5566" VerticalAlignment="Center" />
                                     </StackPanel>
                                 </Border>
@@ -87,18 +87,18 @@
 
                 <!-- Loading State -->
                 <StackPanel x:Name="pnlLoading" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="Collapsed">
-                    <TextBlock Text="检索中..." FontSize="14" FontWeight="Bold" Foreground="#FF3377" HorizontalAlignment="Center" />
+                    <TextBlock Text="检索中..." FontSize="14" FontWeight="Bold" Foreground="{StaticResource BrandBrush}" HorizontalAlignment="Center" />
                 </StackPanel>
 
                 <!-- Search Results Presentation Deck -->
                 <ScrollViewer x:Name="scrollResults" VerticalScrollBarVisibility="Auto" Visibility="Collapsed">
                     <StackPanel>
                         <!-- Section A: Online Tabs List -->
-                        <TextBlock x:Name="lblOnlineTabs" Text="在线乐谱" FontSize="12" FontWeight="Bold" Foreground="#7C7688" Margin="0,0,0,8" />
+                        <TextBlock x:Name="lblOnlineTabs" Text="在线乐谱" FontSize="12" FontWeight="Bold" Foreground="{StaticResource SubBrush}" Margin="0,0,0,8" />
                         <ItemsControl x:Name="icTabs">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Margin="0,0,0,8" Background="#FFF7FA" BorderBrush="#F1DCE5" BorderThickness="1" CornerRadius="6" Padding="14,10">
+                                    <Border Margin="0,0,0,8" Background="{StaticResource StageBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="6" Padding="14,10">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*" />
@@ -107,19 +107,19 @@
 
                                             <StackPanel Grid.Column="0" VerticalAlignment="Center">
                                                 <StackPanel Orientation="Horizontal">
-                                                    <Border Background="#34C274" CornerRadius="3" Padding="5,1.5" Margin="0,0,8,0" VerticalAlignment="Center">
-                                                        <TextBlock Text="GP谱" FontSize="9.5" FontWeight="Bold" Foreground="#FFFFFF" />
+                                                    <Border Background="{StaticResource NormalBrush}" CornerRadius="3" Padding="5,1.5" Margin="0,0,8,0" VerticalAlignment="Center">
+                                                        <TextBlock Text="GP谱" FontSize="9.5" FontWeight="Bold" Foreground="{StaticResource WhiteBrush}" />
                                                     </Border>
-                                                    <TextBlock Text="{Binding Title}" FontSize="14.5" FontWeight="Bold" Foreground="#3D3A4B" VerticalAlignment="Center" />
+                                                    <TextBlock Text="{Binding Title}" FontSize="14.5" FontWeight="Bold" Foreground="{StaticResource InkBrush}" VerticalAlignment="Center" />
                                                 </StackPanel>
-                                                <TextBlock Text="{Binding SubInfo}" FontSize="12" Foreground="#7C7688" Margin="0,3,0,0" />
+                                                <TextBlock Text="{Binding SubInfo}" FontSize="12" Foreground="{StaticResource SubBrush}" Margin="0,3,0,0" />
                                             </StackPanel>
 
                                             <Button Grid.Column="1" Click="BtnImportItem_Click" Tag="{Binding}" Cursor="Hand" VerticalAlignment="Center">
                                                 <Button.Template>
                                                     <ControlTemplate TargetType="Button">
                                                         <Border Background="{StaticResource PinkVividGradient}" CornerRadius="6" Padding="14,7">
-                                                            <TextBlock Text="导入" FontSize="12" FontWeight="Bold" Foreground="#FFFFFF" />
+                                                            <TextBlock Text="导入" FontSize="12" FontWeight="Bold" Foreground="{StaticResource WhiteBrush}" />
                                                         </Border>
                                                     </ControlTemplate>
                                                 </Button.Template>
@@ -131,7 +131,7 @@
                         </ItemsControl>
 
                         <!-- Section B: Audio Match / Transcribe -->
-                        <TextBlock x:Name="lblAudioSources" Text="官方音源" FontSize="12" FontWeight="Bold" Foreground="#7C7688" Margin="0,10,0,8" />
+                        <TextBlock x:Name="lblAudioSources" Text="官方音源" FontSize="12" FontWeight="Bold" Foreground="{StaticResource SubBrush}" Margin="0,10,0,8" />
                         <ItemsControl x:Name="icAudio">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
@@ -144,19 +144,19 @@
 
                                             <StackPanel Grid.Column="0" VerticalAlignment="Center">
                                                 <StackPanel Orientation="Horizontal">
-                                                    <Border Background="#E04BD6" CornerRadius="3" Padding="5,1.5" Margin="0,0,8,0" VerticalAlignment="Center">
-                                                        <TextBlock Text="{Binding Source}" FontSize="9.5" FontWeight="Bold" Foreground="#FFFFFF" />
+                                                    <Border Background="{StaticResource SpecialBrush}" CornerRadius="3" Padding="5,1.5" Margin="0,0,8,0" VerticalAlignment="Center">
+                                                        <TextBlock Text="{Binding Source}" FontSize="9.5" FontWeight="Bold" Foreground="{StaticResource WhiteBrush}" />
                                                     </Border>
-                                                    <TextBlock Text="{Binding Title}" FontSize="14.5" FontWeight="Bold" Foreground="#3D3A4B" VerticalAlignment="Center" />
+                                                    <TextBlock Text="{Binding Title}" FontSize="14.5" FontWeight="Bold" Foreground="{StaticResource InkBrush}" VerticalAlignment="Center" />
                                                 </StackPanel>
-                                                <TextBlock Text="{Binding SubInfo}" FontSize="12" Foreground="#7C7688" Margin="0,3,0,0" />
+                                                <TextBlock Text="{Binding SubInfo}" FontSize="12" Foreground="{StaticResource SubBrush}" Margin="0,3,0,0" />
                                             </StackPanel>
 
                                             <Button Grid.Column="1" Click="BtnTranscribeItem_Click" Tag="{Binding}" Cursor="Hand" VerticalAlignment="Center">
                                                 <Button.Template>
                                                     <ControlTemplate TargetType="Button">
                                                         <Border Background="{StaticResource PurpleGradient}" CornerRadius="6" Padding="14,7">
-                                                            <TextBlock Text="扒谱" FontSize="12" FontWeight="Bold" Foreground="#FFFFFF" />
+                                                            <TextBlock Text="扒谱" FontSize="12" FontWeight="Bold" Foreground="{StaticResource WhiteBrush}" />
                                                         </Border>
                                                     </ControlTemplate>
                                                 </Button.Template>
@@ -168,7 +168,7 @@
                         </ItemsControl>
 
                         <!-- Section C: Bilibili Reference -->
-                        <TextBlock x:Name="lblBiliReferences" Text="演奏参考" FontSize="12" FontWeight="Bold" Foreground="#7C7688" Margin="0,10,0,8" />
+                        <TextBlock x:Name="lblBiliReferences" Text="演奏参考" FontSize="12" FontWeight="Bold" Foreground="{StaticResource SubBrush}" Margin="0,10,0,8" />
                         <ItemsControl x:Name="icBili">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
@@ -182,18 +182,18 @@
                                             <StackPanel Grid.Column="0" VerticalAlignment="Center">
                                                 <StackPanel Orientation="Horizontal">
                                                     <Border Background="#0284C7" CornerRadius="3" Padding="5,1.5" Margin="0,0,8,0" VerticalAlignment="Center">
-                                                        <TextBlock Text="B站" FontSize="9.5" FontWeight="Bold" Foreground="#FFFFFF" />
+                                                        <TextBlock Text="B站" FontSize="9.5" FontWeight="Bold" Foreground="{StaticResource WhiteBrush}" />
                                                     </Border>
-                                                    <TextBlock Text="{Binding Title}" FontSize="13.5" FontWeight="SemiBold" Foreground="#3D3A4B" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" MaxWidth="540" />
+                                                    <TextBlock Text="{Binding Title}" FontSize="13.5" FontWeight="SemiBold" Foreground="{StaticResource InkBrush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" MaxWidth="540" />
                                                 </StackPanel>
-                                                <TextBlock Text="{Binding SubInfo}" FontSize="12" Foreground="#7C7688" Margin="0,3,0,0" />
+                                                <TextBlock Text="{Binding SubInfo}" FontSize="12" Foreground="{StaticResource SubBrush}" Margin="0,3,0,0" />
                                             </StackPanel>
 
                                             <Button Grid.Column="1" Click="BtnOpenReference_Click" Tag="{Binding}" Cursor="Hand" VerticalAlignment="Center">
                                                 <Button.Template>
                                                     <ControlTemplate TargetType="Button">
                                                         <Border Background="#0284C7" CornerRadius="6" Padding="14,7">
-                                                            <TextBlock Text="参考" FontSize="12" FontWeight="Bold" Foreground="#FFFFFF" />
+                                                            <TextBlock Text="参考" FontSize="12" FontWeight="Bold" Foreground="{StaticResource WhiteBrush}" />
                                                         </Border>
                                                     </ControlTemplate>
                                                 </Button.Template>
@@ -211,7 +211,7 @@
         <!-- 4. Bottom Status Strip -->
         <Border Grid.Row="3" Margin="0,12,0,0">
             <Grid>
-                <TextBlock x:Name="txtStatus" Text="" FontSize="12" Foreground="#7C7688" VerticalAlignment="Center" />
+                <TextBlock x:Name="txtStatus" Text="" FontSize="12" Foreground="{StaticResource SubBrush}" VerticalAlignment="Center" />
                 <Button x:Name="btnClose" Click="BtnClose_Click" Content="关闭" HorizontalAlignment="Right" Padding="16,5" FontWeight="Bold" FontSize="12" Style="{StaticResource GbpButtonWhite}">
                     
                 </Button>

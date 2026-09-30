@@ -22,7 +22,7 @@
             <Setter Property="FontWeight" Value="Bold" />
             <Setter Property="FontFamily" Value="{StaticResource NumFont}" />
             <Setter Property="FontStyle" Value="Italic" />
-            <Setter Property="Foreground" Value="#3D3A4B" />
+            <Setter Property="Foreground" Value="{StaticResource InkBrush}" />
             <Setter Property="HorizontalAlignment" Value="Right" />
             <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
@@ -45,7 +45,7 @@
             <Setter Property="FontWeight" Value="Bold" />
             <Setter Property="FontFamily" Value="{StaticResource NumFont}" />
             <Setter Property="FontStyle" Value="Italic" />
-            <Setter Property="Foreground" Value="#3D3A4B" />
+            <Setter Property="Foreground" Value="{StaticResource InkBrush}" />
             <Setter Property="HorizontalAlignment" Value="Center" />
             <Setter Property="Text" Value="--" />
         </Style>
@@ -62,7 +62,7 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="bd" Property="Background" Value="#FFF1F5" />
+                                <Setter TargetName="bd" Property="Background" Value="{StaticResource WashBrush}" />
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter Property="Cursor" Value="Arrow" />
@@ -85,16 +85,16 @@
         <!-- 1. Header Bar -->
         <Grid Grid.Row="0" Margin="0,0,0,16">
             <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
-                <Path Data="{StaticResource ExclaimBoltGeometry}" Fill="#FFAE1A" Stretch="Uniform" Width="14" Height="27" Margin="0,0,10,4" />
+                <Path Data="{StaticResource ExclaimBoltGeometry}" Fill="{StaticResource HardBrush}" Stretch="Uniform" Width="14" Height="27" Margin="0,0,10,4" />
                 <StackPanel>
-                    <TextBlock Text="演奏评测" FontSize="22" FontWeight="Bold" Foreground="#4A4750" />
-                    <Border Height="3" Background="#FF3B72" Width="320" HorizontalAlignment="Left" Margin="0,3,0,0" />
+                    <TextBlock Text="演奏评测" FontSize="22" FontWeight="Bold" Foreground="{StaticResource TextBrush}" />
+                    <Border Height="3" Background="{StaticResource BrandBrush}" Width="320" HorizontalAlignment="Left" Margin="0,3,0,0" />
                 </StackPanel>
             </StackPanel>
         </Grid>
 
         <!-- 2. Target Song Banner -->
-        <Border Grid.Row="1" Background="#FFFFFF" BorderBrush="#F1DCE5" BorderThickness="1" CornerRadius="6" Padding="14,10" Margin="0,0,0,16">
+        <Border Grid.Row="1" Background="{StaticResource WhiteBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="6" Padding="14,10" Margin="0,0,0,16">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="48" />
@@ -102,13 +102,13 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <Border Grid.Column="0" Width="44" Height="44" CornerRadius="6" Background="#F1DCE5" ClipToBounds="True">
+                <Border Grid.Column="0" Width="44" Height="44" CornerRadius="6" Background="{StaticResource LineBrush}" ClipToBounds="True">
                     <Image x:Name="imgSongCover" Stretch="UniformToFill" />
                 </Border>
 
                 <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="12,0">
-                    <TextBlock x:Name="txtSongTitle" FontSize="14" FontWeight="Bold" Foreground="#3D3A4B" />
-                    <TextBlock FontSize="11.5" Foreground="#7C7688" Margin="0,2,0,0">
+                    <TextBlock x:Name="txtSongTitle" FontSize="14" FontWeight="Bold" Foreground="{StaticResource InkBrush}" />
+                    <TextBlock FontSize="11.5" Foreground="{StaticResource SubBrush}" Margin="0,2,0,0">
                         <Run x:Name="txtSongArtist" />
                         <Run Text=" · " />
                         <Run x:Name="txtSongBpm" />
@@ -117,9 +117,9 @@
 
                 <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right">
                     <Border x:Name="bdTier" Background="#FAF5FF" CornerRadius="6" Padding="8,2" HorizontalAlignment="Right">
-                        <TextBlock x:Name="txtTier" FontSize="11" FontWeight="Bold" FontFamily="{StaticResource NumFont}" FontStyle="Italic" Foreground="#E04BD6" />
+                        <TextBlock x:Name="txtTier" FontSize="11" FontWeight="Bold" FontFamily="{StaticResource NumFont}" FontStyle="Italic" Foreground="{StaticResource SpecialBrush}" />
                     </Border>
-                    <TextBlock x:Name="txtLevel" FontSize="14" FontWeight="Bold" FontFamily="{StaticResource NumFont}" FontStyle="Italic" Foreground="#E04BD6" HorizontalAlignment="Right" Margin="0,2,0,0" />
+                    <TextBlock x:Name="txtLevel" FontSize="14" FontWeight="Bold" FontFamily="{StaticResource NumFont}" FontStyle="Italic" Foreground="{StaticResource SpecialBrush}" HorizontalAlignment="Right" Margin="0,2,0,0" />
                 </StackPanel>
             </Grid>
         </Border>
@@ -133,7 +133,7 @@
             </Grid.ColumnDefinitions>
 
             <!-- Left: Rank & Score -->
-            <Border Grid.Column="0" Background="#FFFFFF" BorderBrush="#F1DCE5" BorderThickness="1" CornerRadius="6" Padding="20">
+            <Border Grid.Column="0" Background="{StaticResource WhiteBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="6" Padding="20">
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                     <Border x:Name="bdRankCircle" Width="100" Height="100" CornerRadius="6" BorderThickness="3" HorizontalAlignment="Center">
                         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
@@ -143,18 +143,18 @@
                     </Border>
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,16,0,0">
-                        <TextBlock x:Name="txtOverallScore" Text="--" FontSize="36" FontWeight="Bold" FontFamily="{StaticResource NumFont}" FontStyle="Italic" Foreground="#3D3A4B" />
+                        <TextBlock x:Name="txtOverallScore" Text="--" FontSize="36" FontWeight="Bold" FontFamily="{StaticResource NumFont}" FontStyle="Italic" Foreground="{StaticResource InkBrush}" />
                     </StackPanel>
 
-                    <Border x:Name="bdCombo" Background="#FFF1F5" CornerRadius="6" Padding="12,4" Margin="0,10,0,0" HorizontalAlignment="Center" Visibility="Collapsed">
-                        <TextBlock x:Name="txtComboBadge" FontSize="12" FontWeight="Bold" FontFamily="{StaticResource NumFont}" FontStyle="Italic" Foreground="#FF3377" />
+                    <Border x:Name="bdCombo" Background="{StaticResource WashBrush}" CornerRadius="6" Padding="12,4" Margin="0,10,0,0" HorizontalAlignment="Center" Visibility="Collapsed">
+                        <TextBlock x:Name="txtComboBadge" FontSize="12" FontWeight="Bold" FontFamily="{StaticResource NumFont}" FontStyle="Italic" Foreground="{StaticResource BrandBrush}" />
                     </Border>
 
-                    <Border x:Name="bdNewBest" Background="#FFAE1A" CornerRadius="3" Padding="6,1" Margin="0,8,0,0" HorizontalAlignment="Center" Visibility="Collapsed">
-                        <TextBlock Text="NEW BEST" FontSize="10" FontWeight="Bold" FontFamily="{StaticResource NumFont}" FontStyle="Italic" Foreground="#FFFFFF" />
+                    <Border x:Name="bdNewBest" Background="{StaticResource HardBrush}" CornerRadius="3" Padding="6,1" Margin="0,8,0,0" HorizontalAlignment="Center" Visibility="Collapsed">
+                        <TextBlock Text="NEW BEST" FontSize="10" FontWeight="Bold" FontFamily="{StaticResource NumFont}" FontStyle="Italic" Foreground="{StaticResource WhiteBrush}" />
                     </Border>
 
-                    <TextBlock x:Name="txtEvaluatedAt" FontSize="11" Foreground="#B3ACBC" HorizontalAlignment="Center" Margin="0,10,0,0" />
+                    <TextBlock x:Name="txtEvaluatedAt" FontSize="11" Foreground="{StaticResource MutedBrush}" HorizontalAlignment="Center" Margin="0,10,0,0" />
                 </StackPanel>
             </Border>
 
@@ -167,7 +167,7 @@
                 </Grid.RowDefinitions>
 
                 <!-- Judgments + measure strip -->
-                <Border Grid.Row="0" Background="#FFFFFF" BorderBrush="#F1DCE5" BorderThickness="1" CornerRadius="6" Padding="16,12" Margin="0,0,0,12">
+                <Border Grid.Row="0" Background="{StaticResource WhiteBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="6" Padding="16,12" Margin="0,0,0,12">
                     <StackPanel>
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -179,28 +179,28 @@
                                 <ColumnDefinition Width="1.3*" />
                             </Grid.ColumnDefinitions>
                             <StackPanel Grid.Column="0">
-                                <TextBlock Text="PERFECT" Foreground="#FF3377" Style="{StaticResource JudgeName}" />
+                                <TextBlock Text="PERFECT" Foreground="{StaticResource BrandBrush}" Style="{StaticResource JudgeName}" />
                                 <TextBlock x:Name="txtPerfect" Style="{StaticResource JudgeCount}" />
                             </StackPanel>
                             <StackPanel Grid.Column="1">
-                                <TextBlock Text="GREAT" Foreground="#FFAE1A" Style="{StaticResource JudgeName}" />
+                                <TextBlock Text="GREAT" Foreground="{StaticResource HardBrush}" Style="{StaticResource JudgeName}" />
                                 <TextBlock x:Name="txtGreat" Style="{StaticResource JudgeCount}" />
                             </StackPanel>
                             <StackPanel Grid.Column="2">
-                                <TextBlock Text="GOOD" Foreground="#34C274" Style="{StaticResource JudgeName}" />
+                                <TextBlock Text="GOOD" Foreground="{StaticResource NormalBrush}" Style="{StaticResource JudgeName}" />
                                 <TextBlock x:Name="txtGood" Style="{StaticResource JudgeCount}" />
                             </StackPanel>
                             <StackPanel Grid.Column="3">
-                                <TextBlock Text="BAD" Foreground="#3E8BFF" Style="{StaticResource JudgeName}" />
+                                <TextBlock Text="BAD" Foreground="{StaticResource EasyBrush}" Style="{StaticResource JudgeName}" />
                                 <TextBlock x:Name="txtBad" Style="{StaticResource JudgeCount}" />
                             </StackPanel>
                             <StackPanel Grid.Column="4">
                                 <TextBlock Text="MISS" Foreground="#9A93A6" Style="{StaticResource JudgeName}" />
                                 <TextBlock x:Name="txtMiss" Style="{StaticResource JudgeCount}" />
                             </StackPanel>
-                            <Border Grid.Column="5" BorderBrush="#F1DCE5" BorderThickness="1,0,0,0" Margin="6,0,0,0">
+                            <Border Grid.Column="5" BorderBrush="{StaticResource LineBrush}" BorderThickness="1,0,0,0" Margin="6,0,0,0">
                                 <StackPanel>
-                                    <TextBlock Text="MAX COMBO" Foreground="#7C7688" Style="{StaticResource JudgeName}" />
+                                    <TextBlock Text="MAX COMBO" Foreground="{StaticResource SubBrush}" Style="{StaticResource JudgeName}" />
                                     <TextBlock x:Name="txtMaxCombo" Style="{StaticResource JudgeCount}" />
                                 </StackPanel>
                             </Border>
@@ -222,7 +222,7 @@
                 </Border>
 
                 <!-- Dimensions -->
-                <Border Grid.Row="1" Background="#FFFFFF" BorderBrush="#F1DCE5" BorderThickness="1" CornerRadius="6" Padding="16,12" Margin="0,0,0,12">
+                <Border Grid.Row="1" Background="{StaticResource WhiteBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="6" Padding="16,12" Margin="0,0,0,12">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="40" />
@@ -236,22 +236,22 @@
                             <RowDefinition Height="22" />
                         </Grid.RowDefinitions>
                         <TextBlock Grid.Row="0" Text="节奏" Style="{StaticResource DimLabel}" />
-                        <ProgressBar Grid.Row="0" Grid.Column="1" x:Name="pbTiming" Foreground="#FF3377" Style="{StaticResource DimBar}" />
+                        <ProgressBar Grid.Row="0" Grid.Column="1" x:Name="pbTiming" Foreground="{StaticResource BrandBrush}" Style="{StaticResource DimBar}" />
                         <TextBlock Grid.Row="0" Grid.Column="2" x:Name="txtTiming" Style="{StaticResource DimValue}" />
                         <TextBlock Grid.Row="1" Text="音准" Style="{StaticResource DimLabel}" />
-                        <ProgressBar Grid.Row="1" Grid.Column="1" x:Name="pbPitch" Foreground="#FFAE1A" Style="{StaticResource DimBar}" />
+                        <ProgressBar Grid.Row="1" Grid.Column="1" x:Name="pbPitch" Foreground="{StaticResource HardBrush}" Style="{StaticResource DimBar}" />
                         <TextBlock Grid.Row="1" Grid.Column="2" x:Name="txtPitch" Style="{StaticResource DimValue}" />
                         <TextBlock Grid.Row="2" Text="完整" Style="{StaticResource DimLabel}" />
-                        <ProgressBar Grid.Row="2" Grid.Column="1" x:Name="pbComplete" Foreground="#34C274" Style="{StaticResource DimBar}" />
+                        <ProgressBar Grid.Row="2" Grid.Column="1" x:Name="pbComplete" Foreground="{StaticResource NormalBrush}" Style="{StaticResource DimBar}" />
                         <TextBlock Grid.Row="2" Grid.Column="2" x:Name="txtComplete" Style="{StaticResource DimValue}" />
                         <TextBlock Grid.Row="3" Text="干净" Style="{StaticResource DimLabel}" />
-                        <ProgressBar Grid.Row="3" Grid.Column="1" x:Name="pbClean" Foreground="#3E8BFF" Style="{StaticResource DimBar}" />
+                        <ProgressBar Grid.Row="3" Grid.Column="1" x:Name="pbClean" Foreground="{StaticResource EasyBrush}" Style="{StaticResource DimBar}" />
                         <TextBlock Grid.Row="3" Grid.Column="2" x:Name="txtClean" Style="{StaticResource DimValue}" />
                     </Grid>
                 </Border>
 
                 <!-- Take history: a row opens that take's result screen -->
-                <Border Grid.Row="2" x:Name="cardHistory" Background="#FFFFFF" BorderBrush="#F1DCE5" BorderThickness="1" CornerRadius="6" Padding="6,6" Visibility="Collapsed">
+                <Border Grid.Row="2" x:Name="cardHistory" Background="{StaticResource WhiteBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="6" Padding="6,6" Visibility="Collapsed">
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <ItemsControl x:Name="icTakes">
                             <ItemsControl.ItemTemplate>
@@ -266,8 +266,8 @@
                                                 <ColumnDefinition Width="34" />
                                             </Grid.ColumnDefinitions>
                                             <TextBlock Text="{Binding When}" FontSize="11" Foreground="#9A93A6" FontFamily="{StaticResource NumFont}" VerticalAlignment="Center" />
-                                            <TextBlock Grid.Column="1" Text="{Binding ChartText}" FontSize="12" FontWeight="Bold" Foreground="#4A4750" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
-                                            <TextBlock Grid.Column="2" Text="{Binding PointsText}" FontSize="13" FontWeight="Bold" FontFamily="{StaticResource NumFont}" FontStyle="Italic" Foreground="#3D3A4B" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" Text="{Binding ChartText}" FontSize="12" FontWeight="Bold" Foreground="{StaticResource TextBrush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Grid.Column="2" Text="{Binding PointsText}" FontSize="13" FontWeight="Bold" FontFamily="{StaticResource NumFont}" FontStyle="Italic" Foreground="{StaticResource InkBrush}" VerticalAlignment="Center" />
                                             <TextBlock Grid.Column="3" Text="{Binding Grade}" FontSize="13" FontWeight="Bold" FontFamily="{StaticResource NumFont}" FontStyle="Italic" Foreground="{Binding GradeColor}" HorizontalAlignment="Right" VerticalAlignment="Center" />
                                         </Grid>
                                     </Button>
@@ -295,7 +295,7 @@
 
             <Button Grid.Column="0" x:Name="btnUploadAudio" Click="BtnUploadAudio_Click" Height="54" Style="{StaticResource GbpButtonWhite}" HorizontalAlignment="Stretch">
                 <StackPanel Orientation="Horizontal">
-                    <Path x:Name="icoUpload" Data="M 2,3 L 6,3 L 8,5 L 14,5 C 14.5,5 15,5.5 15,6 L 15,12 C 15,12.5 14.5,13 14,13 L 2,13 C 1.5,13 1,12.5 1,12 L 1,4 C 1,3.5 1.5,3 2,3 Z" Stroke="#4A4750" StrokeThickness="1.6" Width="15" Height="13" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <Path x:Name="icoUpload" Data="M 2,3 L 6,3 L 8,5 L 14,5 C 14.5,5 15,5.5 15,6 L 15,12 C 15,12.5 14.5,13 14,13 L 2,13 C 1.5,13 1,12.5 1,12 L 1,4 C 1,3.5 1.5,3 2,3 Z" Stroke="{StaticResource TextBrush}" StrokeThickness="1.6" Width="15" Height="13" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,8,0" />
                     <TextBlock x:Name="txtUpload" Text="选择录音" FontSize="14" FontWeight="Bold" VerticalAlignment="Center" />
                 </StackPanel>
             </Button>
@@ -303,7 +303,7 @@
             <!-- input device -->
             <Button Grid.Column="2" x:Name="btnInput" Click="BtnInput_Click" Height="54" Width="120" Style="{StaticResource GbpButtonWhite}" Padding="12,6">
                 <StackPanel Orientation="Horizontal">
-                    <Path Data="M 6,1 C 7.7,1 9,2.3 9,4 L 9,8 C 9,9.7 7.7,11 6,11 C 4.3,11 3,9.7 3,8 L 3,4 C 3,2.3 4.3,1 6,1 Z M 1,7.5 C 1,10.5 3.2,12.6 6,12.6 C 8.8,12.6 11,10.5 11,7.5 M 6,12.6 L 6,15" Stroke="#4A4750" StrokeThickness="1.5" Width="11" Height="15" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <Path Data="M 6,1 C 7.7,1 9,2.3 9,4 L 9,8 C 9,9.7 7.7,11 6,11 C 4.3,11 3,9.7 3,8 L 3,4 C 3,2.3 4.3,1 6,1 Z M 1,7.5 C 1,10.5 3.2,12.6 6,12.6 C 8.8,12.6 11,10.5 11,7.5 M 6,12.6 L 6,15" Stroke="{StaticResource TextBrush}" StrokeThickness="1.5" Width="11" Height="15" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,8,0" />
                     <TextBlock x:Name="txtInput" FontSize="12" FontWeight="Bold" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" MaxWidth="72" />
                 </StackPanel>
                 <Button.ContextMenu>
@@ -315,7 +315,7 @@
             <Button Grid.Column="4" x:Name="btnSection" Click="BtnSection_Click" Height="54" Width="118" Style="{StaticResource GbpButtonWhite}" Padding="10,6">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock x:Name="txtSection" Text="全曲" FontSize="13" FontWeight="Bold" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" MaxWidth="80" />
-                    <Path Data="M 0,0 L 8,0 L 4,5 Z" Fill="#4A4750" Width="8" Height="5" Stretch="Uniform" VerticalAlignment="Center" Margin="7,1,0,0" />
+                    <Path Data="M 0,0 L 8,0 L 4,5 Z" Fill="{StaticResource TextBrush}" Width="8" Height="5" Stretch="Uniform" VerticalAlignment="Center" Margin="7,1,0,0" />
                 </StackPanel>
                 <Button.ContextMenu>
                     <ContextMenu x:Name="menuSection" />
@@ -326,7 +326,7 @@
             <Button Grid.Column="6" x:Name="btnRate" Click="BtnRate_Click" Height="54" Width="84" Style="{StaticResource GbpButtonWhite}" Padding="10,6">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock x:Name="txtRate" Text="100%" FontSize="13" FontWeight="Bold" FontFamily="{StaticResource NumFont}" FontStyle="Italic" VerticalAlignment="Center" />
-                    <Path Data="M 0,0 L 8,0 L 4,5 Z" Fill="#4A4750" Width="8" Height="5" Stretch="Uniform" VerticalAlignment="Center" Margin="7,1,0,0" />
+                    <Path Data="M 0,0 L 8,0 L 4,5 Z" Fill="{StaticResource TextBrush}" Width="8" Height="5" Stretch="Uniform" VerticalAlignment="Center" Margin="7,1,0,0" />
                 </StackPanel>
                 <Button.ContextMenu>
                     <ContextMenu x:Name="menuRate" />
@@ -335,9 +335,9 @@
 
             <Button Grid.Column="8" x:Name="btnRecord" Click="BtnRecord_Click" Height="54" Style="{StaticResource GbpButton}" HorizontalAlignment="Stretch">
                 <StackPanel Orientation="Horizontal">
-                    <Ellipse x:Name="icoRecord" Width="12" Height="12" Fill="#FFFFFF" VerticalAlignment="Center" Margin="0,0,9,0" />
-                    <Rectangle x:Name="icoStop" Width="11" Height="11" RadiusX="1.5" RadiusY="1.5" Fill="#FFFFFF" VerticalAlignment="Center" Margin="0,0,9,0" Visibility="Collapsed" />
-                    <TextBlock x:Name="txtRecord" Text="开始录制" FontSize="14" FontWeight="Bold" Foreground="#FFFFFF" VerticalAlignment="Center" />
+                    <Ellipse x:Name="icoRecord" Width="12" Height="12" Fill="{StaticResource WhiteBrush}" VerticalAlignment="Center" Margin="0,0,9,0" />
+                    <Rectangle x:Name="icoStop" Width="11" Height="11" RadiusX="1.5" RadiusY="1.5" Fill="{StaticResource WhiteBrush}" VerticalAlignment="Center" Margin="0,0,9,0" Visibility="Collapsed" />
+                    <TextBlock x:Name="txtRecord" Text="开始录制" FontSize="14" FontWeight="Bold" Foreground="{StaticResource WhiteBrush}" VerticalAlignment="Center" />
                 </StackPanel>
             </Button>
         </Grid>

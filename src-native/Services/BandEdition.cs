@@ -26,8 +26,8 @@ public sealed class BandEdition
         Title = System.Array.ConvertAll(title, C), Foil = System.Array.ConvertAll(foil, C), Paper = C(paper), Tint = C(tint)
     };
 
-    public static readonly BandEdition Default = Make("bassdream", "BaSSDream", "#FF3377", "#B81E55",
-        new[] { "#FF9CC6", "#FF4F93", "#E0206A" }, new[] { "#FFD1E0", "#FF8FB3", "#C9A7FF", "#FFE9C9" }, "#FBF6F8", "#FFE1EA");
+    public static readonly BandEdition Default = Make("bassdream", "BaSSDream", "#E50050", "#A8003B",
+        new[] { "#FF8AB5", "#FF4D8A", "#E50050" }, new[] { "#FFD1E0", "#FF8FB3", "#C9A7FF", "#FFE9C9" }, "#FBF6F8", "#FFE1EA");
 
     private static readonly BandEdition[] All =
     {

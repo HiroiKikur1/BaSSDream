@@ -12,7 +12,7 @@
         <SolidColorBrush x:Key="ChromeLine" Color="#3A3741" />
         <SolidColorBrush x:Key="ChromeText" Color="#ECE8EF" />
         <SolidColorBrush x:Key="ChromeSub" Color="#9C97A4" />
-        <SolidColorBrush x:Key="Accent" Color="#FF3377" />
+        <SolidColorBrush x:Key="Accent" Color="{StaticResource BrandColor}" />
 
         <!-- flat tool button: icon glyph + label; Tag="on" marks a latched toggle -->
         <Style x:Key="Tool" TargetType="Button">
@@ -126,7 +126,7 @@
                                     <Thumb>
                                         <Thumb.Template>
                                             <ControlTemplate TargetType="Thumb">
-                                                <Ellipse Width="12" Height="12" Fill="#FFFFFF" Stroke="{StaticResource Accent}" StrokeThickness="2" />
+                                                <Ellipse Width="12" Height="12" Fill="{StaticResource WhiteBrush}" Stroke="{StaticResource Accent}" StrokeThickness="2" />
                                             </ControlTemplate>
                                         </Thumb.Template>
                                     </Thumb>
@@ -246,7 +246,7 @@
             <Grid x:Name="page" HorizontalAlignment="Center" Margin="0,18,0,24">
                 <v:ScoreCanvas x:Name="canvas" MouseLeftButtonDown="Canvas_MouseDown" />
                 <Canvas IsHitTestVisible="False">
-                    <Rectangle x:Name="cursor" Width="2.5" RadiusX="1.2" RadiusY="1.2" Fill="#FF3377" Visibility="Collapsed" />
+                    <Rectangle x:Name="cursor" Width="2.5" RadiusX="1.2" RadiusY="1.2" Fill="{StaticResource BrandBrush}" Visibility="Collapsed" />
                 </Canvas>
             </Grid>
         </ScrollViewer>

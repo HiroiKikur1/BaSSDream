@@ -21,10 +21,10 @@
         <!-- 1. Header Bar -->
         <Grid Grid.Row="0" Margin="0,0,0,16">
             <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
-                    <Path Data="{StaticResource ExclaimBoltGeometry}" Fill="#FFAE1A" Stretch="Uniform" Width="14" Height="27"  Margin="0,0,10,4" />
+                    <Path Data="{StaticResource ExclaimBoltGeometry}" Fill="{StaticResource HardBrush}" Stretch="Uniform" Width="14" Height="27"  Margin="0,0,10,4" />
                     <StackPanel>
-                        <TextBlock Text="练琴日历" FontSize="22" FontWeight="Bold" Foreground="#4A4750" />
-                        <Border Height="3" Background="#FF3B72" Width="320" HorizontalAlignment="Left" Margin="0,3,0,0" />
+                        <TextBlock Text="练琴日历" FontSize="22" FontWeight="Bold" Foreground="{StaticResource TextBrush}" />
+                        <Border Height="3" Background="{StaticResource BrandBrush}" Width="320" HorizontalAlignment="Left" Margin="0,3,0,0" />
                     </StackPanel>
                 </StackPanel>
 
@@ -41,47 +41,47 @@
             </Grid.ColumnDefinitions>
 
             <!-- Card 1: Total Hours -->
-            <Border Grid.Column="0" Background="#FFFFFF" BorderBrush="#F1DCE5" BorderThickness="1" CornerRadius="6" Padding="14,12" Margin="0,0,8,0">
+            <Border Grid.Column="0" Background="{StaticResource WhiteBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="6" Padding="14,12" Margin="0,0,8,0">
                 <StackPanel>
-                    <TextBlock Text="累计时长" FontSize="12" FontWeight="Bold" Foreground="#7C7688" />
+                    <TextBlock Text="累计时长" FontSize="12" FontWeight="Bold" Foreground="{StaticResource SubBrush}" />
                     <StackPanel Orientation="Horizontal" Margin="0,4,0,0" VerticalAlignment="Bottom">
-                        <TextBlock x:Name="txtTotalHours" Text="0.0" FontSize="26" FontWeight="Bold" FontFamily="{StaticResource NumFont}" FontStyle="Italic" Foreground="#3D3A4B" />
-                        <TextBlock Text=" 小时" FontSize="12" FontWeight="Bold" Foreground="#B3ACBC" VerticalAlignment="Bottom" Margin="4,0,0,4" />
+                        <TextBlock x:Name="txtTotalHours" Text="0.0" FontSize="26" FontWeight="Bold" FontFamily="{StaticResource NumFont}" FontStyle="Italic" Foreground="{StaticResource InkBrush}" />
+                        <TextBlock Text=" 小时" FontSize="12" FontWeight="Bold" Foreground="{StaticResource MutedBrush}" VerticalAlignment="Bottom" Margin="4,0,0,4" />
                     </StackPanel>
                 </StackPanel>
             </Border>
 
             <!-- Card 2: Streak Days -->
-            <Border Grid.Column="1" Background="#FFFFFF" BorderBrush="#F1DCE5" BorderThickness="1" CornerRadius="6" Padding="14,12" Margin="4,0,4,0">
+            <Border Grid.Column="1" Background="{StaticResource WhiteBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="6" Padding="14,12" Margin="4,0,4,0">
                 <StackPanel>
-                    <TextBlock Text="连续天数" FontSize="12" FontWeight="Bold" Foreground="#7C7688" />
+                    <TextBlock Text="连续天数" FontSize="12" FontWeight="Bold" Foreground="{StaticResource SubBrush}" />
                     <StackPanel Orientation="Horizontal" Margin="0,4,0,0" VerticalAlignment="Bottom">
-                        <TextBlock x:Name="txtStreakDays" Text="0" FontSize="26" FontWeight="Bold" FontFamily="{StaticResource NumFont}" FontStyle="Italic" Foreground="#FF3377" />
-                        <TextBlock Text=" 天" FontSize="12" FontWeight="Bold" Foreground="#B3ACBC" VerticalAlignment="Bottom" Margin="4,0,0,4" />
+                        <TextBlock x:Name="txtStreakDays" Text="0" FontSize="26" FontWeight="Bold" FontFamily="{StaticResource NumFont}" FontStyle="Italic" Foreground="{StaticResource BrandBrush}" />
+                        <TextBlock Text=" 天" FontSize="12" FontWeight="Bold" Foreground="{StaticResource MutedBrush}" VerticalAlignment="Bottom" Margin="4,0,0,4" />
                         <!-- Sleek Flame Vector Path -->
-                        <Path Data="M 6.5,1 C 6.5,1 8,4 6.5,6 C 5.5,4.5 4.5,4 4.5,4 C 3,6 2.5,8.5 2.5,10.5 C 2.5,13.5 5,15.5 8,15.5 C 11,15.5 13.5,13.5 13.5,10.5 C 13.5,6.5 10,4 10,4 C 10,4 10,6 8.5,7 C 8.5,4 6.5,1 6.5,1 Z" Fill="#FF3377" Width="12" Height="14" Stretch="Uniform" VerticalAlignment="Bottom" Margin="4,0,0,5" />
+                        <Path Data="M 6.5,1 C 6.5,1 8,4 6.5,6 C 5.5,4.5 4.5,4 4.5,4 C 3,6 2.5,8.5 2.5,10.5 C 2.5,13.5 5,15.5 8,15.5 C 11,15.5 13.5,13.5 13.5,10.5 C 13.5,6.5 10,4 10,4 C 10,4 10,6 8.5,7 C 8.5,4 6.5,1 6.5,1 Z" Fill="{StaticResource BrandBrush}" Width="12" Height="14" Stretch="Uniform" VerticalAlignment="Bottom" Margin="4,0,0,5" />
                     </StackPanel>
                 </StackPanel>
             </Border>
 
             <!-- Card 3: Sessions Count -->
-            <Border Grid.Column="2" Background="#FFFFFF" BorderBrush="#F1DCE5" BorderThickness="1" CornerRadius="6" Padding="14,12" Margin="4,0,4,0">
+            <Border Grid.Column="2" Background="{StaticResource WhiteBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="6" Padding="14,12" Margin="4,0,4,0">
                 <StackPanel>
-                    <TextBlock Text="打卡场次" FontSize="12" FontWeight="Bold" Foreground="#7C7688" />
+                    <TextBlock Text="打卡场次" FontSize="12" FontWeight="Bold" Foreground="{StaticResource SubBrush}" />
                     <StackPanel Orientation="Horizontal" Margin="0,4,0,0" VerticalAlignment="Bottom">
-                        <TextBlock x:Name="txtTotalSessions" Text="0" FontSize="26" FontWeight="Bold" FontFamily="{StaticResource NumFont}" FontStyle="Italic" Foreground="#3D3A4B" />
-                        <TextBlock Text=" 次" FontSize="12" FontWeight="Bold" Foreground="#B3ACBC" VerticalAlignment="Bottom" Margin="4,0,0,4" />
+                        <TextBlock x:Name="txtTotalSessions" Text="0" FontSize="26" FontWeight="Bold" FontFamily="{StaticResource NumFont}" FontStyle="Italic" Foreground="{StaticResource InkBrush}" />
+                        <TextBlock Text=" 次" FontSize="12" FontWeight="Bold" Foreground="{StaticResource MutedBrush}" VerticalAlignment="Bottom" Margin="4,0,0,4" />
                     </StackPanel>
                 </StackPanel>
             </Border>
 
             <!-- Card 4: Today Minutes -->
-            <Border Grid.Column="3" Background="#FFFFFF" BorderBrush="#F1DCE5" BorderThickness="1" CornerRadius="6" Padding="14,12" Margin="8,0,0,0">
+            <Border Grid.Column="3" Background="{StaticResource WhiteBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="6" Padding="14,12" Margin="8,0,0,0">
                 <StackPanel>
-                    <TextBlock Text="今日时长" FontSize="12" FontWeight="Bold" Foreground="#7C7688" />
+                    <TextBlock Text="今日时长" FontSize="12" FontWeight="Bold" Foreground="{StaticResource SubBrush}" />
                     <StackPanel Orientation="Horizontal" Margin="0,4,0,0" VerticalAlignment="Bottom">
-                        <TextBlock x:Name="txtTodayMinutes" Text="0" FontSize="26" FontWeight="Bold" FontFamily="{StaticResource NumFont}" FontStyle="Italic" Foreground="#34C274" />
-                        <TextBlock Text=" 分钟" FontSize="12" FontWeight="Bold" Foreground="#B3ACBC" VerticalAlignment="Bottom" Margin="4,0,0,4" />
+                        <TextBlock x:Name="txtTodayMinutes" Text="0" FontSize="26" FontWeight="Bold" FontFamily="{StaticResource NumFont}" FontStyle="Italic" Foreground="{StaticResource NormalBrush}" />
+                        <TextBlock Text=" 分钟" FontSize="12" FontWeight="Bold" Foreground="{StaticResource MutedBrush}" VerticalAlignment="Bottom" Margin="4,0,0,4" />
                     </StackPanel>
                 </StackPanel>
             </Border>
@@ -96,7 +96,7 @@
             </Grid.ColumnDefinitions>
 
             <!-- Left: Monthly Calendar -->
-            <Border Grid.Column="0" Background="#FFFFFF" BorderBrush="#F1DCE5" BorderThickness="1" CornerRadius="6" Padding="16">
+            <Border Grid.Column="0" Background="{StaticResource WhiteBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="6" Padding="16">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -108,23 +108,23 @@
                     <!-- Month Switcher with Crisp Chevron Paths -->
                     <Grid Grid.Row="0" Margin="0,0,0,12">
                         <Button x:Name="btnPrevMonth" Click="BtnPrevMonth_Click" Cursor="Hand" Background="Transparent" BorderThickness="0" HorizontalAlignment="Left" Padding="8,4" VerticalAlignment="Center">
-                            <Path Data="M 7,2 L 2,7 L 7,12" Stroke="#7C7688" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Width="7" Height="10" Stretch="Uniform" />
+                            <Path Data="M 7,2 L 2,7 L 7,12" Stroke="{StaticResource SubBrush}" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Width="7" Height="10" Stretch="Uniform" />
                         </Button>
-                        <TextBlock x:Name="txtCurrentMonth" Text="2026 年 9 月" FontSize="15" FontWeight="Bold" Foreground="#3D3A4B" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <TextBlock x:Name="txtCurrentMonth" Text="2026 年 9 月" FontSize="15" FontWeight="Bold" Foreground="{StaticResource InkBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                         <Button x:Name="btnNextMonth" Click="BtnNextMonth_Click" Cursor="Hand" Background="Transparent" BorderThickness="0" HorizontalAlignment="Right" Padding="8,4" VerticalAlignment="Center">
-                            <Path Data="M 2,2 L 7,7 L 2,12" Stroke="#7C7688" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Width="7" Height="10" Stretch="Uniform" />
+                            <Path Data="M 2,2 L 7,7 L 2,12" Stroke="{StaticResource SubBrush}" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Width="7" Height="10" Stretch="Uniform" />
                         </Button>
                     </Grid>
 
                     <!-- Day of Week Headers -->
                     <UniformGrid Grid.Row="1" Columns="7" Margin="0,0,0,8">
-                        <TextBlock Text="一" FontSize="12" FontWeight="Bold" Foreground="#B3ACBC" HorizontalAlignment="Center" />
-                        <TextBlock Text="二" FontSize="12" FontWeight="Bold" Foreground="#B3ACBC" HorizontalAlignment="Center" />
-                        <TextBlock Text="三" FontSize="12" FontWeight="Bold" Foreground="#B3ACBC" HorizontalAlignment="Center" />
-                        <TextBlock Text="四" FontSize="12" FontWeight="Bold" Foreground="#B3ACBC" HorizontalAlignment="Center" />
-                        <TextBlock Text="五" FontSize="12" FontWeight="Bold" Foreground="#B3ACBC" HorizontalAlignment="Center" />
-                        <TextBlock Text="六" FontSize="12" FontWeight="Bold" Foreground="#FF3377" HorizontalAlignment="Center" />
-                        <TextBlock Text="日" FontSize="12" FontWeight="Bold" Foreground="#FF3377" HorizontalAlignment="Center" />
+                        <TextBlock Text="一" FontSize="12" FontWeight="Bold" Foreground="{StaticResource MutedBrush}" HorizontalAlignment="Center" />
+                        <TextBlock Text="二" FontSize="12" FontWeight="Bold" Foreground="{StaticResource MutedBrush}" HorizontalAlignment="Center" />
+                        <TextBlock Text="三" FontSize="12" FontWeight="Bold" Foreground="{StaticResource MutedBrush}" HorizontalAlignment="Center" />
+                        <TextBlock Text="四" FontSize="12" FontWeight="Bold" Foreground="{StaticResource MutedBrush}" HorizontalAlignment="Center" />
+                        <TextBlock Text="五" FontSize="12" FontWeight="Bold" Foreground="{StaticResource MutedBrush}" HorizontalAlignment="Center" />
+                        <TextBlock Text="六" FontSize="12" FontWeight="Bold" Foreground="{StaticResource BrandBrush}" HorizontalAlignment="Center" />
+                        <TextBlock Text="日" FontSize="12" FontWeight="Bold" Foreground="{StaticResource BrandBrush}" HorizontalAlignment="Center" />
                     </UniformGrid>
 
                     <!-- Days Grid -->
@@ -133,48 +133,48 @@
                     <!-- Legend -->
                     <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,0">
                         
-                        <Border Width="12" Height="12" CornerRadius="3" Background="#FFFFFF" BorderBrush="#F1DCE5" BorderThickness="1" Margin="2,0" />
-                        <TextBlock Text="无记录" FontSize="11" Foreground="#B3ACBC" VerticalAlignment="Center" Margin="2,0,8,0" />
+                        <Border Width="12" Height="12" CornerRadius="3" Background="{StaticResource WhiteBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" Margin="2,0" />
+                        <TextBlock Text="无记录" FontSize="11" Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center" Margin="2,0,8,0" />
                         <Border Width="12" Height="12" CornerRadius="3" Background="#FFA3C2" Margin="2,0" />
-                        <TextBlock Text="&lt;30m" FontSize="11" Foreground="#B3ACBC" VerticalAlignment="Center" Margin="2,0,8,0" />
+                        <TextBlock Text="&lt;30m" FontSize="11" Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center" Margin="2,0,8,0" />
                         <Border Width="12" Height="12" CornerRadius="3" Background="#FF5C93" Margin="2,0" />
-                        <TextBlock Text="30-60m" FontSize="11" Foreground="#B3ACBC" VerticalAlignment="Center" Margin="2,0,8,0" />
-                        <Border Width="12" Height="12" CornerRadius="3" Background="#FF3377" Margin="2,0" />
-                        <TextBlock Text="60m+" FontSize="11" Foreground="#B3ACBC" VerticalAlignment="Center" Margin="2,0,0,0" />
+                        <TextBlock Text="30-60m" FontSize="11" Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center" Margin="2,0,8,0" />
+                        <Border Width="12" Height="12" CornerRadius="3" Background="{StaticResource BrandBrush}" Margin="2,0" />
+                        <TextBlock Text="60m+" FontSize="11" Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center" Margin="2,0,0,0" />
                     </StackPanel>
                 </Grid>
             </Border>
 
             <!-- Right: Recent Practice Log -->
-            <Border Grid.Column="2" Background="#FFFFFF" BorderBrush="#F1DCE5" BorderThickness="1" CornerRadius="6" Padding="16">
+            <Border Grid.Column="2" Background="{StaticResource WhiteBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="6" Padding="16">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
-                    <TextBlock Grid.Row="0" Text="练习记录" FontSize="14" FontWeight="Bold" Foreground="#3D3A4B" Margin="0,0,0,12" />
+                    <TextBlock Grid.Row="0" Text="练习记录" FontSize="14" FontWeight="Bold" Foreground="{StaticResource InkBrush}" Margin="0,0,0,12" />
 
                     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                         <ItemsControl x:Name="lstRecentSessions">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate DataType="{x:Type models:PracticeSessionModel}">
-                                    <Border Background="#FFF7FA" BorderBrush="#F7F1F4" BorderThickness="1" CornerRadius="6" Padding="12,8" Margin="0,0,0,8">
+                                    <Border Background="{StaticResource StageBrush}" BorderBrush="#F7F1F4" BorderThickness="1" CornerRadius="6" Padding="12,8" Margin="0,0,0,8">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
                                             <StackPanel Grid.Column="0">
-                                                <TextBlock Text="{Binding SongTitle}" FontSize="13" FontWeight="Bold" Foreground="#3D3A4B" TextTrimming="CharacterEllipsis" />
+                                                <TextBlock Text="{Binding SongTitle}" FontSize="13" FontWeight="Bold" Foreground="{StaticResource InkBrush}" TextTrimming="CharacterEllipsis" />
                                                 <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
-                                                    <TextBlock Text="{Binding Artist}" FontSize="11" Foreground="#B3ACBC" />
-                                                    <TextBlock Text=" · " FontSize="11" Foreground="#B3ACBC" />
-                                                    <TextBlock Text="{Binding DisplayTime}" FontSize="11" Foreground="#B3ACBC" />
+                                                    <TextBlock Text="{Binding Artist}" FontSize="11" Foreground="{StaticResource MutedBrush}" />
+                                                    <TextBlock Text=" · " FontSize="11" Foreground="{StaticResource MutedBrush}" />
+                                                    <TextBlock Text="{Binding DisplayTime}" FontSize="11" Foreground="{StaticResource MutedBrush}" />
                                                 </StackPanel>
                                             </StackPanel>
-                                            <Border Grid.Column="1" Background="#FFF1F5" CornerRadius="6" Padding="8,3" VerticalAlignment="Center">
-                                                <TextBlock Text="{Binding DisplayDuration, Mode=OneWay}" FontSize="11" FontWeight="Bold" FontFamily="{StaticResource NumFont}" FontStyle="Italic" Foreground="#FF3377" />
+                                            <Border Grid.Column="1" Background="{StaticResource WashBrush}" CornerRadius="6" Padding="8,3" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding DisplayDuration, Mode=OneWay}" FontSize="11" FontWeight="Bold" FontFamily="{StaticResource NumFont}" FontStyle="Italic" Foreground="{StaticResource BrandBrush}" />
                                             </Border>
                                         </Grid>
                                     </Border>

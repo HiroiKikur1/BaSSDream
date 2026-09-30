@@ -68,15 +68,7 @@ public class SongModel : System.ComponentModel.INotifyPropertyChanged
 
     public string DisplayTuning => Is5String ? "5弦 [BEADG]" : "4弦 [EADG]";
 
-    public string TierColor => Tier?.ToUpperInvariant() switch
-    {
-        "EASY" => "#3E8BFF",
-        "NORMAL" => "#34C274",
-        "HARD" => "#FFAE1A",
-        "EXPERT" => "#FF4058",
-        "SPECIAL" => "#E04BD6",
-        _ => "#FF3377"
-    };
+    public string TierColor => Services.Palette.Hex(Services.Palette.Tier(Tier));
 
     public string TierBgColor => Tier?.ToUpperInvariant() switch
     {

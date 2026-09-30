@@ -20,7 +20,7 @@
                         <Grid>
                             <Border CornerRadius="12" Background="#40000000" Margin="0,3,0,-3" />
                             <Border CornerRadius="12" Background="#B4B2B6" Padding="1.5">
-                                <Border CornerRadius="10.5" Background="#FFFFFF" Padding="3.5">
+                                <Border CornerRadius="10.5" Background="{StaticResource WhiteBrush}" Padding="3.5">
                                     <Border x:Name="face" CornerRadius="7.5" Background="{TemplateBinding Background}">
                                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,2" />
                                     </Border>
@@ -49,7 +49,7 @@
             </Setter>
         </Style>
         <Style x:Key="ResultButtonPink" TargetType="Button" BasedOn="{StaticResource ResultButton}">
-            <Setter Property="Foreground" Value="#FFFFFF" />
+            <Setter Property="Foreground" Value="{StaticResource WhiteBrush}" />
             <Setter Property="Background">
                 <Setter.Value>
                     <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
@@ -94,14 +94,14 @@
         <Canvas x:Name="summaryPanel" Width="1440" Height="810">
             <!-- cover in place of the card illustration -->
             <Grid Canvas.Left="92" Canvas.Top="150" Width="496" Height="496">
-                <Border Background="#FFFFFF" CornerRadius="4">
+                <Border Background="{StaticResource WhiteBrush}" CornerRadius="4">
                     <Border.Effect>
                         <DropShadowEffect BlurRadius="24" ShadowDepth="0" Opacity="0.45" Color="#1A0F33" />
                     </Border.Effect>
                 </Border>
                 <Border Margin="6" ClipToBounds="True" Background="#E7E1EE">
                     <Grid>
-                        <TextBlock x:Name="txtCoverInitial" FontFamily="{StaticResource RoundFont}" FontWeight="Heavy" FontSize="170" Foreground="#FFFFFF"
+                        <TextBlock x:Name="txtCoverInitial" FontFamily="{StaticResource RoundFont}" FontWeight="Heavy" FontSize="170" Foreground="{StaticResource WhiteBrush}"
                                    HorizontalAlignment="Center" VerticalAlignment="Center" />
                         <Image x:Name="imgCover" Stretch="UniformToFill" />
                     </Grid>
@@ -112,14 +112,14 @@
 
             <!-- results card -->
             <Canvas x:Name="cardResult" Canvas.Left="744" Canvas.Top="232" Width="590" Height="302">
-                <Border Width="590" Height="302" Background="#FFFFFF" CornerRadius="14">
+                <Border Width="590" Height="302" Background="{StaticResource WhiteBrush}" CornerRadius="14">
                     <Border.Effect>
                         <DropShadowEffect BlurRadius="16" ShadowDepth="2" Opacity="0.3" Color="#1A0F33" />
                     </Border.Effect>
                 </Border>
 
                 <Grid Canvas.Left="22" Canvas.Top="18" Width="30" Height="30">
-                    <Ellipse Fill="#FFFFFF" Stroke="#4F504D" StrokeThickness="2.4" />
+                    <Ellipse Fill="{StaticResource WhiteBrush}" Stroke="#4F504D" StrokeThickness="2.4" />
                     <Path Data="{StaticResource StarGeometry}" Fill="#4F504D" Stretch="Uniform" Width="16" Height="15" Margin="0,0,0,1" />
                 </Grid>
                 <TextBlock Canvas.Left="62" Canvas.Top="12" Text="得分" FontSize="26" Style="{StaticResource RoundLabel}" />
@@ -148,7 +148,7 @@
                             <GradientStop Color="#0096F5" Offset="1" />
                         </LinearGradientBrush>
                     </Border.Background>
-                    <TextBlock Text="FAST" FontFamily="{StaticResource RoundFont}" FontWeight="Heavy" FontSize="17" Foreground="#FFFFFF"
+                    <TextBlock Text="FAST" FontFamily="{StaticResource RoundFont}" FontWeight="Heavy" FontSize="17" Foreground="{StaticResource WhiteBrush}"
                                HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,1" />
                 </Border>
                 <TextBlock x:Name="nFast" Canvas.Left="442" Canvas.Top="106" Width="120" Style="{StaticResource Digits}" />
@@ -159,20 +159,20 @@
                             <GradientStop Color="#FD5700" Offset="1" />
                         </LinearGradientBrush>
                     </Border.Background>
-                    <TextBlock Text="SLOW" FontFamily="{StaticResource RoundFont}" FontWeight="Heavy" FontSize="17" Foreground="#FFFFFF"
+                    <TextBlock Text="SLOW" FontFamily="{StaticResource RoundFont}" FontWeight="Heavy" FontSize="17" Foreground="{StaticResource WhiteBrush}"
                                HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,1" />
                 </Border>
                 <TextBlock x:Name="nSlow" Canvas.Left="442" Canvas.Top="143.5" Width="120" Style="{StaticResource Digits}" />
 
                 <!-- MAX COMBO -->
-                <Border Canvas.Left="368" Canvas.Top="184" Width="156" Height="64" CornerRadius="6" BorderBrush="#828282" BorderThickness="1.6" Background="#FFFFFF">
+                <Border Canvas.Left="368" Canvas.Top="184" Width="156" Height="64" CornerRadius="6" BorderBrush="#828282" BorderThickness="1.6" Background="{StaticResource WhiteBrush}">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="21" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <Border Background="#3A3A3A" CornerRadius="4.5,4.5,0,0">
-                            <TextBlock Text="MAX COMBO" FontFamily="{StaticResource RoundFont}" FontWeight="Bold" FontSize="14" Foreground="#FFFFFF"
+                            <TextBlock Text="MAX COMBO" FontFamily="{StaticResource RoundFont}" FontWeight="Bold" FontSize="14" Foreground="{StaticResource WhiteBrush}"
                                        HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
                         <TextBlock Grid.Row="1" x:Name="nCombo" FontFamily="{StaticResource GbpLatin}" FontSize="25" Foreground="#4E4E4E"
@@ -185,13 +185,13 @@
 
             <!-- analysis card (in place of the leaderboard) -->
             <Canvas Canvas.Left="744" Canvas.Top="546" Width="590" Height="86">
-                <Border Width="590" Height="86" Background="#FFFFFF" CornerRadius="12">
+                <Border Width="590" Height="86" Background="{StaticResource WhiteBrush}" CornerRadius="12">
                     <Border.Effect>
                         <DropShadowEffect BlurRadius="16" ShadowDepth="2" Opacity="0.3" Color="#1A0F33" />
                     </Border.Effect>
                 </Border>
                 <Border Canvas.Left="12" Canvas.Top="9" Width="262" Height="28" CornerRadius="14" Background="#40423F">
-                    <TextBlock Text="演奏分析" FontSize="17" Style="{StaticResource RoundLabel}" Foreground="#FFFFFF" VerticalAlignment="Center" Margin="18,0,0,1" />
+                    <TextBlock Text="演奏分析" FontSize="17" Style="{StaticResource RoundLabel}" Foreground="{StaticResource WhiteBrush}" VerticalAlignment="Center" Margin="18,0,0,1" />
                 </Border>
                 <TextBlock Canvas.Left="334" Canvas.Top="10" Text="错音" FontSize="20" Style="{StaticResource RoundLabel}" Foreground="#3F403B" />
                 <TextBlock x:Name="nWrong" Canvas.Left="420" Canvas.Top="11" Width="110" Style="{StaticResource Digits}" FontSize="21" Foreground="#494949" />
@@ -240,7 +240,7 @@
                                             <Setter TargetName="bd" Property="Background" Value="#3A3741" />
                                         </Trigger>
                                         <Trigger Property="Tag" Value="on">
-                                            <Setter TargetName="bd" Property="Background" Value="#FF3377" />
+                                            <Setter TargetName="bd" Property="Background" Value="{StaticResource BrandBrush}" />
                                         </Trigger>
                                         <Trigger Property="IsEnabled" Value="False">
                                             <Setter Property="Opacity" Value="0.45" />
@@ -282,7 +282,7 @@
         </Canvas>
 
         <!-- ============ TOP: title bar + score rank ============ -->
-        <Border Canvas.Left="100" Canvas.Top="74" Width="1106" Height="46" Background="#FFFFFF" CornerRadius="11">
+        <Border Canvas.Left="100" Canvas.Top="74" Width="1106" Height="46" Background="{StaticResource WhiteBrush}" CornerRadius="11">
             <Border.Effect>
                 <DropShadowEffect BlurRadius="10" ShadowDepth="1.5" Opacity="0.28" Color="#1A0F33" />
             </Border.Effect>
@@ -293,7 +293,7 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <Path Data="{StaticResource StarGeometry}" Width="30" Height="29" Stretch="Uniform" Stroke="#FFFFFF" StrokeThickness="1.6"
+                <Path Data="{StaticResource StarGeometry}" Width="30" Height="29" Stretch="Uniform" Stroke="{StaticResource WhiteBrush}" StrokeThickness="1.6"
                       StrokeLineJoin="Round" VerticalAlignment="Center" Margin="0,0,0,1">
                     <Path.Fill>
                         <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
@@ -306,7 +306,7 @@
                     </Path.Effect>
                 </Path>
                 <Border Grid.Column="1" x:Name="bdTier" Margin="12,0,0,0" Height="25" Padding="7,0" CornerRadius="3" VerticalAlignment="Center">
-                    <TextBlock x:Name="txtTier" FontFamily="{StaticResource GbpLatin}" FontWeight="Bold" FontSize="17" Foreground="#FFFFFF" VerticalAlignment="Center" />
+                    <TextBlock x:Name="txtTier" FontFamily="{StaticResource GbpLatin}" FontWeight="Bold" FontSize="17" Foreground="{StaticResource WhiteBrush}" VerticalAlignment="Center" />
                 </Border>
                 <TextBlock Grid.Column="2" x:Name="txtTitle" FontFamily="{StaticResource GbpLatin}" FontSize="24" Foreground="#494B4B"
                            VerticalAlignment="Center" Margin="16,0,16,1" TextTrimming="CharacterEllipsis" />
