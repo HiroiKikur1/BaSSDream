@@ -4,6 +4,7 @@
 tabs/
 cache/
 tools/
+!.claude/skills/design-craft/tools/
 snapshots/
 incoming/
 scores/
@@ -91,6 +92,7 @@ roselia_new.png
 # project skills are shared; local settings stay private
 .claude/*
 !.claude/skills/
+!.claude/agents/
 .vscode/
 .idea/
 .vs/
@@ -98,3 +100,8 @@ roselia_new.png
 
 # machine-specific paths (see bassdream.example.json)
 bassdream.json
+
+# design lab: fetched fonts and render outputs stay local
+design-lab/fonts/
+design-lab/node_modules/
+design-lab/studies/*/out/
