@@ -19,3 +19,6 @@ always_on: true
 ## 5. 界面设计准则
 - 设计或修改任何界面前，先读 `.claude/skills/human-made-ui/SKILL.md`。
 - 做新界面、改版或探索视觉方向：按 `.claude/skills/design-lab/SKILL.md` 在 `design-lab/` 里先做小样、渲染、评审，用户批准后再改产品代码。通用设计原理和工具在 `.claude/skills/design-craft/`。
+
+## 6. 本机与云端同步
+- 按 `docs/本机与云端同步.md`：只合并、不覆盖；合并前先把未提交的改动提交并推送；交接前推送；云端会话开始时先 `git fetch`，从最新的分支起步（`main` 落后时看 HANDOVER 末节记的分支）。

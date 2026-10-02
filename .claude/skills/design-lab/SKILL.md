@@ -60,7 +60,7 @@ T 指 `.claude/skills/design-craft/tools`。
 
 1. 填 `brief.md`：这一屏回答哪些问题，它在现实里是什么，素材和参考有哪些，以及**默认答案**（一个没想过的 AI 会怎么做）。
 2. 读 `seeds.md` 和相关参考图，从种子长，不另起炉灶。这一段不读反面目录。
-3. 做三个以上空间逻辑不同的方向。每版都渲染出来，自己用 Read 看：
+3. 做三个以上空间逻辑不同的方向。每个方向先在 brief 里起名、写四到六句宣言，再画。每版都渲染出来，自己用 Read 看：
    `node T/render.cjs studies/x/a.html studies/x/out/a.png`，细节加 `--scale 2`，动效加 `--frames 0,120,240,480`。
 4. 曲绘取色：`python T/palette.py <曲绘>`。
 
@@ -70,7 +70,7 @@ T 指 `.claude/skills/design-craft/tools`。
 6. 对比图：`python T/sheet.py studies/x/sheet.png <参考...> studies/x/out/*.png --notan`，自己先看。
 7. 用 Agent 工具启动 `design-critic` 子代理，只给它图片路径和一句这一屏是做什么的，不给你的设计理由。
 8. 读 design-craft 的诊断词典、反面目录和清单，再读 `rejected.md`。每条命中要么改，要么在 `critique.md` 写一句理由。每轮至少删一样东西。
-9. 重复 3–8，直到你自己愿意把它放到参考旁边。
+9. 重复 3–8，直到你自己愿意把它放到参考旁边。最后做一轮只精修、不加东西的打磨（design-craft `references/process.md`）。
 
 **第三段：交给用户**
 
@@ -83,5 +83,15 @@ T 指 `.claude/skills/design-craft/tools`。
 13. 在 Windows 上截真实界面：`BassStation.exe --render-song out.png` 等（全部入口见 `src-native/DebugTools/RenderHarness.cs`）。
 14. 叠比：`python T/overlay.py studies/x/out/a.png out.png studies/x/out/a-vs-wpf.png`，差异逐条处理。WPF 做不到的效果，回到小样里找一个能做到的等价做法，不要悄悄删掉。
 15. 气味报告：`python T/xaml_lint.py src-native/Views/<改动的文件>`。新增的命中要么改，要么写理由。存量问题不在这次范围内。
+
+## 5. 可以配合的 skill 和连接器
+
+这些在用户账号里可能已经装了，有就用：
+
+- **canvas-design**：单张视觉（开机画面、背景板、结算页插画、海报式的空状态）。它“先写美学宣言、再画、再精修”的做法就是本流程第一段的来源。
+- **algorithmic-art**：生成式纹理、背景、粒子、节拍可视化的动态部分（p5.js，带种子，可复现）。它的查看器模板是 Anthropic 品牌样式，只用来调参数，不要把那套样式带进产品。
+- **Canva 连接器**（generate-image 等）：做情绪板、找纹理和氛围。生成的图默认很通用，只当参考，不直接进产品；不要用它生成乐队或角色形象。
+- **theme-factory、web-artifacts-builder（shadcn/ui）**：预设主题和组件库的默认外观正是“默认答案”的来源，不用于产品界面的设计。做内部文档或调试页面可以用。
+- 用户在本机装的设计插件只在本机会话里可见；云端会话看不到的不要假设存在。
 
 云端容器跑不了 WPF：第 13–14 步只能在 Windows 上做。在云端改了 WPF，要明确告诉用户“未截图验证”。

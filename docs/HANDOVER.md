@@ -840,3 +840,5 @@ cd backend && python -c "from tab_scanner import scan_all_tabs; scan_all_tabs(fo
   - `design-lab/`：setup 脚本（云端 `setup.sh`、Windows `setup.ps1`）、字体库清单 `fonts.txt`、参考库 `refs/`、`seeds.md`、`rejected.md`、study 模板。
 - human-made-ui 改动：millsage 的通用拆解移到 design-craft，只留本项目的用法；接触影的颜色由“黑色”改为带色相的深色，和 design-craft 一致。
 - `xaml_lint.py` 对现有 `src-native` 的报告（存量，未改）：238 处字面色值、7 处发散或零偏移阴影、17 个英文大写标签（多为 PERFECT/GREAT 等判定字和 FAST/SLOW，属游戏约定，可保留）、20 种圆角、27 种字号（相邻档差小于 1.15 倍的很多）。界面保持现状，这些只作为以后改版时的参考。
+- 2026-10-02 补充：吸收 canvas-design / algorithmic-art 的做法（每个方向先起名、写宣言再画；隐性引用；精修轮只精修不加东西），列出可配合的 skill 与 Canva 连接器的用途和边界。
+- **同步**：GitHub 上 `main → claude/nifty-hamilton-smvkn0 → claude/vigilant-keller-9cge3v → design-lab` 是一条直线，`design-lab` 含云端全部成果。本机对齐步骤见 `docs/本机与云端同步.md`（先推本机未提交改动到 `local-wip`，再合并 `origin/design-lab`）。
