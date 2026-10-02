@@ -1,4 +1,5 @@
 """Value-structure (notan) + tone audit for UI screenshots.
+(The targets below are starting points: compare with a reference the user approved, not with the numbers alone.)
 
 usage: python notan.py OUTDIR IMAGE [IMAGE ...]
 

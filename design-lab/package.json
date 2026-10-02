@@ -1,0 +1,8 @@
+{
+  "name": "bassdream-design-lab",
+  "private": true,
+  "description": "Rendering for design mocks (see ../.claude/skills/design-lab/SKILL.md)",
+  "dependencies": {
+    "playwright-core": "1.56.1"
+  }
+}

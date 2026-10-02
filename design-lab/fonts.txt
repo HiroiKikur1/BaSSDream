@@ -1,0 +1,38 @@
+# 设计工作台的字体库（Google Fonts，OFL）。python ../.claude/skills/design-craft/tools/fonts.py fonts.txt fonts --install
+# 选字按题材的世界选（design-craft references/typography.md）；这里只是让手边有得选，不是推荐清单。
+# 项目自带的思源圆体在 assets/fonts/（ResourceHanRoundedCN），小样里用 @font-face 指过去。
+
+# 明朝 / 宋（印刷、唱片内页、歌词本）
+Shippori Mincho:500;700;800
+Zen Old Mincho:400;700;900
+Noto Serif SC:500;700;900
+# 圆体 / 黑体（游戏 UI、标签）
+Zen Maru Gothic:500;700;900
+M PLUS Rounded 1c:500;700;800
+Zen Kaku Gothic New:500;700;900
+Noto Sans SC:400;500;700;900
+# 有性格的标题字
+Dela Gothic One
+RocknRoll One
+Mochiy Pop One
+Kaisei Decol:500;700
+ZCOOL QingKe HuangYou
+ZCOOL XiaoWei
+LXGW WenKai TC:400;700
+# 像素
+DotGothic16
+Pixelify Sans:400;700
+Silkscreen:400;700
+# 拉丁数字与标题（计数、拍号、速度）
+Barlow Condensed:500;600;700;800
+Barlow:400;500;600;700
+Oswald:500;600;700
+Bebas Neue
+Archivo Narrow:500;700
+Cormorant Garamond:500;600;700
+Bodoni Moda:500;700
+# 等宽
+JetBrains Mono:400;600
+IBM Plex Mono:400;600
+# 音乐记号（♩ 𝄞 𝄢 ♯ ♭）
+Noto Music

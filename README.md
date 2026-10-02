@@ -36,7 +36,9 @@ BaSSDream/
 ├── src-native/       # WPF (.NET 10 C#) 原生客户端工程
 ├── assets/           # 乐队图标、Logo、字体与视觉资源
 ├── docs/             # 交接文档（HANDOVER.md）、架构方案与排查清单
-├── .claude/skills/   # 界面设计准则 human-made-ui（改界面前先读）
+├── .claude/skills/   # 界面准则 human-made-ui（改界面前先读）、通用设计学 design-craft、设计工作台流程 design-lab
+├── .claude/agents/   # design-critic：只看图的设计评审子代理
+├── design-lab/       # 设计工作台：小样、参考库、种子与反面清单、字体库清单、setup 脚本
 └── bassdream.example.json  # 本机路径配置模板（复制为 bassdream.json）
 ```
 

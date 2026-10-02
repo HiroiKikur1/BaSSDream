@@ -828,3 +828,15 @@ cd backend && python -c "from tab_scanner import scan_all_tabs; scan_all_tabs(fo
 ### 25.5 已知问题
 - `backend/ai_transcriber.py` 约 784 行引用未定义的 `min_allowed_midi`（旧版扒谱器，此前就存在）：走到 PYIN 下 19 半音修正分支时会 NameError。
 
+
+## 26. 2026-10-02：设计工作台（`design-lab` 分支）
+
+- 用户的问题：同一个模型做视频（millsage 节拍/歌词可视化）审美很好，做应用界面却是“AI 味”。结论：做应用时看不到渲染结果、第一版就交、注意力被功能占满、没有素材、被 WPF 限制、只有禁令没有参照。详见 `.claude/skills/design-craft/references/process.md`。
+- 解决办法是“放开风格、收紧证据”：创作段只读事实、素材、参考和总纲，先写下默认答案再绕开它，做三个以上方向，每版都渲染出来看；审查段跑审计、拼对比图、交给 `design-critic` 子代理（只看图），对照反面目录逐条改或写理由；用户判活死；批准后翻译成 WPF，用 `--render-*` 截图和小样叠比。
+- 新增：
+  - `.claude/skills/design-craft/`：另一会话写的通用设计学，原样导入后合入 millsage 拆解（`references/music-ui.md`）、过程方法（`references/process.md`），并加了工具：`render.cjs`（出图，同时报告实际画出的字体、字号、圆角、阴影）、`sheet.py`、`palette.py`、`overlay.py`、`xaml_lint.py`、`fonts.py`。
+  - `.claude/skills/design-lab/`：本项目的工作台流程，硬约束只有 5 条（文案、固定令牌、官方素材、现有界面保持现状、框架稳定）。
+  - `.claude/agents/design-critic.md`。
+  - `design-lab/`：setup 脚本（云端 `setup.sh`、Windows `setup.ps1`）、字体库清单 `fonts.txt`、参考库 `refs/`、`seeds.md`、`rejected.md`、study 模板。
+- human-made-ui 改动：millsage 的通用拆解移到 design-craft，只留本项目的用法；接触影的颜色由“黑色”改为带色相的深色，和 design-craft 一致。
+- `xaml_lint.py` 对现有 `src-native` 的报告（存量，未改）：238 处字面色值、7 处发散或零偏移阴影、17 个英文大写标签（多为 PERFECT/GREAT 等判定字和 FAST/SLOW，属游戏约定，可保留）、20 种圆角、27 种字号（相邻档差小于 1.15 倍的很多）。界面保持现状，这些只作为以后改版时的参考。

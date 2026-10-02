@@ -18,3 +18,4 @@ always_on: true
 
 ## 5. 界面设计准则
 - 设计或修改任何界面前，先读 `.claude/skills/human-made-ui/SKILL.md`。
+- 做新界面、改版或探索视觉方向：按 `.claude/skills/design-lab/SKILL.md` 在 `design-lab/` 里先做小样、渲染、评审，用户批准后再改产品代码。通用设计原理和工具在 `.claude/skills/design-craft/`。
