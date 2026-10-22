@@ -198,7 +198,8 @@ def run_song(args):
         os.path.join(LABELS, key + ".json")) else m
     ref = [(n["time"], n["midi"]) for n in lab["notes"] if not n.get("grace") and not n.get("dead")]
     en = [(est_t(n.qpos), n.midi) for n in est.notes if not n.grace and not n.dead]
-    r["note_f1"], _ = f1_events(ref, en, 0.05)
+    r["note_f1"], r["note_hit"] = f1_events(ref, en, 0.05)
+    r["n_ref"], r["n_est"] = len(ref), len(en)        # counts for pooled F1 / bootstrap (score_ci.py)
     r["onset_f1"], _ = f1_events([(t, None) for t, _ in ref], [(t, None) for t, _ in en], 0.05)
     cb = compare_bars(gt_score_bars(m, gt, qm), score_bars(est, qmap=est_t))
     r["notation_acc"], r["barline"] = cb["notation_note_acc"], cb["barline"]
